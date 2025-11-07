@@ -3,11 +3,12 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Waves, ArrowLeft } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useUser } from "@/contexts/UserContext";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import stackdLogo from "@/assets/stackd-logo.png";
 import { cn } from "@/lib/utils";
 
 const VendorSignup = () => {
@@ -109,8 +110,8 @@ const VendorSignup = () => {
         
         <Card className="w-full p-8 space-y-6">
         <div className="text-center space-y-2">
-          <Link to="/" className="inline-flex items-center gap-2 mb-4">
-            <Waves className="h-8 w-8 text-primary" />
+          <Link to="/" className="inline-flex items-center gap-3 mb-4">
+            <img src={stackdLogo} alt="stackd logo" className="h-10 w-10" />
             <h1 className="text-3xl font-bold">stackd</h1>
           </Link>
           <h2 className="text-2xl font-semibold">Vendor Sign Up</h2>

@@ -3,8 +3,9 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Waves, Calendar, Clock, Users, ArrowLeft } from "lucide-react";
+import { Calendar, Clock, Users, ArrowLeft } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import stackdLogo from "@/assets/stackd-logo.png";
 
 const Booking = () => {
   const navigate = useNavigate();
@@ -21,7 +22,7 @@ const Booking = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <Link to="/" className="flex items-center gap-2">
-              <Waves className="h-6 w-6 text-primary" />
+              <img src={stackdLogo} alt="stackd logo" className="h-8 w-8" />
               <span className="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                 stackd
               </span>

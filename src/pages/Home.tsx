@@ -2,12 +2,13 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Waves, Briefcase, User, Search, Star } from "lucide-react";
+import { Briefcase, User, Search, Star } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useUser } from "@/contexts/UserContext";
 import { useEffect, useState } from "react";
 import { experiences } from "@/data/mockData";
 import heroImage from "@/assets/hero-beach.jpg";
+import stackdLogo from "@/assets/stackd-logo.png";
 
 const categories = [
   { id: "all", name: "All Experiences", icon: "✨" },
@@ -62,7 +63,8 @@ const Home = () => {
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 sm:py-32">
           <div className="text-center space-y-8">
-            <div className="inline-flex items-center gap-2 mb-4">
+            <div className="inline-flex items-center gap-3 mb-4">
+              <img src={stackdLogo} alt="stackd logo" className="h-14 w-14 sm:h-16 sm:w-16" />
               <h1 className="text-5xl sm:text-6xl font-bold font-display bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent">
                 stackd
               </h1>
