@@ -56,7 +56,7 @@ const Home = () => {
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         <div
-          className="absolute inset-0 bg-cover bg-center opacity-40"
+          className="absolute inset-0 bg-cover bg-top opacity-40"
           style={{ backgroundImage: `url(${heroImage})` }}
         />
         <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-background/50 to-background/70" />
