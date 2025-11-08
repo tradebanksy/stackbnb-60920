@@ -33,13 +33,13 @@ const getExperienceImage = (experience) => {
     8: "https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?w=800&auto=format&fit=crop", // Luxury boat
     9: "https://images.unsplash.com/photo-1527786356703-4b100091cd2c?w=800&auto=format&fit=crop", // Zip line adventure
     10: "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?w=800&auto=format&fit=crop", // Horseback beach
-    11: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&auto=format&fit=crop", // Scuba underwater
+    11: "https://images.unsplash.com/photo-1544551763-77ef2d0cfc6c?w=800&auto=format&fit=crop", // Scuba underwater
     12: "https://images.unsplash.com/photo-1551632811-561732d1e306?w=800&auto=format&fit=crop", // Mountain trail
     13: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&auto=format&fit=crop", // Parasailing
     14: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&auto=format&fit=crop", // Beach yoga
-    15: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&auto=format&fit=crop", // Deep sea fishing
+    15: "https://images.unsplash.com/photo-1566412777355-dc6e9fc0f9d6?w=800&auto=format&fit=crop", // Deep sea fishing
     16: "https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=800&auto=format&fit=crop", // Cooking class
-    17: "https://images.unsplash.com/photo-1498978441726-0fc8df1ec72e?w=800&auto=format&fit=crop", // Hot air balloon
+    17: "https://images.unsplash.com/photo-1479245415506-4abeec913180?w=800&auto=format&fit=crop", // Hot air balloon
     18: "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=800&auto=format&fit=crop", // Wine tasting
   };
   return imageMap[experience.id] || imageMap[1];
