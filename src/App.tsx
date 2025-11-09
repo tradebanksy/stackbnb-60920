@@ -45,6 +45,7 @@ import HostActiveVendors from "./pages/HostActiveVendors";
 import HostEarnings from "./pages/HostEarnings";
 import HostRatings from "./pages/HostRatings";
 import VendorRatings from "./pages/VendorRatings";
+import AppView from "./pages/AppView";
 
 
 // Protected route component for hosts
@@ -90,6 +91,7 @@ const ProtectedVendorRoute = ({ children }: { children: React.ReactNode }) => {
 const AppRoutes = () => (
   <Routes>
     <Route path="/" element={<Home />} />
+    <Route path="/appview" element={<AppView />} />
     
     {/* Guest/Public Routes */}
     <Route path="/explore" element={<Explore />} />

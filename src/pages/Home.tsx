@@ -125,6 +125,10 @@ const Home = () => {
               <Button asChild variant="gradient" size="lg">
                 <Link to="/signup/vendor">I'm a Vendor</Link>
               </Button>
+              
+              <Button asChild variant="outline" size="lg">
+                <Link to="/appview">Preview App View</Link>
+              </Button>
             </div>
 
             <p className="text-sm text-muted-foreground pt-4">
