@@ -124,12 +124,24 @@ const AppView = () => {
           </div>
           
           {/* Search Bar */}
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input 
-              placeholder="Search experiences..." 
-              className="pl-10 bg-background"
-            />
+          <div className="relative group">
+            {/* Shadow layers for 3D effect */}
+            <div className="absolute -inset-1 bg-gradient-to-r from-orange-500 to-pink-500 rounded-full blur opacity-25 group-hover:opacity-40 transition duration-300"></div>
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-orange-400 to-pink-400 rounded-full blur-sm opacity-20 group-hover:opacity-30 transition duration-300"></div>
+
+            {/* Main search container */}
+            <div className="relative bg-card rounded-full shadow-2xl border border-border/50 backdrop-blur-sm overflow-hidden hover:shadow-3xl transition-all duration-300">
+              <div className="flex items-center px-6 py-3 gap-3">
+                <Search className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                <Input
+                  placeholder="Search experiences..."
+                  className="border-0 bg-transparent text-base shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 px-0"
+                />
+                <button className="bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white rounded-full p-2 flex-shrink-0 transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg">
+                  <Search className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </header>
@@ -387,19 +399,9 @@ const AppView = () => {
       {/* Bottom Navigation */}
       <nav className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-sm border-t border-border z-50 shadow-lg">
         <div className="max-w-[450px] mx-auto flex justify-around items-center h-16">
-          <Link to="/appview" className="flex flex-col items-center justify-center flex-1 h-full gap-1 text-foreground">
-            <Search className="h-5 w-5" />
-            <span className="text-[10px] font-medium">Explore</span>
-          </Link>
-
           <Link to="/appview" className="flex flex-col items-center justify-center flex-1 h-full gap-1 text-muted-foreground">
             <Heart className="h-5 w-5" />
             <span className="text-[10px]">Wishlists</span>
-          </Link>
-
-          <Link to="/appview" className="flex flex-col items-center justify-center flex-1 h-full gap-1 text-muted-foreground">
-            <Calendar className="h-5 w-5" />
-            <span className="text-[10px]">Trips</span>
           </Link>
 
           <Link to="/appview" className="relative flex flex-col items-center justify-center flex-1 h-full gap-1 text-muted-foreground">
