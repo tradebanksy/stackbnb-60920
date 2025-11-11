@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Send, Loader2 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import ReactMarkdown from "react-markdown";
 
 interface Message {
   role: "user" | "assistant";
@@ -26,7 +27,7 @@ const TripPlannerChat = () => {
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Always scroll to bottom when messages update
+  // Scroll to bottom whenever messages change
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
@@ -122,7 +123,7 @@ const TripPlannerChat = () => {
           <div className="w-10" />
         </div>
 
-        {/* Messages */}
+        {/* Chat area */}
         <ScrollArea ref={scrollRef} className="flex-1 p-4">
           <div className="space-y-4">
             {messages.map((m, i) => (
@@ -133,13 +134,22 @@ const TripPlannerChat = () => {
                 }`}
               >
                 <Card
-                  className={`max-w-[80%] p-3 text-sm whitespace-pre-wrap ${
+                  className={`max-w-[80%] p-3 text-sm ${
                     m.role === "user"
                       ? "bg-gradient-to-r from-orange-500 to-pink-500 text-white"
                       : "bg-muted"
                   }`}
                 >
-                  {m.content}
+                  {/* Render markdown here */}
+                  <ReactMarkdown
+                    className={
+                      m.role === "assistant"
+                        ? "prose prose-sm prose-neutral dark:prose-invert"
+                        : ""
+                    }
+                  >
+                    {m.content}
+                  </ReactMarkdown>
                 </Card>
               </div>
             ))}
@@ -153,7 +163,7 @@ const TripPlannerChat = () => {
           </div>
         </ScrollArea>
 
-        {/* Input */}
+        {/* Input bar */}
         <div className="p-4 border-t">
           <form
             onSubmit={(e) => {
