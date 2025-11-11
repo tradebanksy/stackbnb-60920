@@ -46,6 +46,9 @@ import HostEarnings from "./pages/HostEarnings";
 import HostRatings from "./pages/HostRatings";
 import VendorRatings from "./pages/VendorRatings";
 import AppView from "./pages/AppView";
+import Auth from "./pages/Auth";
+import Profile from "./pages/Profile";
+import TripPlannerChat from "./pages/TripPlannerChat";
 
 
 // Protected route component for hosts
@@ -100,6 +103,9 @@ const AppRoutes = () => (
     <Route path="/booking/:id/payment" element={<PaymentPage />} />
     <Route path="/booking/:id/confirmed" element={<BookingConfirmation />} />
     <Route path="/storefront/:hostId" element={<HostStorefront />} />
+    <Route path="/auth" element={<Auth />} />
+    <Route path="/profile" element={<Profile />} />
+    <Route path="/trip-planner-chat" element={<TripPlannerChat />} />
     
     {/* Legacy routes */}
     <Route path="/storefront/:id" element={<Storefront />} />

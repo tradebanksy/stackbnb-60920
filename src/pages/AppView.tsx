@@ -129,7 +129,7 @@ const AppView = () => {
             </h1>
           </div>
           
-          {/* Search Bar */}
+          {/* Enhanced Search Bar with City and Zip */}
           <div className="relative group">
             {/* Shadow layers for 3D effect */}
             <div className="absolute -inset-1 bg-gradient-to-r from-orange-500 to-pink-500 rounded-full blur opacity-25 group-hover:opacity-40 transition duration-300"></div>
@@ -139,10 +139,19 @@ const AppView = () => {
             <div className="relative bg-card rounded-full shadow-2xl border border-border/50 backdrop-blur-sm overflow-hidden hover:shadow-3xl transition-all duration-300">
               <div className="flex items-center px-6 py-3 gap-3">
                 <Search className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                <Input
-                  placeholder="Search experiences..."
-                  className="border-0 bg-transparent text-base shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 px-0"
-                />
+                <div className="flex-1 flex items-center gap-2">
+                  <input
+                    type="text"
+                    placeholder="City"
+                    className="flex-1 bg-transparent border-none outline-none text-sm placeholder:text-muted-foreground"
+                  />
+                  <div className="h-4 w-px bg-border"></div>
+                  <input
+                    type="text"
+                    placeholder="Zip"
+                    className="w-20 bg-transparent border-none outline-none text-sm placeholder:text-muted-foreground"
+                  />
+                </div>
                 <button className="bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white rounded-full p-2 flex-shrink-0 transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg">
                   <Search className="h-4 w-4" />
                 </button>
@@ -273,48 +282,32 @@ const AppView = () => {
               </section>
             )}
 
-            {/* Restaurants Near You Row */}
+            {/* Restaurants Near You - Actual local restaurants */}
             <section className="space-y-3">
               <div className="px-4">
                 <h2 className="text-lg font-semibold">Restaurants Near You</h2>
               </div>
               <ScrollArea className="w-full whitespace-nowrap">
                 <div className="flex gap-4 px-4 pb-4">
-                  {nearbyRestaurants.map((restaurant) => (
-                    <Link
+                  {[
+                    { id: 'r1', name: "The Ocean View", cuisine: "Seafood", rating: 4.8, price: "$$$", image: diningImg },
+                    { id: 'r2', name: "Sunset Grill", cuisine: "American", rating: 4.6, price: "$$", image: diningImg },
+                    { id: 'r3', name: "La Bella Italia", cuisine: "Italian", rating: 4.9, price: "$$$$", image: diningImg },
+                    { id: 'r4', name: "Spice Garden", cuisine: "Asian Fusion", rating: 4.7, price: "$$", image: diningImg },
+                    { id: 'r5', name: "The Steakhouse", cuisine: "Steakhouse", rating: 4.8, price: "$$$$", image: diningImg },
+                  ].map((restaurant) => (
+                    <div
                       key={restaurant.id}
-                      to={`/experience/${restaurant.id}`}
-                      className="flex-shrink-0 w-[200px] group"
+                      className="flex-shrink-0 w-[200px] group cursor-pointer"
                     >
                       <div className="space-y-2">
                         <div className="relative aspect-square overflow-hidden rounded-xl">
                           <div
                             className="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-500"
                             style={{
-                              backgroundImage: `url(${getExperienceImage(restaurant)})`,
+                              backgroundImage: `url(${restaurant.image})`,
                             }}
                           />
-                          
-                          <button
-                            onClick={(e) => toggleFavorite(restaurant.id, e)}
-                            className="absolute top-2 right-2 z-10 p-1.5 rounded-full hover:scale-110 active:scale-95 transition-transform"
-                          >
-                            <Heart
-                              className={`h-5 w-5 transition-all drop-shadow-md ${
-                                favorites.includes(restaurant.id)
-                                  ? "fill-red-500 text-red-500"
-                                  : "fill-black/50 text-white stroke-white stroke-2"
-                              }`}
-                            />
-                          </button>
-
-                          {restaurant.rating >= 4.8 && (
-                            <div className="absolute top-2 left-2 z-10">
-                              <Badge className="bg-white/95 text-foreground backdrop-blur-sm shadow-sm text-[10px] px-2 py-0.5 border-0">
-                                Guest favorite
-                              </Badge>
-                            </div>
-                          )}
                         </div>
 
                         <div className="space-y-0.5">
@@ -322,18 +315,18 @@ const AppView = () => {
                             {restaurant.name}
                           </h3>
                           <p className="text-xs text-muted-foreground line-clamp-1">
-                            {restaurant.vendor}
+                            {restaurant.cuisine}
                           </p>
-                          <p className="text-xs text-muted-foreground">
-                            ★ {restaurant.rating} · {restaurant.duration}
-                          </p>
-                          <div className="pt-0.5">
-                            <span className="text-sm font-semibold">${restaurant.price}</span>
-                            <span className="text-xs text-muted-foreground"> per person</span>
+                          <div className="flex items-center justify-between pt-0.5">
+                            <div className="flex items-center gap-1">
+                              <span className="text-xs">★</span>
+                              <span className="text-xs font-medium">{restaurant.rating}</span>
+                            </div>
+                            <span className="text-xs font-medium">{restaurant.price}</span>
                           </div>
                         </div>
                       </div>
-                    </Link>
+                    </div>
                   ))}
                 </div>
                 <ScrollBar orientation="horizontal" className="h-3" />
@@ -475,7 +468,7 @@ const AppView = () => {
       {/* Bottom Navigation */}
       <nav className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-sm border-t border-border z-50 shadow-lg">
         <div className="max-w-[450px] mx-auto flex justify-around items-center h-16">
-          <button 
+          <button
             onClick={() => setViewMode('wishlists')}
             className={`relative flex flex-col items-center justify-center flex-1 h-full gap-1 ${
               viewMode === 'wishlists' ? 'text-foreground' : 'text-muted-foreground'
@@ -490,23 +483,18 @@ const AppView = () => {
             )}
           </button>
 
-          <button 
-            onClick={() => setViewMode('explore')}
-            className={`flex flex-col items-center justify-center flex-1 h-full gap-1 ${
-              viewMode === 'explore' ? 'text-foreground' : 'text-muted-foreground'
-            }`}
+          <Link 
+            to="/trip-planner-chat"
+            className="relative flex flex-col items-center justify-center flex-1 h-full gap-1 text-muted-foreground hover:text-foreground transition-colors"
           >
-            <Search className="h-5 w-5" />
-            <span className={`text-[10px] ${viewMode === 'explore' ? 'font-medium' : ''}`}>Explore</span>
-          </button>
-
-          <Link to="/appview" className="relative flex flex-col items-center justify-center flex-1 h-full gap-1 text-muted-foreground">
             <MessageCircle className="h-5 w-5" />
-            <div className="absolute top-2 right-1/4 h-2 w-2 bg-gradient-to-r from-orange-500 to-pink-500 rounded-full"></div>
             <span className="text-[10px]">Messages</span>
           </Link>
 
-          <Link to="/appview" className="flex flex-col items-center justify-center flex-1 h-full gap-1 text-muted-foreground">
+          <Link 
+            to="/profile"
+            className="flex flex-col items-center justify-center flex-1 h-full gap-1 text-muted-foreground hover:text-foreground transition-colors"
+          >
             <User className="h-5 w-5" />
             <span className="text-[10px]">Profile</span>
           </Link>
