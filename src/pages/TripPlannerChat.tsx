@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Send, Loader2 } from "lucide-react";
+import { ArrowLeft, Send } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface Message {
@@ -18,21 +18,54 @@ const TripPlannerChat = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: "Hello! I'm your AI travel assistant. I can help you discover amazing restaurants and excursions for your trip. Where are you planning to visit?",
+      content:
+        "🌴 Hello! I'm JC, your AI travel assistant. I can help you discover amazing restaurants and excursions for your trip. Where are you planning to visit?",
     },
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, isTyping]);
 
   const scrollToBottom = () => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
+  };
+
+  // 🧠 Smart typing animation based on message length
+  const typeOutMessage = (fullText: string) => {
+    return new Promise<void>((resolve) => {
+      setIsTyping(true);
+      let index = 0;
+
+      // Dynamically adjust typing speed by message length
+      const length = fullText.length;
+      let speed = 20; // default
+      if (length < 80) speed = 10;
+      else if (length < 300) speed = 20;
+      else speed = 35;
+
+      setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
+
+      const interval = setInterval(() => {
+        setMessages((prev) => {
+          const updated = [...prev];
+          updated[updated.length - 1].content = fullText.slice(0, index);
+          return updated;
+        });
+        index++;
+        if (index > fullText.length) {
+          clearInterval(interval);
+          setIsTyping(false);
+          resolve();
+        }
+      }, speed);
+    });
   };
 
   const sendMessage = async () => {
@@ -64,105 +97,74 @@ const TripPlannerChat = () => {
         throw new Error("Failed to get response");
       }
 
-      const reader = response.body?.getReader();
-      if (!reader) throw new Error("No reader available");
+      const data = await response.json();
+      const assistantMessage = data?.reply || "I'm here to help! Can you try again?";
 
-      const decoder = new TextDecoder();
-      let textBuffer = "";
-      let assistantContent = "";
-      let streamDone = false;
-
-      setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
-
-      while (!streamDone) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        textBuffer += decoder.decode(value, { stream: true });
-
-        let newlineIndex: number;
-        while ((newlineIndex = textBuffer.indexOf("\n")) !== -1) {
-          let line = textBuffer.slice(0, newlineIndex);
-          textBuffer = textBuffer.slice(newlineIndex + 1);
-
-          if (line.endsWith("\r")) line = line.slice(0, -1);
-          if (line.startsWith(":") || line.trim() === "") continue;
-          if (!line.startsWith("data: ")) continue;
-
-          const jsonStr = line.slice(6).trim();
-          if (jsonStr === "[DONE]") {
-            streamDone = true;
-            break;
-          }
-
-          try {
-            const parsed = JSON.parse(jsonStr);
-            const content = parsed.choices?.[0]?.delta?.content as string | undefined;
-            if (content) {
-              assistantContent += content;
-              setMessages((prev) => {
-                const newMessages = [...prev];
-                newMessages[newMessages.length - 1].content = assistantContent;
-                return newMessages;
-              });
-            }
-          } catch {
-            textBuffer = line + "\n" + textBuffer;
-            break;
-          }
-        }
-      }
+      await typeOutMessage(assistantMessage);
     } catch (error: any) {
       toast({
         title: "Error",
         description: error.message || "Failed to send message",
         variant: "destructive",
       });
-      setMessages((prev) => prev.slice(0, -1));
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="h-screen bg-background flex flex-col">
-      <div className="max-w-[375px] mx-auto w-full flex flex-col h-full">
-        <div className="flex items-center justify-between p-4 border-b">
+    <div className="h-screen bg-gradient-to-b from-blue-50 to-emerald-50 flex flex-col">
+      <div className="max-w-[420px] mx-auto w-full flex flex-col h-full border-x border-gray-200 relative">
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 border-b bg-white/80 backdrop-blur-sm sticky top-0 z-10">
           <Button variant="ghost" size="icon" onClick={() => navigate("/appview")}>
-            <ArrowLeft className="h-5 w-5" />
+            <ArrowLeft className="h-5 w-5 text-gray-700" />
           </Button>
-          <h1 className="text-lg font-bold">Trip Planner</h1>
+          <h1 className="text-lg font-bold text-gray-800">Trip Planner</h1>
           <div className="w-10" />
         </div>
 
+        {/* Chat Messages */}
         <ScrollArea ref={scrollRef} className="flex-1 p-4">
           <div className="space-y-4">
             {messages.map((message, index) => (
               <div
                 key={index}
-                className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
+                className={`flex ${
+                  message.role === "user" ? "justify-end" : "justify-start"
+                }`}
               >
                 <Card
-                  className={`max-w-[80%] p-3 ${
+                  className={`max-w-[80%] p-3 rounded-2xl shadow-md ${
                     message.role === "user"
-                      ? "bg-gradient-to-r from-orange-500 to-pink-500 text-white"
-                      : "bg-muted"
+                      ? "bg-gradient-to-r from-orange-400 to-pink-500 text-white"
+                      : "bg-white text-gray-800 border border-gray-100"
                   }`}
                 >
-                  <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                  <p
+                    className={`text-sm leading-relaxed whitespace-pre-wrap ${
+                      message.role === "assistant" ? "chat-link-styles" : ""
+                    }`}
+                    dangerouslySetInnerHTML={{ __html: message.content }}
+                  />
                 </Card>
               </div>
             ))}
-            {isLoading && (
+
+            {(isLoading || isTyping) && (
               <div className="flex justify-start">
-                <Card className="max-w-[80%] p-3 bg-muted">
-                  <Loader2 className="h-4 w-4 animate-spin" />
+                <Card className="max-w-[80%] p-3 bg-white/80 shadow-sm flex items-center gap-1">
+                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.3s]" />
+                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.15s]" />
+                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
                 </Card>
               </div>
             )}
           </div>
         </ScrollArea>
 
-        <div className="p-4 border-t">
+        {/* Input Bar */}
+        <div className="p-4 border-t bg-white/80 backdrop-blur-sm sticky bottom-0">
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -173,15 +175,35 @@ const TripPlannerChat = () => {
             <Input
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask about restaurants or activities..."
-              disabled={isLoading}
+              placeholder="Ask me a question..."
+              disabled={isLoading || isTyping}
+              className="text-sm"
             />
-            <Button type="submit" size="icon" disabled={isLoading || !input.trim()}>
+            <Button
+              type="submit"
+              size="icon"
+              disabled={isLoading || isTyping || !input.trim()}
+              className="bg-orange-500 hover:bg-orange-600 text-white"
+            >
               <Send className="h-4 w-4" />
             </Button>
           </form>
         </div>
       </div>
+
+      {/* Link styling */}
+      <style>{`
+        .chat-link-styles a {
+          color: #059669; /* teal-600 */
+          text-decoration: none;
+          font-weight: 500;
+          transition: all 0.2s ease;
+        }
+        .chat-link-styles a:hover {
+          color: #047857;
+          text-decoration: underline;
+        }
+      `}</style>
     </div>
   );
 };
