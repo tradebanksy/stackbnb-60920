@@ -140,16 +140,15 @@ const TripPlannerChat = () => {
                       : "bg-muted"
                   }`}
                 >
-                  {/* Render markdown here */}
-                  <ReactMarkdown
+                  <div
                     className={
                       m.role === "assistant"
                         ? "prose prose-sm prose-neutral dark:prose-invert"
                         : ""
                     }
                   >
-                    {m.content}
-                  </ReactMarkdown>
+                    <ReactMarkdown>{m.content}</ReactMarkdown>
+                  </div>
                 </Card>
               </div>
             ))}
