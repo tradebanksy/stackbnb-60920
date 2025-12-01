@@ -1,12 +1,36 @@
 import { useState, useCallback } from 'react';
 import { 
-  fetchNearbyPlaces, 
   reverseGeocode, 
   geocodeLocation,
-  searchRestaurantsByName,
   type GeoapifyPlace 
 } from '@/services/geoapifyService';
+import { searchNearbyRestaurants } from '@/services/tripadvisorService';
+import { Restaurant } from '@/data/mockRestaurants';
 import { toast } from '@/hooks/use-toast';
+
+// Convert Restaurant to GeoapifyPlace format for compatibility
+const convertToGeoapifyPlace = (restaurant: Restaurant): GeoapifyPlace => ({
+  id: restaurant.id,
+  name: restaurant.name,
+  cuisine: restaurant.cuisine,
+  address: restaurant.address,
+  city: restaurant.city,
+  zipCode: restaurant.zipCode,
+  phone: restaurant.phone,
+  website: restaurant.website,
+  openingHours: restaurant.hours ? Object.entries(restaurant.hours)
+    .filter(([_, value]) => value !== null)
+    .map(([day, value]) => value ? `${day}: ${value.open} - ${value.close}` : '')
+    .filter(Boolean) : undefined,
+  lat: restaurant.coordinates?.lat || 0,
+  lng: restaurant.coordinates?.lng || 0,
+  distance: restaurant.distance,
+  categories: [restaurant.cuisine],
+  rating: restaurant.rating,
+  reviewCount: restaurant.reviewCount,
+  priceRange: restaurant.priceRange,
+  photos: restaurant.photos,
+});
 
 interface UseNearbyPlacesResult {
   places: GeoapifyPlace[];
@@ -32,13 +56,17 @@ export const useNearbyPlaces = (): UseNearbyPlacesResult => {
   } | null>(null);
   const [isLocationLoading, setIsLocationLoading] = useState(false);
 
-  // Fetch places when we have coordinates
-  const fetchPlaces = useCallback(async (lat: number, lng: number, radius: number = 10000) => {
+  // Fetch places using TripAdvisor API
+  const fetchPlaces = useCallback(async (lat: number, lng: number) => {
     setIsLoading(true);
     setError(null);
     
     try {
-      const nearbyPlaces = await fetchNearbyPlaces(lat, lng, radius, 20);
+      console.log(`Fetching TripAdvisor restaurants for ${lat}, ${lng}`);
+      const restaurants = await searchNearbyRestaurants(lat, lng, 15);
+      
+      // Convert to GeoapifyPlace format for compatibility
+      const nearbyPlaces = restaurants.map(convertToGeoapifyPlace);
       setPlaces(nearbyPlaces);
       
       if (nearbyPlaces.length === 0) {
@@ -47,10 +75,21 @@ export const useNearbyPlaces = (): UseNearbyPlacesResult => {
           description: "Try searching for a different location",
           duration: 3000 
         });
+      } else {
+        toast({ 
+          title: `Found ${nearbyPlaces.length} restaurants from TripAdvisor`, 
+          duration: 2000 
+        });
       }
     } catch (err) {
-      setError('Failed to fetch nearby places');
-      console.error(err);
+      setError('Failed to fetch nearby restaurants');
+      console.error('TripAdvisor fetch error:', err);
+      toast({ 
+        title: "Error loading restaurants", 
+        description: "Please try again",
+        variant: "destructive",
+        duration: 3000 
+      });
     } finally {
       setIsLoading(false);
     }
@@ -75,7 +114,7 @@ export const useNearbyPlaces = (): UseNearbyPlacesResult => {
       async (position) => {
         const { latitude, longitude } = position.coords;
         
-        // Reverse geocode to get city name
+        // Reverse geocode to get city name (still using Geoapify for geocoding)
         const locationInfo = await reverseGeocode(latitude, longitude);
         
         const newLocation = {
@@ -91,7 +130,7 @@ export const useNearbyPlaces = (): UseNearbyPlacesResult => {
           duration: 2000 
         });
         
-        // Fetch nearby places
+        // Fetch nearby places using TripAdvisor
         await fetchPlaces(latitude, longitude);
         setIsLocationLoading(false);
       },
@@ -123,14 +162,16 @@ export const useNearbyPlaces = (): UseNearbyPlacesResult => {
     setError(null);
 
     try {
+      // Use Geoapify for geocoding the location
       const locationData = await geocodeLocation(query);
       
       if (locationData) {
         setUserLocation(locationData);
         toast({ 
-          title: `Showing restaurants in ${locationData.city}`, 
+          title: `Searching restaurants in ${locationData.city}...`, 
           duration: 2000 
         });
+        // Use TripAdvisor for restaurant search
         await fetchPlaces(locationData.lat, locationData.lng);
       } else {
         toast({ 
@@ -148,7 +189,7 @@ export const useNearbyPlaces = (): UseNearbyPlacesResult => {
     }
   }, [fetchPlaces]);
 
-  // Search restaurants by name within a location
+  // Search restaurants by name within a location (uses TripAdvisor nearby search)
   const searchByName = useCallback(async (query: string, lat: number, lng: number) => {
     if (!query.trim()) return;
     
@@ -156,10 +197,17 @@ export const useNearbyPlaces = (): UseNearbyPlacesResult => {
     setError(null);
 
     try {
-      const results = await searchRestaurantsByName(query, lat, lng);
-      setPlaces(results);
+      // TripAdvisor nearby search - filter results by name on client side
+      const restaurants = await searchNearbyRestaurants(lat, lng, 20);
+      const filteredResults = restaurants.filter(r => 
+        r.name.toLowerCase().includes(query.toLowerCase()) ||
+        r.cuisine.toLowerCase().includes(query.toLowerCase())
+      );
       
-      if (results.length === 0) {
+      const places = filteredResults.map(convertToGeoapifyPlace);
+      setPlaces(places);
+      
+      if (places.length === 0) {
         toast({ 
           title: `No results for "${query}"`, 
           description: "Try a different search term",
@@ -167,7 +215,7 @@ export const useNearbyPlaces = (): UseNearbyPlacesResult => {
         });
       } else {
         toast({ 
-          title: `Found ${results.length} results for "${query}"`, 
+          title: `Found ${places.length} results for "${query}"`, 
           duration: 2000 
         });
       }

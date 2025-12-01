@@ -2,3 +2,6 @@ project_id = "ilityngsjxknvxtqrgav"
 
 [functions.trip-planner-chat]
 verify_jwt = true
+
+[functions.tripadvisor-search]
+verify_jwt = false
