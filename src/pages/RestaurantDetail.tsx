@@ -171,14 +171,14 @@ const RestaurantDetail = () => {
         </div>
 
         {/* Scrollable photo strip */}
-        <div className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide">
+        <div className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide gap-0.5">
           {restaurant.photos.map((photo, index) => (
             <div 
               key={index} 
-              className={`flex-shrink-0 snap-start ${index > 0 ? 'pl-1' : ''}`}
-              style={{ width: restaurant.photos.length === 1 ? '100%' : '80%' }}
+              className="flex-shrink-0 snap-start"
+              style={{ width: restaurant.photos.length === 1 ? '100%' : '45%' }}
             >
-              <div className="aspect-[4/3] max-h-[220px] overflow-hidden">
+              <div className="aspect-[4/3] max-h-[200px] overflow-hidden">
                 <img
                   src={photo}
                   alt={`${restaurant.name} photo ${index + 1}`}
