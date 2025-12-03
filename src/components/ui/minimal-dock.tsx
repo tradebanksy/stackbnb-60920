@@ -11,8 +11,8 @@ interface DockItem {
 }
 
 const dockItems: DockItem[] = [
-  { id: 'search', icon: <Search size={20} />, label: 'Explore', href: '/appview' },
-  { id: 'favorites', icon: <Heart size={20} />, label: 'Wishlists', href: '/wishlists' },
+  { id: 'search', icon: <Search size={18} />, label: 'Explore', href: '/appview' },
+  { id: 'favorites', icon: <Heart size={18} />, label: 'Wishlists', href: '/wishlists' },
 ];
 
 interface DockItemProps {
@@ -26,28 +26,16 @@ const DockItemComponent: React.FC<DockItemProps> = ({ item, isHovered, onHover }
     <div
       className={`
         relative flex items-center justify-center
-        w-11 h-11 rounded-lg
-        bg-white/5 backdrop-blur-[2px]
-        border border-white/10
+        w-8 h-8 rounded-full
         transition-all duration-300 ease-out
         cursor-pointer
-        shadow-none
         ${isHovered 
-          ? 'scale-110 bg-white/10 border-white/20 -translate-y-1 shadow-lg shadow-white/10' 
-          : 'hover:scale-105 hover:bg-white/7 hover:-translate-y-0.5'
+          ? 'scale-110 bg-muted' 
+          : 'hover:scale-105 hover:bg-muted/50'
         }
       `}
-      style={{
-        boxShadow: isHovered
-          ? '0 4px 24px 0 rgba(255,255,255,0.08)'
-          : undefined,
-        transitionProperty: 'box-shadow, transform, background, border-color'
-      }}
     >
-      <div className={`
-        text-white transition-all duration-300
-        ${isHovered ? 'scale-105 drop-shadow-[0_1px_4px_rgba(255,255,255,0.10)]' : ''}
-      `}>
+      <div className="text-foreground transition-all duration-300">
         {item.icon}
       </div>
     </div>
@@ -69,9 +57,9 @@ const DockItemComponent: React.FC<DockItemProps> = ({ item, isHovered, onHover }
       <div className={`
         absolute -top-10 left-1/2 transform -translate-x-1/2
         px-2.5 py-1 rounded-md
-        bg-black/70 backdrop-blur
-        text-white text-xs font-normal
-        border border-white/5
+        bg-popover backdrop-blur
+        text-popover-foreground text-xs font-normal
+        border border-border
         transition-all duration-200
         pointer-events-none
         whitespace-nowrap
@@ -84,7 +72,7 @@ const DockItemComponent: React.FC<DockItemProps> = ({ item, isHovered, onHover }
       `}>
         {item.label}
         <div className="absolute top-full left-1/2 transform -translate-x-1/2">
-          <div className="w-2 h-2 bg-black/70 rotate-45 border-r border-b border-white/5"></div>
+          <div className="w-2 h-2 bg-popover rotate-45 border-r border-b border-border"></div>
         </div>
       </div>
     </div>
@@ -97,14 +85,7 @@ const MinimalDock: React.FC = () => {
   return (
     <div className="relative">
       {/* Dock Container */}
-      <div className={`
-        flex items-end gap-2 px-4 py-3
-        rounded-2xl
-        bg-black/40 backdrop-blur-xl
-        border border-white/10
-        shadow-2xl
-        transition-all duration-500 ease-out
-      `}>
+      <div className="flex items-center gap-1 px-3 py-2 rounded-full bg-card/80 backdrop-blur-sm border border-border/50 shadow-md">
         {dockItems.map((item) => (
           <DockItemComponent
             key={item.id}
