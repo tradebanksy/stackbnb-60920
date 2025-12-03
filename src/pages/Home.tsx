@@ -169,7 +169,7 @@ const Home = () => {
             </div>
 
             {/* Headline */}
-            <h2 className="text-4xl sm:text-6xl lg:text-7xl tracking-tight text-foreground max-w-4xl mx-auto leading-[1.1]">
+            <h2 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-foreground max-w-4xl mx-auto leading-[1.1]">
               Grow your affiliate income
             </h2>
 
