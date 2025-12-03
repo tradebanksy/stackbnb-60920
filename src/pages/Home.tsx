@@ -186,16 +186,12 @@ const Home = () => {
                 </Link>
               </div>
               
-              <div className="relative group">
-                <div className="absolute -inset-1 bg-gradient-to-r from-orange-500 to-pink-500 rounded-full blur opacity-25 group-hover:opacity-50 transition duration-300"></div>
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-orange-400 to-pink-400 rounded-full blur-sm opacity-20 group-hover:opacity-40 transition duration-300"></div>
-                <Link 
-                  to="/appview"
-                  className="relative flex items-center bg-card/80 backdrop-blur-sm rounded-full px-6 py-3 border border-border/50 shadow-md hover:bg-card hover:shadow-lg transition-all duration-300 text-foreground font-medium"
-                >
-                  Preview App View
-                </Link>
-              </div>
+              <Link 
+                to="/appview"
+                className="flex items-center bg-card/80 backdrop-blur-sm rounded-full px-6 py-3 border border-border/50 shadow-md hover:bg-card hover:shadow-lg transition-all duration-300 text-foreground font-medium"
+              >
+                Preview App View
+              </Link>
             </div>
 
             <p className="text-sm text-muted-foreground pt-4">
