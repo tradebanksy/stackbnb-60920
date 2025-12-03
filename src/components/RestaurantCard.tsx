@@ -123,7 +123,7 @@ const RestaurantCard = ({ restaurant, variant = 'horizontal' }: RestaurantCardPr
   return (
     <Link
       to={`/restaurant/${restaurant.id}`}
-      className="flex-shrink-0 w-[200px] sm:w-[240px] md:w-[280px] lg:w-[300px] group"
+      className="flex-shrink-0 w-[140px] sm:w-[180px] md:w-[220px] lg:w-[260px] group"
       onClick={handleClick}
     >
       <div className="space-y-2">
