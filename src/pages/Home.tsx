@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Briefcase, User, Search, Star, Heart } from "lucide-react";
+import { Briefcase, User, Search, Star, Heart, Sparkles } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthContext } from "@/contexts/AuthContext";
 import { useEffect, useState } from "react";
@@ -141,8 +141,15 @@ const Home = () => {
           <ThemeToggle />
         </div>
 
-        {/* Minimal Dock - Top Right */}
-        <div className="absolute top-4 right-4 z-50">
+        {/* AI Chat & Minimal Dock - Top Right */}
+        <div className="absolute top-4 right-4 z-50 flex items-center gap-2">
+          <Link
+            to="/trip-planner"
+            className="p-2 rounded-full bg-gradient-to-r from-orange-500 to-pink-500 text-white shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
+            title="AI Trip Planner"
+          >
+            <Sparkles className="h-5 w-5" />
+          </Link>
           <MinimalDock />
         </div>
 

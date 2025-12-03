@@ -7,7 +7,6 @@ import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Send, Loader2 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import ReactMarkdown from "react-markdown";
-import { supabase } from "@/integrations/supabase/client";
 
 interface Message {
   role: "user" | "assistant";
@@ -66,40 +65,16 @@ const TripPlannerChat = () => {
     setIsLoading(true);
 
     try {
-      // Get the current session for authentication
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session?.access_token) {
-        toast({
-          title: "Authentication required",
-          description: "Please sign in to use the trip planner.",
-          variant: "destructive",
-        });
-        navigate("/auth");
-        return;
-      }
-
       const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/trip-planner-chat`;
       const response = await fetch(CHAT_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({
           messages: [...messages, { role: "user", content: trimmedInput }],
         }),
       });
-
-      if (response.status === 401) {
-        toast({
-          title: "Session expired",
-          description: "Please sign in again.",
-          variant: "destructive",
-        });
-        navigate("/auth");
-        return;
-      }
 
       if (!response.ok || !response.body) {
         const errorData = await response.json().catch(() => ({ error: "Unknown error" }));

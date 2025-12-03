@@ -123,7 +123,7 @@ const AppRoutes = () => (
     <Route path="/storefront/:hostId" element={<HostStorefront />} />
     <Route path="/auth" element={<Auth />} />
     <Route path="/profile" element={<Profile />} />
-    <Route path="/trip-planner-chat" element={<ProtectedRoute><TripPlannerChat /></ProtectedRoute>} />
+    <Route path="/trip-planner" element={<TripPlannerChat />} />
     <Route path="/restaurant/:id" element={<RestaurantDetail />} />
     <Route path="/wishlists" element={<ProtectedRoute><Wishlists /></ProtectedRoute>} />
     
