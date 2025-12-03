@@ -229,7 +229,8 @@ const ForHosts = () => {
           height: 64px;
           margin: 0 auto 24px;
           border-radius: 50%;
-          background: linear-gradient(135deg, #f97316, #ec4899);
+          background: var(--card-bg);
+          border: 1px solid var(--border);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -358,7 +359,8 @@ const ForHosts = () => {
           width: 48px;
           height: 48px;
           border-radius: 12px;
-          background: linear-gradient(135deg, #f97316, #ec4899);
+          background: var(--card-bg);
+          border: 1px solid var(--border);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -456,17 +458,14 @@ const ForHosts = () => {
         {/* Hero Section */}
         <section className="hero-section">
           <div className="hero-icon">
-            <Store className="h-8 w-8 text-white" />
+            <Store className="h-8 w-8 text-[var(--fg)]" />
           </div>
           <div className="hero-kicker">For Airbnb Hosts</div>
           <h1 className="hero-title">Grow your<br />affiliate income.</h1>
           <p className="hero-subtitle">
             Organize vendor relationships, track commissions, and manage partnerships all in one organized dashboard.
           </p>
-          <div className="btn-group">
-            <Link to="/signup/host" className="btn-primary">Get Started as Host</Link>
-            <Link to="/host/auth" className="btn-outline">Sign In</Link>
-          </div>
+          <Link to="/signup/host" className="btn-primary">Get Started as Host</Link>
         </section>
 
         {/* Features Grid */}
@@ -476,7 +475,7 @@ const ForHosts = () => {
             {features.map((feature, index) => (
               <div key={index} className="feature-card">
                 <div className="feature-icon">
-                  <feature.icon className="h-6 w-6 text-white" />
+                  <feature.icon className="h-6 w-6 text-[var(--fg)]" />
                 </div>
                 <h3 className="feature-title">{feature.title}</h3>
                 <p className="feature-desc">{feature.description}</p>

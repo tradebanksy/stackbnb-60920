@@ -235,7 +235,8 @@ const ForVendors = () => {
           height: 64px;
           margin: 0 auto 24px;
           border-radius: 50%;
-          background: linear-gradient(135deg, #f97316, #ec4899);
+          background: var(--card-bg);
+          border: 1px solid var(--border);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -364,7 +365,8 @@ const ForVendors = () => {
           width: 48px;
           height: 48px;
           border-radius: 12px;
-          background: linear-gradient(135deg, #f97316, #ec4899);
+          background: var(--card-bg);
+          border: 1px solid var(--border);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -489,27 +491,24 @@ const ForVendors = () => {
         {/* Hero Section */}
         <section className="hero-section">
           <div className="hero-icon">
-            <Sparkles className="h-8 w-8 text-white" />
+            <Sparkles className="h-8 w-8 text-[var(--fg)]" />
           </div>
           <div className="hero-kicker">For Vendors</div>
           <h1 className="hero-title">Reach more<br />travelers.</h1>
           <p className="hero-subtitle">
             Get additional advertising and promote your affiliate programs to reach more customers through local Airbnb hosts.
           </p>
-          <div className="btn-group">
-            <Link to="/signup/vendor" className="btn-primary">Get Started as Vendor</Link>
-            <Link to="/signin" className="btn-outline">Sign In</Link>
-          </div>
+          <Link to="/signup/vendor" className="btn-primary">Get Started as Vendor</Link>
         </section>
 
         {/* Features Grid */}
         <section className="features-section">
           <h2 className="section-title">Why Vendors Choose stackd</h2>
           <div className="features-grid">
-            {features.map((feature, index) => (
+          {features.map((feature, index) => (
               <div key={index} className="feature-card">
                 <div className="feature-icon">
-                  <feature.icon className="h-6 w-6 text-white" />
+                  <feature.icon className="h-6 w-6 text-[var(--fg)]" />
                 </div>
                 <h3 className="feature-title">{feature.title}</h3>
                 <p className="feature-desc">{feature.description}</p>
