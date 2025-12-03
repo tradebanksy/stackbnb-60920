@@ -40,7 +40,7 @@ const SignOut = () => {
           <Button 
             variant="outline" 
             className="flex-1"
-            onClick={() => navigate(-1)}
+            onClick={() => window.history.length > 1 ? navigate(-1) : navigate('/appview')}
           >
             Cancel
           </Button>
