@@ -32,7 +32,7 @@ const Booking = () => {
       </header>
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Button variant="ghost" className="mb-6" onClick={() => navigate(-1)}>
+        <Button variant="ghost" className="mb-6" onClick={() => window.history.length > 1 ? navigate(-1) : navigate('/appview')}>
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back
         </Button>
