@@ -4,6 +4,49 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Star, Clock, Users, CheckCircle } from "lucide-react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { experiences } from "@/data/mockData";
+import { ThreeDPhotoCarousel } from "@/components/ui/3d-carousel";
+import kayakingImg from "@/assets/experiences/kayaking.jpg";
+import bikesImg from "@/assets/experiences/bikes.jpg";
+import snorkelingImg from "@/assets/experiences/snorkeling.jpg";
+import photographyImg from "@/assets/experiences/photography.jpg";
+import spaImg from "@/assets/experiences/spa.jpg";
+import diningImg from "@/assets/experiences/dining.jpg";
+import atvImg from "@/assets/experiences/atv.jpg";
+import boatImg from "@/assets/experiences/boat.jpg";
+import ziplineImg from "@/assets/experiences/zipline.jpg";
+import horsebackImg from "@/assets/experiences/horseback.jpg";
+import scubaImg from "@/assets/experiences/scuba.jpg";
+import hikingImg from "@/assets/experiences/hiking.jpg";
+import parasailingImg from "@/assets/experiences/parasailing.jpg";
+import yogaImg from "@/assets/experiences/yoga.jpg";
+import fishingImg from "@/assets/experiences/fishing.jpg";
+import cookingImg from "@/assets/experiences/cooking.jpg";
+import balloonImg from "@/assets/experiences/balloon.jpg";
+import wineImg from "@/assets/experiences/wine.jpg";
+
+const getExperienceImages = (experienceId: number): string[] => {
+  const imageMap: Record<number, string[]> = {
+    1: [kayakingImg, boatImg, snorkelingImg],
+    2: [bikesImg, hikingImg, photographyImg],
+    3: [snorkelingImg, kayakingImg, scubaImg],
+    4: [photographyImg, yogaImg, spaImg],
+    5: [spaImg, yogaImg, diningImg],
+    6: [diningImg, wineImg, cookingImg],
+    7: [atvImg, ziplineImg, hikingImg],
+    8: [boatImg, kayakingImg, fishingImg],
+    9: [ziplineImg, atvImg, hikingImg],
+    10: [horsebackImg, hikingImg, photographyImg],
+    11: [scubaImg, snorkelingImg, kayakingImg],
+    12: [hikingImg, photographyImg, yogaImg],
+    13: [parasailingImg, boatImg, kayakingImg],
+    14: [yogaImg, spaImg, hikingImg],
+    15: [fishingImg, boatImg, kayakingImg],
+    16: [cookingImg, diningImg, wineImg],
+    17: [balloonImg, photographyImg, hikingImg],
+    18: [wineImg, diningImg, cookingImg],
+  };
+  return imageMap[experienceId] || [kayakingImg, boatImg, snorkelingImg];
+};
 
 const ExperienceDetails = () => {
   const { id } = useParams();
@@ -36,6 +79,11 @@ const ExperienceDetails = () => {
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
           </button>
+        </div>
+
+        {/* 3D Photo Carousel */}
+        <div className="mb-4">
+          <ThreeDPhotoCarousel images={getExperienceImages(experience.id)} />
         </div>
 
         <div className="px-4 py-6 space-y-6">

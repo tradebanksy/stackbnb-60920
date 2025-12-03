@@ -18,6 +18,7 @@ import { Separator } from "@/components/ui/separator";
 import { toast } from "@/hooks/use-toast";
 import { mockRestaurants, isRestaurantOpen, type Restaurant } from "@/data/mockRestaurants";
 import { formatDistance } from "@/services/geoapifyService";
+import { ThreeDPhotoCarousel } from "@/components/ui/3d-carousel";
 
 const RestaurantDetail = () => {
   const { id } = useParams();
@@ -157,54 +158,25 @@ const RestaurantDetail = () => {
         </div>
       </header>
 
-      {/* Photo Gallery - Horizontal scroll like Yelp/Airbnb */}
+      {/* 3D Photo Carousel */}
       <div className="relative">
-        {/* Action buttons - fixed above scroll */}
+        {/* Action buttons */}
         <div className="absolute top-3 right-3 z-20 flex gap-2">
           <button
             onClick={handleShare}
-            className="bg-white/90 hover:bg-white rounded-full p-1.5 shadow-lg transition-colors"
+            className="bg-card/90 hover:bg-card rounded-full p-1.5 shadow-lg transition-colors"
           >
             <Share2 className="h-4 w-4 text-foreground" />
           </button>
           <button
             onClick={toggleFavorite}
-            className="bg-white/90 hover:bg-white rounded-full p-1.5 shadow-lg transition-colors"
+            className="bg-card/90 hover:bg-card rounded-full p-1.5 shadow-lg transition-colors"
           >
             <Heart className={`h-4 w-4 ${isFavorite ? 'fill-red-500 text-red-500' : 'text-foreground'}`} />
           </button>
         </div>
 
-        {/* Scrollable photo strip */}
-        <div 
-          className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide"
-          style={{ gap: '1px' }}
-        >
-          {restaurant.photos.map((photo, index) => (
-            <div 
-              key={index} 
-              className="flex-shrink-0 snap-start"
-              style={{ 
-                width: restaurant.photos.length === 1 ? '100%' : 'calc(50% - 0.5px)'
-              }}
-            >
-              <div className="aspect-[4/3] max-h-[200px] overflow-hidden">
-                <img
-                  src={photo}
-                  alt={`${restaurant.name} photo ${index + 1}`}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Photo count indicator */}
-        {restaurant.photos.length > 1 && (
-          <div className="absolute bottom-3 right-3 bg-black/60 text-white text-xs px-2 py-0.5 rounded-full">
-            {restaurant.photos.length} photos
-          </div>
-        )}
+        <ThreeDPhotoCarousel images={restaurant.photos} />
       </div>
 
       {/* Content */}
