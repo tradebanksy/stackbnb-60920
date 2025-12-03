@@ -130,22 +130,27 @@ const Home = () => {
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
       <section className="relative overflow-hidden">
+        {/* Background image with blur and overlay */}
         <div
-          className="absolute inset-0 bg-cover bg-top opacity-40"
-          style={{ backgroundImage: `url(${heroImage})` }}
+          className="absolute inset-0 bg-cover bg-center scale-105"
+          style={{ 
+            backgroundImage: `url(${heroImage})`,
+            filter: 'blur(2px)',
+          }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-background/50 to-background/70" />
+        <div className="absolute inset-0 bg-background/60 dark:bg-background/70" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/30 to-background" />
 
         {/* Theme Toggle - Top Left */}
-        <div className="absolute top-4 left-4 z-50">
+        <div className="absolute top-6 left-6 z-50">
           <ThemeToggle />
         </div>
 
         {/* AI Chat & Minimal Dock - Top Right */}
-        <div className="absolute top-4 right-4 z-50 flex items-center gap-2">
+        <div className="absolute top-6 right-6 z-50 flex items-center gap-3">
           <Link
             to="/trip-planner"
-            className="p-2 rounded-full bg-gradient-to-r from-orange-500 to-pink-500 text-white shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
+            className="p-2.5 rounded-full bg-gradient-to-r from-orange-500 to-purple-600 text-white shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
             title="AI Trip Planner"
           >
             <Sparkles className="h-5 w-5" />
@@ -153,57 +158,59 @@ const Home = () => {
           <MinimalDock />
         </div>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 sm:py-32">
-          <div className="text-center space-y-8">
-            <div className="inline-flex items-center gap-3 mb-4">
-              <img src={stackdLogo} alt="stackd logo" className="h-14 w-14 sm:h-16 sm:w-16" />
-              <h1 className="text-5xl sm:text-6xl font-bold font-display bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32 sm:py-40">
+          <div className="text-center space-y-10">
+            {/* Logo */}
+            <div className="inline-flex items-center gap-3 mb-2">
+              <img src={stackdLogo} alt="stackd logo" className="h-14 w-14 sm:h-16 sm:w-16 drop-shadow-lg" />
+              <h1 className="text-5xl sm:text-6xl font-bold font-display bg-gradient-to-r from-orange-500 via-pink-500 to-purple-600 bg-clip-text text-transparent drop-shadow-sm">
                 stackd
               </h1>
             </div>
 
-            <h2 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-foreground max-w-4xl mx-auto leading-tight font-headline">
+            {/* Headline */}
+            <h2 className="text-4xl sm:text-6xl lg:text-7xl tracking-tight text-foreground max-w-4xl mx-auto leading-[1.1]">
               Grow your affiliate income
             </h2>
 
-            <p className="mt-4 text-lg sm:text-xl text-gray-500 max-w-2xl mx-auto">
+            {/* Subheadline */}
+            <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
               A smarter way for hosts to partner locally, grow revenue, and streamline guest bookings.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center pt-2">
-              <div className="relative group">
-                <div className="absolute -inset-1 bg-gradient-to-r from-orange-500 to-pink-500 rounded-full blur opacity-25 group-hover:opacity-50 transition duration-300"></div>
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-orange-400 to-pink-400 rounded-full blur-sm opacity-20 group-hover:opacity-40 transition duration-300"></div>
-                <Link 
-                  to="/signup/host"
-                  className="relative flex items-center bg-card/80 backdrop-blur-sm rounded-full px-6 py-3 border border-border/50 shadow-md hover:bg-card hover:shadow-lg transition-all duration-300 text-foreground font-medium"
-                >
-                  Get Started as Host
-                </Link>
-              </div>
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-6">
+              {/* Primary Button - Get Started as Host */}
+              <Link 
+                to="/signup/host"
+                className="relative group flex items-center justify-center bg-gradient-to-r from-orange-500 to-purple-600 text-white rounded-full px-8 py-4 font-semibold text-base shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
+                style={{ boxShadow: '0 8px 32px -8px rgba(168, 85, 247, 0.5)' }}
+              >
+                <span className="relative z-10">Get Started as Host</span>
+                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-orange-600 to-purple-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              </Link>
 
-              <div className="relative group">
-                <div className="absolute -inset-1 bg-gradient-to-r from-orange-500 to-pink-500 rounded-full blur opacity-25 group-hover:opacity-50 transition duration-300"></div>
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-orange-400 to-pink-400 rounded-full blur-sm opacity-20 group-hover:opacity-40 transition duration-300"></div>
-                <Link 
-                  to="/signup/vendor"
-                  className="relative flex items-center bg-card/80 backdrop-blur-sm rounded-full px-6 py-3 border border-border/50 shadow-md hover:bg-card hover:shadow-lg transition-all duration-300 text-foreground font-medium"
-                >
-                  I'm a Vendor
-                </Link>
-              </div>
+              {/* Secondary Button - I'm a Vendor */}
+              <Link 
+                to="/signup/vendor"
+                className="flex items-center justify-center bg-card/80 backdrop-blur-md rounded-full px-8 py-4 border border-border hover:border-purple-500/50 shadow-md hover:shadow-lg transition-all duration-300 text-foreground font-semibold text-base hover:scale-[1.02] active:scale-[0.98]"
+              >
+                I'm a Vendor
+              </Link>
               
+              {/* Tertiary Button - Preview App View */}
               <Link 
                 to="/appview"
-                className="flex items-center bg-card/80 backdrop-blur-sm rounded-full px-6 py-3 border border-border/50 shadow-md hover:bg-card hover:shadow-lg transition-all duration-300 text-foreground font-medium"
+                className="flex items-center justify-center rounded-full px-8 py-4 text-muted-foreground hover:text-foreground font-medium text-base transition-all duration-300 hover:bg-card/50"
               >
                 Preview App View
               </Link>
             </div>
 
-            <p className="text-sm text-muted-foreground pt-4">
+            {/* Sign In Link */}
+            <p className="text-sm text-muted-foreground pt-2">
               Already have an account?{" "}
-              <Link to="/signin" className="text-primary hover:underline font-medium">
+              <Link to="/signin" className="text-purple-500 hover:text-purple-400 hover:underline font-medium transition-colors">
                 Sign In
               </Link>
             </p>
@@ -218,12 +225,11 @@ const Home = () => {
           <div className="text-center space-y-4">
             <div className="max-w-2xl mx-auto">
               <div className="relative group">
-                {/* Shadow layers for 3D effect */}
-                <div className="absolute -inset-1 bg-gradient-to-r from-orange-500 to-pink-500 rounded-full blur opacity-25 group-hover:opacity-40 transition duration-300"></div>
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-orange-400 to-pink-400 rounded-full blur-sm opacity-20 group-hover:opacity-30 transition duration-300"></div>
+                {/* Soft glow effect */}
+                <div className="absolute -inset-1 bg-gradient-to-r from-orange-500/30 to-purple-600/30 rounded-full blur-lg opacity-40 group-hover:opacity-60 transition duration-300"></div>
 
                 {/* Main search container */}
-                <div className="relative bg-card rounded-full shadow-2xl border border-border/50 backdrop-blur-sm overflow-hidden hover:shadow-3xl transition-all duration-300">
+                <div className="relative bg-card rounded-full shadow-xl border border-border/30 backdrop-blur-md overflow-hidden transition-all duration-300 group-hover:shadow-2xl group-hover:border-purple-500/20">
                   <div className="flex items-center px-6 py-4 gap-3">
                     <Search className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                     <Input
@@ -232,7 +238,7 @@ const Home = () => {
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className="border-0 bg-transparent text-base shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 px-0"
                     />
-                    <button className="bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white rounded-full p-3 flex-shrink-0 transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg">
+                    <button className="bg-gradient-to-r from-orange-500 to-purple-600 hover:from-orange-600 hover:to-purple-700 text-white rounded-full p-3 flex-shrink-0 transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg">
                       <Search className="h-4 w-4" />
                     </button>
                   </div>
@@ -248,12 +254,12 @@ const Home = () => {
                 key={category.id}
                 onClick={() => setSelectedCategory(category.id)}
                 className={`
-                  flex items-center gap-1.5 px-3 py-1.5 rounded-full border-2 whitespace-nowrap text-sm
-                  transition-all duration-300 hover:scale-105 active:scale-95 shadow-md
+                  flex items-center gap-1.5 px-4 py-2 rounded-full border whitespace-nowrap text-sm
+                  transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]
                   ${
                     selectedCategory === category.id
-                      ? "bg-gradient-to-r from-orange-500 to-pink-500 text-white border-transparent shadow-lg scale-105"
-                      : "bg-card hover:border-primary/50 hover:shadow-lg"
+                      ? "bg-gradient-to-r from-orange-500 to-purple-600 text-white border-transparent shadow-lg"
+                      : "bg-card border-border/50 hover:border-purple-500/30 hover:shadow-md"
                   }
                 `}
               >
