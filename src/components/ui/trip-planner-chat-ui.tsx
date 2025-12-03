@@ -141,16 +141,19 @@ export default function TripPlannerChatUI({
         <div className="flex-1 flex flex-col items-center justify-center px-4">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-semibold text-foreground">
-              Hi, I'm JC..
+              Hello, I'm JC.
             </h1>
             <p className="mt-2 text-muted-foreground">
               Discover amazing restaurants and excursions for your trip.
             </p>
           </div>
 
-          {/* Input Box */}
+          {/* Input Box with Radiant Glow */}
           <div className="w-full max-w-2xl">
-            <div className="relative bg-card/60 backdrop-blur-md rounded-xl border border-border">
+            <div className="relative">
+              {/* Radiant glow effect */}
+              <div className="absolute -inset-1 bg-gradient-to-r from-orange-500 via-pink-500 to-orange-500 rounded-xl blur-md opacity-70"></div>
+              <div className="relative bg-card/90 backdrop-blur-md rounded-xl border border-border">
               <Textarea
                 ref={textareaRef}
                 value={message}
@@ -186,6 +189,7 @@ export default function TripPlannerChatUI({
                     <ArrowUpIcon className="w-4 h-4" />
                   )}
                 </Button>
+              </div>
               </div>
             </div>
 
