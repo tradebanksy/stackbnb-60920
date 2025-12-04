@@ -255,7 +255,7 @@ export default function TripPlannerChatUI({
                     <div
                       className={
                         m.role === "assistant"
-                          ? "prose prose-sm dark:prose-invert max-w-none prose-p:my-3 prose-ul:my-2 prose-li:my-1 prose-headings:mt-4 prose-headings:mb-2 prose-strong:text-foreground"
+                          ? "prose prose-sm dark:prose-invert max-w-none prose-p:my-4 prose-ul:my-3 prose-li:my-1.5 prose-headings:mt-5 prose-headings:mb-3 prose-strong:text-foreground [&>*+*]:mt-4"
                           : ""
                       }
                     >
