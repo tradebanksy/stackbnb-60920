@@ -162,7 +162,7 @@ const Home = () => {
           <div className="text-center space-y-10">
             {/* Logo */}
             <div className="mb-4">
-              <img src={stackdLogo} alt="stackd logo" className="h-32 w-32 sm:h-40 sm:w-40 lg:h-48 lg:w-48 drop-shadow-2xl mx-auto" />
+              <img src={stackdLogo} alt="stackd logo" className="h-64 w-64 sm:h-80 sm:w-80 lg:h-96 lg:w-96 drop-shadow-2xl mx-auto" />
             </div>
 
             {/* Headline */}
