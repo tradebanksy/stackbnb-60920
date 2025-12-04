@@ -1,9 +1,7 @@
-import { useState, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { SplashScreen } from "./components/SplashScreen";
 import { UserProvider } from "./contexts/UserContext";
 import { AuthProvider, useAuthContext } from "./contexts/AuthContext";
 import { ThemeProvider } from "./components/ThemeProvider";
@@ -264,17 +262,6 @@ const AppRoutes = () => (
 );
 
 const App = () => {
-  const [showSplash, setShowSplash] = useState(() => {
-    // Only show splash once per session
-    const hasSeenSplash = sessionStorage.getItem('hasSeenSplash');
-    return !hasSeenSplash;
-  });
-
-  const handleSplashComplete = () => {
-    sessionStorage.setItem('hasSeenSplash', 'true');
-    setShowSplash(false);
-  };
-
   return (
     <ThemeProvider
       attribute="class"
@@ -282,7 +269,6 @@ const App = () => {
       enableSystem={false}
       disableTransitionOnChange
     >
-      {showSplash && <SplashScreen onComplete={handleSplashComplete} duration={4000} />}
       <AuthProvider>
         <UserProvider>
           <TooltipProvider>
