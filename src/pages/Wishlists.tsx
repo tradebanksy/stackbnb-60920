@@ -6,10 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { ArrowLeft, Plus, Heart, Trash2, MoreHorizontal } from "lucide-react";
+import { ArrowLeft, Plus, Heart, Trash2, MoreHorizontal, Star, Utensils, Compass } from "lucide-react";
 import { toast } from "sonner";
 import { experiences } from "@/data/mockData";
+import { mockRestaurants, type Restaurant } from "@/data/mockRestaurants";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // Experience images
 import kayakingImg from "@/assets/experiences/kayaking.jpg";
@@ -53,14 +55,20 @@ interface WishlistItem {
   experience_id: number;
 }
 
+interface FavoriteRestaurant extends Restaurant {
+  favoriteId: string;
+}
+
 const Wishlists = () => {
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuthContext();
   const [wishlists, setWishlists] = useState<Wishlist[]>([]);
+  const [favoriteRestaurants, setFavoriteRestaurants] = useState<FavoriteRestaurant[]>([]);
   const [selectedWishlist, setSelectedWishlist] = useState<Wishlist | null>(null);
   const [newWishlistName, setNewWishlistName] = useState("");
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("experiences");
 
   const handleBack = () => {
     if (window.history.length > 1) {
@@ -76,7 +84,43 @@ const Wishlists = () => {
       return;
     }
     fetchWishlists();
+    loadFavoriteRestaurants();
   }, [isAuthenticated, navigate]);
+
+  const loadFavoriteRestaurants = () => {
+    const favoriteIds = JSON.parse(localStorage.getItem("restaurantFavorites") || "[]");
+    const restaurants: FavoriteRestaurant[] = [];
+    
+    favoriteIds.forEach((id: string) => {
+      // Check mock restaurants first
+      const mockRestaurant = mockRestaurants.find(r => r.id === id);
+      if (mockRestaurant) {
+        restaurants.push({ ...mockRestaurant, favoriteId: id });
+        return;
+      }
+      
+      // Check localStorage for API restaurants
+      const cached = localStorage.getItem(`restaurant_${id}`);
+      if (cached) {
+        try {
+          const parsedRestaurant = JSON.parse(cached);
+          restaurants.push({ ...parsedRestaurant, favoriteId: id });
+        } catch (e) {
+          console.error("Error parsing cached restaurant:", e);
+        }
+      }
+    });
+    
+    setFavoriteRestaurants(restaurants);
+  };
+
+  const removeRestaurantFavorite = (restaurantId: string) => {
+    const favoriteIds = JSON.parse(localStorage.getItem("restaurantFavorites") || "[]");
+    const newFavorites = favoriteIds.filter((id: string) => id !== restaurantId);
+    localStorage.setItem("restaurantFavorites", JSON.stringify(newFavorites));
+    setFavoriteRestaurants(favoriteRestaurants.filter(r => r.id !== restaurantId));
+    toast.success("Removed from favorites");
+  };
 
   const fetchWishlists = async () => {
     try {
@@ -182,6 +226,10 @@ const Wishlists = () => {
     return items.slice(0, 4).map((item) => getExperienceImage(item.experience_id));
   };
 
+  // Get total favorites count
+  const totalExperienceFavorites = wishlists.reduce((sum, w) => sum + (w.items?.length || 0), 0);
+  const totalRestaurantFavorites = favoriteRestaurants.length;
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -253,7 +301,7 @@ const Wishlists = () => {
     );
   }
 
-  // Main wishlists grid
+  // Main favorites view with tabs
   return (
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-50 bg-background/95 backdrop-blur border-b">
@@ -261,118 +309,202 @@ const Wishlists = () => {
           <Button variant="ghost" size="icon" onClick={handleBack}>
             <ArrowLeft className="h-5 w-5" />
           </Button>
-          <h1 className="text-xl font-semibold flex-1">Wishlists</h1>
-          <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-            <DialogTrigger asChild>
-              <Button variant="outline" size="sm">
-                <Plus className="h-4 w-4 mr-1" />
-                Create
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Create new wishlist</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4 pt-4">
-                <Input
-                  placeholder="Name your wishlist"
-                  value={newWishlistName}
-                  onChange={(e) => setNewWishlistName(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && createWishlist()}
-                />
-                <Button onClick={createWishlist} className="w-full">
+          <h1 className="text-xl font-semibold flex-1">Favorites</h1>
+          {activeTab === "experiences" && (
+            <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <Plus className="h-4 w-4 mr-1" />
                   Create
                 </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Create new wishlist</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4 pt-4">
+                  <Input
+                    placeholder="Name your wishlist"
+                    value={newWishlistName}
+                    onChange={(e) => setNewWishlistName(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && createWishlist()}
+                  />
+                  <Button onClick={createWishlist} className="w-full">
+                    Create
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          )}
         </div>
       </header>
 
       <main className="max-w-4xl mx-auto px-4 py-6">
-        {wishlists.length === 0 ? (
-          <div className="text-center py-16">
-            <Heart className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
-            <h2 className="text-lg font-semibold mb-2">Create your first wishlist</h2>
-            <p className="text-muted-foreground mb-6">
-              Save your favorite experiences to wishlists
-            </p>
-            <Button onClick={() => setIsCreateOpen(true)}>
-              <Plus className="h-4 w-4 mr-2" />
-              Create Wishlist
-            </Button>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {wishlists.map((wishlist) => {
-              const thumbnails = getWishlistThumbnails(wishlist);
-              const itemCount = wishlist.items?.length || 0;
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-6">
+            <TabsTrigger value="experiences" className="flex items-center gap-2">
+              <Compass className="h-4 w-4" />
+              Experiences
+              {totalExperienceFavorites > 0 && (
+                <span className="bg-primary/20 text-primary text-xs px-1.5 py-0.5 rounded-full">
+                  {totalExperienceFavorites}
+                </span>
+              )}
+            </TabsTrigger>
+            <TabsTrigger value="restaurants" className="flex items-center gap-2">
+              <Utensils className="h-4 w-4" />
+              Restaurants
+              {totalRestaurantFavorites > 0 && (
+                <span className="bg-primary/20 text-primary text-xs px-1.5 py-0.5 rounded-full">
+                  {totalRestaurantFavorites}
+                </span>
+              )}
+            </TabsTrigger>
+          </TabsList>
 
-              return (
-                <Card
-                  key={wishlist.id}
-                  className="overflow-hidden cursor-pointer group hover:shadow-lg transition-shadow"
-                  onClick={() => setSelectedWishlist(wishlist)}
-                >
-                  <div className="relative aspect-square">
-                    {thumbnails.length === 0 ? (
-                      <div className="w-full h-full bg-muted flex items-center justify-center">
-                        <Heart className="h-8 w-8 text-muted-foreground/30" />
+          <TabsContent value="experiences">
+            {wishlists.length === 0 ? (
+              <div className="text-center py-16">
+                <Heart className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
+                <h2 className="text-lg font-semibold mb-2">Create your first wishlist</h2>
+                <p className="text-muted-foreground mb-6">
+                  Save your favorite experiences to wishlists
+                </p>
+                <Button onClick={() => setIsCreateOpen(true)}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Create Wishlist
+                </Button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {wishlists.map((wishlist) => {
+                  const thumbnails = getWishlistThumbnails(wishlist);
+                  const itemCount = wishlist.items?.length || 0;
+
+                  return (
+                    <Card
+                      key={wishlist.id}
+                      className="overflow-hidden cursor-pointer group hover:shadow-lg transition-shadow"
+                      onClick={() => setSelectedWishlist(wishlist)}
+                    >
+                      <div className="relative aspect-square">
+                        {thumbnails.length === 0 ? (
+                          <div className="w-full h-full bg-muted flex items-center justify-center">
+                            <Heart className="h-8 w-8 text-muted-foreground/30" />
+                          </div>
+                        ) : thumbnails.length === 1 ? (
+                          <img
+                            src={thumbnails[0]}
+                            alt=""
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="grid grid-cols-2 h-full">
+                            {[0, 1, 2, 3].map((i) => (
+                              <div key={i} className="relative">
+                                {thumbnails[i] ? (
+                                  <img
+                                    src={thumbnails[i]}
+                                    alt=""
+                                    className="w-full h-full object-cover"
+                                  />
+                                ) : (
+                                  <div className="w-full h-full bg-muted" />
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        <div className="absolute top-2 right-2">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                              <Button variant="secondary" size="icon" className="h-8 w-8 bg-white/90 hover:bg-white">
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                              <DropdownMenuItem
+                                className="text-destructive"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  deleteWishlist(wishlist.id);
+                                }}
+                              >
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                Delete
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
                       </div>
-                    ) : thumbnails.length === 1 ? (
+                      <div className="p-4">
+                        <h3 className="font-semibold">{wishlist.name}</h3>
+                        <p className="text-sm text-muted-foreground">{itemCount} saved</p>
+                      </div>
+                    </Card>
+                  );
+                })}
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="restaurants">
+            {favoriteRestaurants.length === 0 ? (
+              <div className="text-center py-16">
+                <Utensils className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
+                <h2 className="text-lg font-semibold mb-2">No favorite restaurants yet</h2>
+                <p className="text-muted-foreground mb-6">
+                  Heart restaurants to save them here
+                </p>
+                <Button variant="outline" onClick={() => navigate("/restaurants")}>
+                  Explore Restaurants
+                </Button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {favoriteRestaurants.map((restaurant) => (
+                  <Card 
+                    key={restaurant.id} 
+                    className="overflow-hidden group cursor-pointer hover:shadow-lg transition-shadow"
+                    onClick={() => navigate(`/restaurant/${restaurant.id}`)}
+                  >
+                    <div className="relative aspect-[4/3]">
                       <img
-                        src={thumbnails[0]}
-                        alt=""
+                        src={restaurant.photos?.[0] || '/placeholder.svg'}
+                        alt={restaurant.name}
                         className="w-full h-full object-cover"
                       />
-                    ) : (
-                      <div className="grid grid-cols-2 h-full">
-                        {[0, 1, 2, 3].map((i) => (
-                          <div key={i} className="relative">
-                            {thumbnails[i] ? (
-                              <img
-                                src={thumbnails[i]}
-                                alt=""
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <div className="w-full h-full bg-muted" />
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                    <div className="absolute top-2 right-2">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                          <Button variant="secondary" size="icon" className="h-8 w-8 bg-white/90 hover:bg-white">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                          <DropdownMenuItem
-                            className="text-destructive"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              deleteWishlist(wishlist.id);
-                            }}
-                          >
-                            <Trash2 className="h-4 w-4 mr-2" />
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removeRestaurantFavorite(restaurant.id);
+                        }}
+                        className="absolute top-3 right-3 p-2 rounded-full bg-white/90 hover:bg-white transition-colors"
+                      >
+                        <Heart className="h-5 w-5 fill-red-500 text-red-500" />
+                      </button>
                     </div>
-                  </div>
-                  <div className="p-4">
-                    <h3 className="font-semibold">{wishlist.name}</h3>
-                    <p className="text-sm text-muted-foreground">{itemCount} saved</p>
-                  </div>
-                </Card>
-              );
-            })}
-          </div>
-        )}
+                    <div className="p-4">
+                      <h3 className="font-semibold line-clamp-1">{restaurant.name}</h3>
+                      <p className="text-sm text-muted-foreground line-clamp-1">
+                        {restaurant.cuisine} • {restaurant.neighborhood || restaurant.city}
+                      </p>
+                      {restaurant.rating !== undefined && (
+                        <div className="flex items-center gap-1 mt-2">
+                          <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                          <span className="text-sm font-medium">{restaurant.rating.toFixed(1)}</span>
+                          {restaurant.reviewCount !== undefined && (
+                            <span className="text-sm text-muted-foreground">({restaurant.reviewCount})</span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
       </main>
     </div>
   );
