@@ -89,11 +89,14 @@ const Wishlists = () => {
 
   const loadFavoriteRestaurants = () => {
     const favoriteIds = JSON.parse(localStorage.getItem("restaurantFavorites") || "[]");
+    console.log("Restaurant favorite IDs from localStorage:", favoriteIds);
     const restaurants: FavoriteRestaurant[] = [];
     
     favoriteIds.forEach((id: string) => {
+      console.log("Looking for restaurant with ID:", id);
       // Check mock restaurants first
       const mockRestaurant = mockRestaurants.find(r => r.id === id);
+      console.log("Found in mockRestaurants:", mockRestaurant?.name || "NOT FOUND");
       if (mockRestaurant) {
         restaurants.push({ ...mockRestaurant, favoriteId: id });
         return;
@@ -101,6 +104,7 @@ const Wishlists = () => {
       
       // Check localStorage for API restaurants
       const cached = localStorage.getItem(`restaurant_${id}`);
+      console.log("Found in localStorage cache:", cached ? "YES" : "NO");
       if (cached) {
         try {
           const parsedRestaurant = JSON.parse(cached);
@@ -111,6 +115,7 @@ const Wishlists = () => {
       }
     });
     
+    console.log("Total restaurants loaded:", restaurants.length);
     setFavoriteRestaurants(restaurants);
   };
 
