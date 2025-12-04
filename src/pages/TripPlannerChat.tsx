@@ -55,6 +55,9 @@ const TripPlannerChat = () => {
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
 
+      // Add a "thinking" delay before showing response
+      await new Promise(resolve => setTimeout(resolve, 1200));
+
       let assistantText = "";
       setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
 
@@ -75,9 +78,11 @@ const TripPlannerChat = () => {
             const content = json.choices?.[0]?.delta?.content;
             if (content) {
               assistantText += content;
+              // Ensure double newlines for proper paragraph spacing
+              const formattedText = assistantText.replace(/\n\n/g, '\n\n');
               setMessages((prev) => {
                 const updated = [...prev];
-                updated[updated.length - 1].content = assistantText;
+                updated[updated.length - 1].content = formattedText;
                 return updated;
               });
             }
