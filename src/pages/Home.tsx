@@ -161,11 +161,8 @@ const Home = () => {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32 sm:py-40">
           <div className="text-center space-y-10">
             {/* Logo */}
-            <div className="inline-flex items-center gap-3 mb-2">
-              <img src={stackdLogo} alt="stackd logo" className="h-14 w-14 sm:h-16 sm:w-16 drop-shadow-lg" />
-              <h1 className="text-5xl sm:text-6xl font-bold font-display bg-gradient-to-r from-orange-500 via-pink-500 to-purple-600 bg-clip-text text-transparent drop-shadow-sm">
-                stackd
-              </h1>
+            <div className="mb-4">
+              <img src={stackdLogo} alt="stackd logo" className="h-32 w-32 sm:h-40 sm:w-40 lg:h-48 lg:w-48 drop-shadow-2xl mx-auto" />
             </div>
 
             {/* Headline */}
