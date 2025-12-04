@@ -582,9 +582,8 @@ const AppView = () => {
 
         <TabsContent value="services" className="mt-0">
           <div className="px-4 py-8 space-y-6">
-            <div className="text-center space-y-2">
-              <Sparkles className="h-12 w-12 mx-auto text-primary" />
-              <h2 className="text-2xl font-bold">Welcome to stackd</h2>
+            <div className="text-center space-y-3">
+              <img src={stackdLogo} alt="stackd" className="h-48 w-48 mx-auto" />
               <p className="text-muted-foreground">The seamless experience booking platform</p>
             </div>
 
