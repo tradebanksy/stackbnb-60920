@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Calendar, Clock, Users, ArrowLeft } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import stackdLogo from "@/assets/stackd-logo.png";
+import stackdLogo from "@/assets/stackd-logo-new.png";
 
 const Booking = () => {
   const navigate = useNavigate();

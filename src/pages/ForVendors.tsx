@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { ArrowLeft, Sparkles, Megaphone, Users, TrendingUp, Globe, Calendar, Star } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import stackdLogo from "@/assets/stackd-logo.png";
+import stackdLogo from "@/assets/stackd-logo-new.png";
 
 const ForVendors = () => {
   const navigate = useNavigate();

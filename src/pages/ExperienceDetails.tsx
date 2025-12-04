@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Star, Clock, Users, Check, ArrowLeft } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import stackdLogo from "@/assets/stackd-logo.png";
+import stackdLogo from "@/assets/stackd-logo-new.png";
 
 const ExperienceDetails = () => {
   const navigate = useNavigate();
