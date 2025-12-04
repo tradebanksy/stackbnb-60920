@@ -127,11 +127,11 @@ const RestaurantCard = ({ restaurant, variant = 'horizontal' }: RestaurantCardPr
     );
   }
 
-  // Horizontal scroll card (default) - Airbnb style square cards
+  // Horizontal scroll card (default) - matches Experience cards sizing
   return (
     <Link
       to={`/restaurant/${restaurant.id}`}
-      className="flex-shrink-0 w-[280px] sm:w-[300px] md:w-[320px] group"
+      className="flex-shrink-0 w-[200px] group"
       onClick={handleClick}
     >
       <div className="space-y-2">
