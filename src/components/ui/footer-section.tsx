@@ -9,7 +9,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { Facebook, Instagram, Linkedin, Send, Twitter } from "lucide-react"
-import stackdLogo from "@/assets/stackd-logo.png"
+import stackdLogo from "@/assets/stackd-logo-new.png"
 
 function Footerdemo() {
   return (

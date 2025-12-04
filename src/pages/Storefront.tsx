@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Bike, Waves, Map, Heart, Star, Clock, Users } from "lucide-react";
 import { Link } from "react-router-dom";
-import stackdLogo from "@/assets/stackd-logo.png";
+import stackdLogo from "@/assets/stackd-logo-new.png";
 
 const categories = [
   { icon: Bike, label: "Rentals", emoji: "🚴" },

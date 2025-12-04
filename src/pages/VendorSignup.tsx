@@ -8,7 +8,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useUser } from "@/contexts/UserContext";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import stackdLogo from "@/assets/stackd-logo.png";
+import stackdLogo from "@/assets/stackd-logo-new.png";
 import { cn } from "@/lib/utils";
 
 const VendorSignup = () => {

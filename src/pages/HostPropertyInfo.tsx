@@ -8,7 +8,7 @@ import { useUser } from "@/contexts/UserContext";
 import { useAuthContext } from "@/contexts/AuthContext";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import stackdLogo from "@/assets/stackd-logo.png";
+import stackdLogo from "@/assets/stackd-logo-new.png";
 
 const HostPropertyInfo = () => {
   const navigate = useNavigate();

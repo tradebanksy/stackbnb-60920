@@ -8,7 +8,7 @@ import { useState } from "react";
 import { useAuthContext } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import stackdLogo from "@/assets/stackd-logo.png";
+import stackdLogo from "@/assets/stackd-logo-new.png";
 
 const SignIn = () => {
   const navigate = useNavigate();

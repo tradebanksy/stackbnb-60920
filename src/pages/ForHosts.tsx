@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { ArrowLeft, Store, Users, DollarSign, BarChart3, Calendar, Shield } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import stackdLogo from "@/assets/stackd-logo.png";
+import stackdLogo from "@/assets/stackd-logo-new.png";
 
 const ForHosts = () => {
   const navigate = useNavigate();
