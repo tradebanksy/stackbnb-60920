@@ -367,51 +367,50 @@ const AppView2 = () => {
                 </div>
               </section>
 
-              {/* All Experiences Grid - 2 columns */}
+              {/* Wishlists Section - Shows hearted experiences */}
               <section className="space-y-2">
-                <h2 className="text-sm font-semibold">All Experiences</h2>
-                <div className="grid grid-cols-2 gap-3">
-                  {filteredExperiences.slice(0, 8).map((experience) => (
-                    <Link key={experience.id} to={`/experience/${experience.id}`} className="block">
-                      <div className="aspect-square rounded-xl overflow-hidden relative">
-                        <img
-                          src={getExperienceImage(experience)}
-                          alt={experience.name}
-                          className="w-full h-full object-cover"
-                        />
-                        <button
-                          onClick={(e) => toggleFavorite(experience.id, e)}
-                          className="absolute top-2 right-2 z-10"
-                        >
-                          <Heart
-                            className={`h-4 w-4 drop-shadow-md ${
-                              favorites.includes(experience.id)
-                                ? "fill-red-500 text-red-500"
-                                : "fill-black/40 text-white"
-                            }`}
-                          />
-                        </button>
-                      </div>
-                      <div className="mt-1.5">
-                        <p className="text-xs font-medium line-clamp-1">{experience.name}</p>
-                        <p className="text-[10px] text-muted-foreground line-clamp-1">{experience.vendor}</p>
-                        <div className="flex items-center gap-1 text-[10px]">
-                          <Star className="h-2.5 w-2.5 fill-yellow-400 text-yellow-400" />
-                          <span>{experience.rating}</span>
-                          <span className="text-muted-foreground">•</span>
-                          <span className="font-medium">${experience.price}</span>
-                        </div>
-                      </div>
-                    </Link>
-                  ))}
+                <div className="flex items-center justify-between">
+                  <h2 className="text-sm font-semibold">My Wishlists</h2>
+                  {favorites.length > 0 && (
+                    <span className="text-xs text-muted-foreground">{favorites.length} saved</span>
+                  )}
                 </div>
-                {filteredExperiences.length > 8 && (
-                  <Link 
-                    to="/experiences" 
-                    className="block w-full py-2 text-center text-xs text-primary font-medium"
-                  >
-                    View all {filteredExperiences.length} experiences
-                  </Link>
+                {favorites.length === 0 ? (
+                  <div className="py-8 text-center">
+                    <Heart className="h-8 w-8 mx-auto text-muted-foreground/50 mb-2" />
+                    <p className="text-xs text-muted-foreground">No favorites yet</p>
+                    <p className="text-[10px] text-muted-foreground mt-1">Heart experiences to save them here</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 gap-3">
+                    {experiences.filter(exp => favorites.includes(exp.id)).map((experience) => (
+                      <Link key={experience.id} to={`/experience/${experience.id}`} className="block">
+                        <div className="aspect-square rounded-xl overflow-hidden relative">
+                          <img
+                            src={getExperienceImage(experience)}
+                            alt={experience.name}
+                            className="w-full h-full object-cover"
+                          />
+                          <button
+                            onClick={(e) => toggleFavorite(experience.id, e)}
+                            className="absolute top-2 right-2 z-10"
+                          >
+                            <Heart className="h-4 w-4 drop-shadow-md fill-red-500 text-red-500" />
+                          </button>
+                        </div>
+                        <div className="mt-1.5">
+                          <p className="text-xs font-medium line-clamp-1">{experience.name}</p>
+                          <p className="text-[10px] text-muted-foreground line-clamp-1">{experience.vendor}</p>
+                          <div className="flex items-center gap-1 text-[10px]">
+                            <Star className="h-2.5 w-2.5 fill-yellow-400 text-yellow-400" />
+                            <span>{experience.rating}</span>
+                            <span className="text-muted-foreground">•</span>
+                            <span className="font-medium">${experience.price}</span>
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
                 )}
               </section>
 
