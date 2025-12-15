@@ -157,12 +157,7 @@ const AppView2 = () => {
           {/* Header */}
           <div className="relative z-10 flex items-center justify-between px-4 pt-3 pb-2">
             <ThemeToggle />
-            <div className="flex items-center gap-1.5">
-              <img src={stackdLogo} alt="stackd" className="h-8 w-8" />
-              <span className="text-lg font-bold bg-gradient-to-r from-orange-500 to-purple-600 bg-clip-text text-transparent">
-                stackd
-              </span>
-            </div>
+            <div className="w-8" /> {/* Spacer */}
             <Link
               to="/trip-planner"
               className="p-2 rounded-full bg-gradient-to-r from-orange-500 to-purple-600 text-white"
@@ -172,7 +167,8 @@ const AppView2 = () => {
           </div>
 
           {/* Hero Content */}
-          <div className="relative z-10 px-4 pb-4 pt-2 text-center">
+          <div className="relative z-10 px-4 pb-4 pt-4 text-center">
+            <img src={stackdLogo} alt="stackd" className="h-16 w-16 mx-auto mb-3" />
             <h1 className="text-xl font-bold text-foreground mb-1">
               Discover Experiences
             </h1>
