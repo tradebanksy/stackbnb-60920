@@ -46,6 +46,7 @@ import HostEarnings from "./pages/HostEarnings";
 import HostRatings from "./pages/HostRatings";
 import VendorRatings from "./pages/VendorRatings";
 import AppView from "./pages/AppView";
+import AppView2 from "./pages/AppView2";
 import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
 import TripPlannerChat from "./pages/TripPlannerChat";
@@ -115,6 +116,7 @@ const AppRoutes = () => (
   <Routes>
     <Route path="/" element={<Home />} />
     <Route path="/appview" element={<AppView />} />
+    <Route path="/appview2" element={<AppView2 />} />
     
     {/* Guest/Public Routes */}
     <Route path="/explore" element={<Explore />} />
