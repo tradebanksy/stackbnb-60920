@@ -52,17 +52,6 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        // Custom palette
-        "strawberry-red": "hsl(var(--strawberry-red))",
-        "atomic-tangerine": "hsl(var(--atomic-tangerine))",
-        "carrot-orange": "hsl(var(--carrot-orange))",
-        "coral-glow": "hsl(var(--coral-glow))",
-        "tuscan-sun": "hsl(var(--tuscan-sun))",
-        "willow-green": "hsl(var(--willow-green))",
-        "seagrass": "hsl(var(--seagrass))",
-        "dark-cyan": "hsl(var(--dark-cyan))",
-        "blue-slate": "hsl(var(--blue-slate))",
-        "cerulean": "hsl(var(--cerulean))",
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
