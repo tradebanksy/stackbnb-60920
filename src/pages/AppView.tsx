@@ -190,13 +190,26 @@ const AppView = () => {
               {/* Header */}
               <div className="relative z-10 flex items-center justify-between px-4 pt-3 pb-2">
                 <ThemeToggle />
-                <div className="w-8" /> {/* Spacer */}
-                <Link
-                  to="/trip-planner"
-                  className="p-2 rounded-full bg-gradient-to-r from-orange-500 to-purple-600 text-white"
-                >
-                  <Sparkles className="h-4 w-4" />
-                </Link>
+                <div className="flex items-center gap-2">
+                  <Link
+                    to="/auth"
+                    className="px-3 py-1.5 text-xs font-medium rounded-full border border-border bg-background/80 text-foreground hover:bg-accent transition-colors"
+                  >
+                    Sign In
+                  </Link>
+                  <Link
+                    to="/auth?signup=true"
+                    className="px-3 py-1.5 text-xs font-medium rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                  >
+                    Sign Up
+                  </Link>
+                  <Link
+                    to="/trip-planner"
+                    className="p-2 rounded-full bg-gradient-to-r from-orange-500 to-purple-600 text-white"
+                  >
+                    <Sparkles className="h-4 w-4" />
+                  </Link>
+                </div>
               </div>
 
               {/* Hero Content */}
