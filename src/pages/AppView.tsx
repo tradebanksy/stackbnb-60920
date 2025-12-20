@@ -509,24 +509,24 @@ const AppView = () => {
                       <ul className="space-y-2">
                         <li className="flex items-start gap-2">
                           <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                          <span className="text-xs">Vendor pays 10% commission total</span>
+                          <span className="text-xs">Vendors set their own commission %</span>
                         </li>
                         <li className="flex items-start gap-2">
                           <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                          <span className="text-xs">You keep 7%, we keep 3%</span>
+                          <span className="text-xs">No affiliate program? We'll help set one up</span>
                         </li>
                         <li className="flex items-start gap-2">
                           <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                          <span className="text-xs">Guest pays the vendor's regular price (no markup)</span>
+                          <span className="text-xs">Guests pay regular price (no markup)</span>
                         </li>
                         <li className="flex items-start gap-2">
                           <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                          <span className="text-xs">No hidden fees. No monthly costs.</span>
+                          <span className="text-xs">No hidden fees. No monthly costs for hosts.</span>
                         </li>
                       </ul>
                     </div>
                     <div className="border-t border-border pt-4">
-                      <p className="text-xs text-muted-foreground mb-3">Example: Guest books a $100 cenote tour</p>
+                      <p className="text-xs text-muted-foreground mb-3">Example: Vendor offers 10% on a $100 tour</p>
                       <div className="grid grid-cols-3 gap-2">
                         <div className="bg-muted/50 rounded-lg p-2 text-center">
                           <p className="text-[10px] text-muted-foreground mb-0.5">Guest pays</p>
@@ -534,7 +534,7 @@ const AppView = () => {
                         </div>
                         <div className="bg-gradient-to-r from-orange-500/10 to-purple-600/10 rounded-lg p-2 text-center border border-orange-500/20">
                           <p className="text-[10px] text-muted-foreground mb-0.5">You earn</p>
-                          <p className="text-sm font-bold text-orange-500">$7</p>
+                          <p className="text-sm font-bold text-orange-500">$10</p>
                         </div>
                         <div className="bg-muted/50 rounded-lg p-2 text-center">
                           <p className="text-[10px] text-muted-foreground mb-0.5">Vendor gets</p>
@@ -579,7 +579,23 @@ const AppView = () => {
                       Is there a monthly fee?
                     </AccordionTrigger>
                     <AccordionContent className="text-xs text-muted-foreground pb-3">
-                      No. We only make money when you make money (3% of the commission).
+                      No monthly fee for hosts. stackd earns a small platform fee from vendors.
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="item-5" className="bg-card rounded-lg border border-border px-4">
+                    <AccordionTrigger className="text-left text-xs font-semibold hover:no-underline py-3">
+                      What do vendors get?
+                    </AccordionTrigger>
+                    <AccordionContent className="text-xs text-muted-foreground pb-3">
+                      Advertising and exposure through trusted host recommendations — the most valuable kind of marketing.
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="item-6" className="bg-card rounded-lg border border-border px-4">
+                    <AccordionTrigger className="text-left text-xs font-semibold hover:no-underline py-3">
+                      What do guests get?
+                    </AccordionTrigger>
+                    <AccordionContent className="text-xs text-muted-foreground pb-3">
+                      Convenience of booking highly recommended businesses in one place, curated by their host.
                     </AccordionContent>
                   </AccordionItem>
                 </Accordion>

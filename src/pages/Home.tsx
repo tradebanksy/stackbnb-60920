@@ -395,24 +395,24 @@ const Home = () => {
                 <ul className="space-y-3">
                   <li className="flex items-start gap-3">
                     <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                    <span>Vendor pays 10% commission total</span>
+                    <span>Vendors set their own commission % through their affiliate program</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                    <span>You keep 7%, we keep 3%</span>
+                    <span>No affiliate program? We'll help vendors set one up</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                    <span>Guest pays the vendor's regular price (no markup)</span>
+                    <span>Guests pay the vendor's regular price (no markup)</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                    <span>No hidden fees. No monthly costs.</span>
+                    <span>No hidden fees. No monthly costs for hosts.</span>
                   </li>
                 </ul>
               </div>
               <div className="border-t border-border pt-6">
-                <h4 className="font-semibold mb-3 text-muted-foreground">Example: Guest books a $100 cenote tour</h4>
+                <h4 className="font-semibold mb-3 text-muted-foreground">Example: Vendor offers 10% commission on a $100 tour</h4>
                 <div className="grid sm:grid-cols-3 gap-4">
                   <div className="bg-muted/50 rounded-lg p-4 text-center">
                     <p className="text-sm text-muted-foreground mb-1">Guest pays</p>
@@ -420,7 +420,7 @@ const Home = () => {
                   </div>
                   <div className="bg-gradient-to-r from-orange-500/10 to-purple-600/10 rounded-lg p-4 text-center border border-orange-500/20">
                     <p className="text-sm text-muted-foreground mb-1">You earn</p>
-                    <p className="text-2xl font-bold text-orange-500">$7</p>
+                    <p className="text-2xl font-bold text-orange-500">$10</p>
                   </div>
                   <div className="bg-muted/50 rounded-lg p-4 text-center">
                     <p className="text-sm text-muted-foreground mb-1">Vendor gets</p>
@@ -469,7 +469,31 @@ const Home = () => {
                 Is there a monthly fee?
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground">
-                No. We only make money when you make money (3% of the commission).
+                No monthly fee for hosts. stackd earns a small platform fee from vendors.
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-5" className="bg-card rounded-lg border border-border px-6">
+              <AccordionTrigger className="text-left font-semibold hover:no-underline">
+                What if a vendor doesn't have an affiliate program?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground">
+                We'll help them set one up! We work with vendors to create affiliate programs and profiles so you can start earning.
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-6" className="bg-card rounded-lg border border-border px-6">
+              <AccordionTrigger className="text-left font-semibold hover:no-underline">
+                What do vendors get out of this?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground">
+                Vendors get advertising and exposure to guests through trusted host recommendations — the most valuable kind of marketing.
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-7" className="bg-card rounded-lg border border-border px-6">
+              <AccordionTrigger className="text-left font-semibold hover:no-underline">
+                What do guests get?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground">
+                Guests get the convenience of booking highly recommended businesses in one place — curated by their host, not algorithms.
               </AccordionContent>
             </AccordionItem>
           </Accordion>
