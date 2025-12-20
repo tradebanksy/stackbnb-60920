@@ -2,7 +2,13 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Briefcase, User, Search, Star, Heart, Sparkles } from "lucide-react";
+import { Briefcase, User, Search, Star, Heart, Sparkles, ChevronDown, MapPin, CheckCircle, DollarSign, Zap } from "lucide-react";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuthContext } from "@/contexts/AuthContext";
 import { useEffect, useState } from "react";
@@ -162,6 +168,12 @@ const Home = () => {
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32 sm:py-40">
           <div className="text-center space-y-10">
+            {/* Tulum Badge */}
+            <Badge className="bg-gradient-to-r from-orange-500/10 to-purple-600/10 text-foreground border border-orange-500/30 px-4 py-1.5 text-sm font-medium">
+              <MapPin className="h-3.5 w-3.5 mr-1.5 text-orange-500" />
+              Launching in Tulum, Mexico
+            </Badge>
+
             {/* Logo */}
             <div className="mb-4">
               <img src={stackdLogo} alt="stackd logo" className="h-64 w-64 sm:h-80 sm:w-80 lg:h-96 lg:w-96 drop-shadow-2xl mx-auto" />
@@ -329,6 +341,144 @@ const Home = () => {
               </Link>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Services Section */}
+      <section className="py-16 bg-muted/30">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4">How stackd Works</h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Turn your local knowledge into passive income
+            </p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-6">
+            <Card className="p-6 bg-card border-border/50 hover:border-purple-500/30 hover:shadow-lg transition-all duration-300">
+              <div className="h-12 w-12 rounded-full bg-gradient-to-r from-orange-500/10 to-purple-600/10 flex items-center justify-center mb-4">
+                <Heart className="h-6 w-6 text-orange-500" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Curated Recommendations</h3>
+              <p className="text-muted-foreground">
+                Your personal recommendations, not algorithmic suggestions. Guests trust you, not ads.
+              </p>
+            </Card>
+            <Card className="p-6 bg-card border-border/50 hover:border-purple-500/30 hover:shadow-lg transition-all duration-300">
+              <div className="h-12 w-12 rounded-full bg-gradient-to-r from-orange-500/10 to-purple-600/10 flex items-center justify-center mb-4">
+                <DollarSign className="h-6 w-6 text-purple-500" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Commission Tracking</h3>
+              <p className="text-muted-foreground">
+                See exactly what you've earned from each vendor, updated in real-time.
+              </p>
+            </Card>
+            <Card className="p-6 bg-card border-border/50 hover:border-purple-500/30 hover:shadow-lg transition-all duration-300">
+              <div className="h-12 w-12 rounded-full bg-gradient-to-r from-orange-500/10 to-purple-600/10 flex items-center justify-center mb-4">
+                <Zap className="h-6 w-6 text-pink-500" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Easy Integration</h3>
+              <p className="text-muted-foreground">
+                Paste your guidebook, we handle the rest. No technical skills required.
+              </p>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Transparent Pricing Section */}
+      <section className="py-16 bg-background">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4">Transparent Pricing</h2>
+            <p className="text-muted-foreground">
+              No hidden fees. No monthly costs. Simple.
+            </p>
+          </div>
+          <Card className="p-8 bg-card border-border/50">
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-xl font-semibold mb-4">How It Works:</h3>
+                <ul className="space-y-3">
+                  <li className="flex items-start gap-3">
+                    <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
+                    <span>Vendor pays 10% commission total</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
+                    <span>You keep 7%, we keep 3%</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
+                    <span>Guest pays the vendor's regular price (no markup)</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
+                    <span>No hidden fees. No monthly costs.</span>
+                  </li>
+                </ul>
+              </div>
+              <div className="border-t border-border pt-6">
+                <h4 className="font-semibold mb-3 text-muted-foreground">Example: Guest books a $100 cenote tour</h4>
+                <div className="grid sm:grid-cols-3 gap-4">
+                  <div className="bg-muted/50 rounded-lg p-4 text-center">
+                    <p className="text-sm text-muted-foreground mb-1">Guest pays</p>
+                    <p className="text-2xl font-bold">$100</p>
+                  </div>
+                  <div className="bg-gradient-to-r from-orange-500/10 to-purple-600/10 rounded-lg p-4 text-center border border-orange-500/20">
+                    <p className="text-sm text-muted-foreground mb-1">You earn</p>
+                    <p className="text-2xl font-bold text-orange-500">$7</p>
+                  </div>
+                  <div className="bg-muted/50 rounded-lg p-4 text-center">
+                    <p className="text-sm text-muted-foreground mb-1">Vendor gets</p>
+                    <p className="text-2xl font-bold">$90</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Card>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="py-16 bg-muted/30">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4">Common Questions</h2>
+          </div>
+          <Accordion type="single" collapsible className="space-y-4">
+            <AccordionItem value="item-1" className="bg-card rounded-lg border border-border px-6">
+              <AccordionTrigger className="text-left font-semibold hover:no-underline">
+                Do my guests pay more?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground">
+                No. Guests pay the vendor's regular price. Your commission comes from the vendor, not the guest.
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-2" className="bg-card rounded-lg border border-border px-6">
+              <AccordionTrigger className="text-left font-semibold hover:no-underline">
+                How do I get paid?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground">
+                Automatic payouts every week via Stripe. No chasing vendors for payment.
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-3" className="bg-card rounded-lg border border-border px-6">
+              <AccordionTrigger className="text-left font-semibold hover:no-underline">
+                What if I already recommend these places?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground">
+                Perfect! Now you'll get paid for recommendations you're already making for free.
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-4" className="bg-card rounded-lg border border-border px-6">
+              <AccordionTrigger className="text-left font-semibold hover:no-underline">
+                Is there a monthly fee?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground">
+                No. We only make money when you make money (3% of the commission).
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
         </div>
       </section>
 

@@ -23,9 +23,8 @@ function Footerdemo() {
                 stackd
               </h2>
             </div>
-            <p className="mb-6 text-muted-foreground">
-              Join our newsletter for the latest updates on local experiences and exclusive partner offers.
-            </p>
+            <p className="mb-2 text-lg font-semibold">Ready to Monetize Your Recommendations?</p>
+            <p className="mb-4 text-sm text-muted-foreground">Join 200+ Tulum hosts on the waitlist</p>
             <form className="relative group" onSubmit={(e) => e.preventDefault()}>
               <div className="absolute -inset-1 bg-gradient-to-r from-orange-500 to-pink-500 rounded-lg blur opacity-25 group-hover:opacity-50 transition duration-300"></div>
               <div className="absolute -inset-0.5 bg-gradient-to-r from-orange-400 to-pink-400 rounded-lg blur-sm opacity-20 group-hover:opacity-40 transition duration-300"></div>
