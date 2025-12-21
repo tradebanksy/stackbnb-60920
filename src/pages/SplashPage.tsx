@@ -28,27 +28,24 @@ const SplashPage = () => {
       </div>
 
       {/* Buttons Container */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-5">
         {/* Sign Up Button */}
         <Link
           to="/auth"
           onClick={handleSignupClick}
           className={`
-            relative overflow-hidden px-8 py-4 rounded-lg font-semibold text-base
-            bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500
-            text-white shadow-lg
-            border border-white/10
-            backdrop-blur-sm
+            relative overflow-hidden px-10 py-3.5 rounded-full font-medium text-sm uppercase tracking-widest
+            bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400
+            text-white
+            shadow-[0_4px_20px_rgba(168,85,247,0.4)]
             transition-all duration-300
-            hover:shadow-[0_0_30px_rgba(139,92,246,0.5)]
-            hover:border-purple-400/50
+            hover:shadow-[0_6px_30px_rgba(168,85,247,0.6)]
+            hover:scale-105
             active:scale-95
-            before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-white/20 before:to-transparent
-            before:translate-x-[-200%] hover:before:translate-x-[200%] before:transition-transform before:duration-700
             ${shakeSignup ? 'animate-shake' : ''}
           `}
         >
-          <span className="relative z-10 tracking-wide">Sign Up</span>
+          Sign Up
         </Link>
 
         {/* Explore Button */}
@@ -56,22 +53,19 @@ const SplashPage = () => {
           to="/appview"
           onClick={handleExploreClick}
           className={`
-            relative overflow-hidden px-8 py-4 rounded-lg font-semibold text-base
-            bg-card/80 backdrop-blur-md
+            relative px-10 py-3.5 rounded-full font-medium text-sm uppercase tracking-widest
+            bg-transparent
             text-foreground
-            border border-border/50
-            shadow-lg
+            border-2 border-foreground/30
             transition-all duration-300
-            hover:border-cyan-400/50
-            hover:shadow-[0_0_30px_rgba(6,182,212,0.3)]
-            hover:bg-card
+            hover:border-foreground/60
+            hover:bg-foreground/5
+            hover:scale-105
             active:scale-95
-            before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-cyan-500/10 before:to-transparent
-            before:translate-x-[-200%] hover:before:translate-x-[200%] before:transition-transform before:duration-700
             ${shakeExplore ? 'animate-shake' : ''}
           `}
         >
-          <span className="relative z-10 tracking-wide">Explore</span>
+          Explore
         </Link>
       </div>
     </div>
