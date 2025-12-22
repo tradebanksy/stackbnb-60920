@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
-import { Heart, User, Search, Star, Sparkles, Store, ChevronRight, ChevronDown, Megaphone, Monitor, MapPin, CalendarDays, LogIn, UserPlus, CheckCircle, DollarSign, Zap } from "lucide-react";
+import { Heart, User, Search, Star, Sparkles, Store, ChevronRight, ChevronDown, Megaphone, Monitor, MapPin, CalendarDays, LogIn, UserPlus, CheckCircle, DollarSign, Zap, Home } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import {
   Collapsible,
@@ -623,6 +623,50 @@ const AppView = () => {
                         </AccordionContent>
                       </AccordionItem>
                     </Accordion>
+                  </CollapsibleContent>
+                </Collapsible>
+              </section>
+
+              {/* Partner Links Section */}
+              <section className="space-y-3">
+                <Collapsible>
+                  <CollapsibleTrigger className="w-full">
+                    <div className="flex items-center justify-between p-3 bg-card rounded-lg border border-border hover:border-purple-500/30 transition-all cursor-pointer group">
+                      <h2 className="text-sm font-display font-bold tracking-wide">Partner With Us</h2>
+                      <ChevronDown className="h-4 w-4 text-muted-foreground group-data-[state=open]:rotate-180 transition-transform duration-200" />
+                    </div>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="mt-2 space-y-2">
+                    <Link 
+                      to="/for-vendors" 
+                      className="flex items-center justify-between p-3 bg-card rounded-lg border border-border hover:border-orange-500/50 transition-all group"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="h-8 w-8 rounded-full bg-gradient-to-br from-orange-500 to-pink-500 flex items-center justify-center flex-shrink-0">
+                          <Store className="h-4 w-4 text-white" />
+                        </div>
+                        <div>
+                          <p className="text-xs font-semibold">For Vendors</p>
+                          <p className="text-[10px] text-muted-foreground">Grow your business with stackd</p>
+                        </div>
+                      </div>
+                      <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-orange-500 transition-colors" />
+                    </Link>
+                    <Link 
+                      to="/for-hosts" 
+                      className="flex items-center justify-between p-3 bg-card rounded-lg border border-border hover:border-orange-500/50 transition-all group"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="h-8 w-8 rounded-full bg-gradient-to-br from-orange-500 to-pink-500 flex items-center justify-center flex-shrink-0">
+                          <Home className="h-4 w-4 text-white" />
+                        </div>
+                        <div>
+                          <p className="text-xs font-semibold">For Hosts</p>
+                          <p className="text-[10px] text-muted-foreground">Monetize your recommendations</p>
+                        </div>
+                      </div>
+                      <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-orange-500 transition-colors" />
+                    </Link>
                   </CollapsibleContent>
                 </Collapsible>
               </section>
