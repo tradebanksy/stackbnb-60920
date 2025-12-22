@@ -8,11 +8,7 @@ const ForVendors = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   const handleBack = () => {
-    if (window.history.length > 1) {
-      navigate(-1);
-    } else {
-      navigate("/");
-    }
+    navigate(-1);
   };
 
   useEffect(() => {
