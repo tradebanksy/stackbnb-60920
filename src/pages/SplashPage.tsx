@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import stackdLogo from "@/assets/stackd-logo-new.png";
+import Snowfall from "@/components/Snowfall";
 
 const SplashPage = () => {
   const [shakeExplore, setShakeExplore] = useState(false);
@@ -17,7 +18,8 @@ const SplashPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6">
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6 relative overflow-hidden">
+      <Snowfall />
       {/* Logo */}
       <div className="mb-12">
         <img 
