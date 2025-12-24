@@ -25,7 +25,8 @@ const SplashPage = () => {
         <img 
           src={stackdLogo} 
           alt="stackd logo" 
-          className="h-64 w-64 sm:h-80 sm:w-80 lg:h-96 lg:w-96 drop-shadow-2xl mx-auto" 
+          className="h-64 w-64 sm:h-80 sm:w-80 lg:h-96 lg:w-96 mx-auto"
+          style={{ filter: 'drop-shadow(0 25px 50px rgba(0, 0, 0, 0.5)) drop-shadow(0 10px 20px rgba(0, 0, 0, 0.3))' }}
         />
       </div>
 
