@@ -20,6 +20,16 @@ const SplashPage = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6 relative overflow-hidden">
       <Snowfall />
+      
+      {/* Top right shadow effect */}
+      <div 
+        className="absolute top-0 right-0 w-96 h-96 pointer-events-none"
+        style={{ 
+          background: 'radial-gradient(circle at top right, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.2) 30%, transparent 70%)',
+          filter: 'blur(40px)'
+        }}
+      />
+      
       {/* Logo */}
       <div className="mb-12">
         <img 
