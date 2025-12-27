@@ -10,14 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft, Apple } from "lucide-react";
 import { FaAirbnb } from "react-icons/fa";
 import { authSchema, type AuthFormData } from "@/lib/validations";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -79,7 +72,7 @@ const Auth = () => {
     setLoading(true);
     try {
       const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
+        provider: "google",
         options: {
           redirectTo: `${window.location.origin}/appview`,
         },
@@ -100,7 +93,7 @@ const Auth = () => {
       <div className="w-full max-w-md space-y-6">
         <Button
           variant="ghost"
-          onClick={() => window.history.length > 1 ? navigate(-1) : navigate('/appview')}
+          onClick={() => (window.history.length > 1 ? navigate(-1) : navigate("/appview"))}
           className="mb-4"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
@@ -110,13 +103,9 @@ const Auth = () => {
         <Card className="p-6">
           <div className="space-y-6">
             <div className="text-center space-y-2">
-              <h1 className="text-2xl font-bold">
-                {isSignUp ? "Create Account" : "Welcome Back"}
-              </h1>
+              <h1 className="text-2xl font-bold">{isSignUp ? "Create Account" : "Welcome Back"}</h1>
               <p className="text-sm text-muted-foreground">
-                {isSignUp
-                  ? "Sign up to save your favorite experiences"
-                  : "Sign in to access your profile"}
+                {isSignUp ? "Sign up to save your favorite experiences" : "Sign in to access your profile"}
               </p>
             </div>
 
@@ -129,11 +118,7 @@ const Auth = () => {
                     <FormItem>
                       <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input
-                          type="email"
-                          placeholder="you@example.com"
-                          {...field}
-                        />
+                        <Input type="email" placeholder="you@example.com" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -147,22 +132,14 @@ const Auth = () => {
                     <FormItem>
                       <FormLabel>Password</FormLabel>
                       <FormControl>
-                        <Input
-                          type="password"
-                          placeholder="••••••••"
-                          {...field}
-                        />
+                        <Input type="password" placeholder="••••••••" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
 
-                <Button
-                  type="submit"
-                  className="w-full"
-                  disabled={loading}
-                >
+                <Button type="submit" className="w-full" disabled={loading}>
                   {loading ? "Loading..." : isSignUp ? "Sign Up" : "Sign In"}
                 </Button>
               </form>
@@ -177,9 +154,7 @@ const Auth = () => {
                 }}
                 className="text-sm text-primary hover:underline"
               >
-                {isSignUp
-                  ? "Already have an account? Sign in"
-                  : "Don't have an account? Sign up"}
+                {isSignUp ? "Already have an account? Sign in" : "Don't have an account? Sign up"}
               </button>
             </div>
 
@@ -188,9 +163,7 @@ const Auth = () => {
                 <span className="w-full border-t" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-card px-2 text-muted-foreground">
-                  Or continue with
-                </span>
+                <span className="bg-card px-2 text-muted-foreground">continue with</span>
               </div>
             </div>
 
@@ -222,29 +195,33 @@ const Auth = () => {
                   />
                 </svg>
               </Button>
-              
+
               <Button
                 type="button"
                 variant="outline"
                 size="icon"
                 className="h-12 w-12 rounded-full"
-                onClick={() => toast({
-                  title: "Coming Soon",
-                  description: "Apple Sign-In will be available soon.",
-                })}
+                onClick={() =>
+                  toast({
+                    title: "Coming Soon",
+                    description: "Apple Sign-In will be available soon.",
+                  })
+                }
               >
                 <Apple className="h-5 w-5" />
               </Button>
-              
+
               <Button
                 type="button"
                 variant="outline"
                 size="icon"
                 className="h-12 w-12 rounded-full"
-                onClick={() => toast({
-                  title: "Coming Soon",
-                  description: "Airbnb login will be available soon.",
-                })}
+                onClick={() =>
+                  toast({
+                    title: "Coming Soon",
+                    description: "Airbnb login will be available soon.",
+                  })
+                }
               >
                 <FaAirbnb className="h-5 w-5 text-[#FF5A5F]" />
               </Button>
