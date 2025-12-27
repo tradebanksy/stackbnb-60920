@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.tripadvisor-search]
 verify_jwt = false
+
+[functions.google-reviews]
+verify_jwt = false

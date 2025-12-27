@@ -10,7 +10,9 @@ import {
   Navigation,
   Heart,
   Share2,
-  Globe
+  Globe,
+  MessageSquare,
+  Loader2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -19,6 +21,25 @@ import { toast } from "@/hooks/use-toast";
 import { mockRestaurants, isRestaurantOpen, type Restaurant } from "@/data/mockRestaurants";
 import { formatDistance } from "@/services/geoapifyService";
 import InteractiveSelector from "@/components/ui/interactive-selector";
+import { supabase } from "@/integrations/supabase/client";
+
+interface GoogleReview {
+  author_name: string;
+  author_url?: string;
+  profile_photo_url?: string;
+  rating: number;
+  relative_time_description: string;
+  text: string;
+}
+
+interface GoogleReviewsData {
+  placeId?: string;
+  rating?: number;
+  totalReviews?: number;
+  reviews: GoogleReview[];
+  googleMapsUrl?: string;
+  error?: string;
+}
 
 const RestaurantDetail = () => {
   const { id } = useParams();
@@ -26,6 +47,8 @@ const RestaurantDetail = () => {
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [isFavorite, setIsFavorite] = useState(false);
   const [showReservationWebview, setShowReservationWebview] = useState(false);
+  const [googleReviews, setGoogleReviews] = useState<GoogleReviewsData | null>(null);
+  const [isLoadingReviews, setIsLoadingReviews] = useState(false);
 
   const handleBack = () => {
     if (window.history.length > 1) {
@@ -53,6 +76,38 @@ const RestaurantDetail = () => {
     const favorites = JSON.parse(localStorage.getItem("restaurantFavorites") || "[]");
     setIsFavorite(favorites.includes(id));
   }, [id]);
+
+  // Fetch Google Reviews when restaurant is loaded
+  useEffect(() => {
+    const fetchGoogleReviews = async () => {
+      if (!restaurant) return;
+      
+      setIsLoadingReviews(true);
+      try {
+        const searchQuery = `${restaurant.name} ${restaurant.city}`;
+        const { data, error } = await supabase.functions.invoke('google-reviews', {
+          body: { 
+            searchQuery,
+            lat: restaurant.coordinates?.lat,
+            lng: restaurant.coordinates?.lng
+          }
+        });
+
+        if (error) {
+          console.error('Error fetching Google reviews:', error);
+          return;
+        }
+
+        setGoogleReviews(data);
+      } catch (error) {
+        console.error('Error fetching Google reviews:', error);
+      } finally {
+        setIsLoadingReviews(false);
+      }
+    };
+
+    fetchGoogleReviews();
+  }, [restaurant]);
 
   const toggleFavorite = () => {
     const favorites = JSON.parse(localStorage.getItem("restaurantFavorites") || "[]");
@@ -319,6 +374,87 @@ const RestaurantDetail = () => {
               );
             })}
           </div>
+        </div>
+
+        <Separator />
+
+        {/* Google Reviews Section */}
+        <div className="space-y-3">
+          <h2 className="font-semibold flex items-center gap-2">
+            <MessageSquare className="h-5 w-5 text-muted-foreground" />
+            Google Reviews
+          </h2>
+          
+          {isLoadingReviews ? (
+            <div className="flex items-center justify-center py-4">
+              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+              <span className="ml-2 text-sm text-muted-foreground">Loading reviews...</span>
+            </div>
+          ) : googleReviews?.reviews && googleReviews.reviews.length > 0 ? (
+            <div className="space-y-4">
+              {/* Rating Summary */}
+              {googleReviews.rating && (
+                <div className="flex items-center gap-2 text-sm">
+                  <div className="flex items-center gap-1">
+                    <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                    <span className="font-semibold">{googleReviews.rating.toFixed(1)}</span>
+                  </div>
+                  <span className="text-muted-foreground">
+                    ({googleReviews.totalReviews?.toLocaleString()} reviews on Google)
+                  </span>
+                </div>
+              )}
+
+              {/* Display up to 3 reviews */}
+              <div className="space-y-3">
+                {googleReviews.reviews.slice(0, 3).map((review, index) => (
+                  <div key={index} className="bg-muted/50 rounded-lg p-3 space-y-2">
+                    <div className="flex items-center gap-2">
+                      {review.profile_photo_url && (
+                        <img 
+                          src={review.profile_photo_url} 
+                          alt={review.author_name}
+                          className="w-8 h-8 rounded-full"
+                        />
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">{review.author_name}</p>
+                        <div className="flex items-center gap-1">
+                          {[...Array(5)].map((_, i) => (
+                            <Star 
+                              key={i} 
+                              className={`h-3 w-3 ${i < review.rating ? 'fill-yellow-400 text-yellow-400' : 'text-muted-foreground'}`} 
+                            />
+                          ))}
+                          <span className="text-xs text-muted-foreground ml-1">
+                            {review.relative_time_description}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <p className="text-sm text-muted-foreground line-clamp-3">{review.text}</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* View All Reviews Link */}
+              {googleReviews.googleMapsUrl && (
+                <a
+                  href={googleReviews.googleMapsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 w-full py-2 text-sm text-primary hover:underline"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                  View all reviews on Google Maps
+                </a>
+              )}
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              No Google reviews available for this restaurant.
+            </p>
+          )}
         </div>
       </div>
 
