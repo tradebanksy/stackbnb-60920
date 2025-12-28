@@ -51,7 +51,7 @@ const RoleSelection = () => {
 
       {/* Title */}
       <h1 className="text-2xl sm:text-3xl font-semibold text-foreground mb-2 text-center">Choose your role.</h1>
-      <p className="text-muted-foreground text-sm mb-10 text-center max-w-sm">Choose your role to get started</p>
+      <p className="text-muted-foreground text-sm mb-10 text-center max-w-sm">:)/p>
 
       {/* Role Cards */}
       <div className="flex flex-col sm:flex-row items-stretch gap-4 w-full max-w-2xl">
