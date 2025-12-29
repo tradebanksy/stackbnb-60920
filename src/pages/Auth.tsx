@@ -24,20 +24,26 @@ const Auth = () => {
 
   // Redirect authenticated users based on their role
   useEffect(() => {
-    if (!isLoading && isAuthenticated && userRole) {
+    if (!isLoading && isAuthenticated) {
+      // If user has a role, redirect to appropriate dashboard
       if (userRole === "host") {
         navigate("/host/dashboard", { replace: true });
       } else if (userRole === "vendor") {
         navigate("/vendor/dashboard", { replace: true });
-      } else {
-        navigate("/appview", { replace: true });
+      } else if (role) {
+        // If URL has role param but userRole not set yet, use that
+        if (role === "host") {
+          navigate("/host/dashboard", { replace: true });
+        } else if (role === "vendor") {
+          navigate("/vendor/dashboard", { replace: true });
+        }
       }
     }
-  }, [isAuthenticated, isLoading, userRole, navigate]);
+  }, [isAuthenticated, isLoading, userRole, role, navigate]);
 
-  const getRedirectPath = (userRole: string | null) => {
-    if (userRole === "host") return "/host/dashboard";
-    if (userRole === "vendor") return "/vendor/dashboard";
+  const getRedirectPath = (selectedRole: string | null) => {
+    if (selectedRole === "host") return "/host/dashboard";
+    if (selectedRole === "vendor") return "/vendor/dashboard";
     return "/appview";
   };
 
