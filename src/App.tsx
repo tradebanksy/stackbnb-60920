@@ -69,6 +69,7 @@ import AllRestaurants from "./pages/AllRestaurants";
 import AllExperiences from "./pages/AllExperiences";
 import SplashPage from "./pages/SplashPage";
 import RoleSelection from "./pages/RoleSelection";
+import GuestGuide from "./pages/GuestGuide";
 
 // Protected route component for hosts - uses Supabase session for authentication
 const ProtectedHostRoute = ({ children }: { children: React.ReactNode }) => {
@@ -148,6 +149,7 @@ const AppRoutes = () => (
     <Route path="/restaurants" element={<AllRestaurants />} />
     <Route path="/experiences" element={<AllExperiences />} />
     <Route path="/wishlists" element={<Wishlists />} />
+    <Route path="/guide/:hostId" element={<GuestGuide />} />
     
     {/* Legacy routes */}
     <Route path="/storefront/:id" element={<Storefront />} />

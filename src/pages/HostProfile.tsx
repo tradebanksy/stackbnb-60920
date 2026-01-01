@@ -1,20 +1,54 @@
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { ChevronRight, Store, CreditCard, Receipt, UserPen, Lock, HelpCircle, LogOut } from "lucide-react";
+import { ChevronRight, Store, CreditCard, Receipt, UserPen, Lock, HelpCircle, LogOut, BookMarked, Copy, Check } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import HostBottomNav from "@/components/HostBottomNav";
 import { useSignup } from "@/contexts/SignupContext";
+import { useAuthContext } from "@/contexts/AuthContext";
+import { toast } from "@/hooks/use-toast";
+import { useState } from "react";
 
 const HostProfile = () => {
   const navigate = useNavigate();
   const { hostSignupData, propertyData } = useSignup();
+  const { user } = useAuthContext();
+  const [copied, setCopied] = useState(false);
 
   const firstName = hostSignupData.firstName || "John";
   const lastName = hostSignupData.lastName || "Doe";
   const propertyName = propertyData.propertyName || "Beach House Paradise";
   const initials = `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
 
+  const guideUrl = user ? `${window.location.origin}/guide/${user.id}` : "";
+
+  const handleCopyGuideLink = async () => {
+    if (!guideUrl) return;
+    
+    try {
+      await navigator.clipboard.writeText(guideUrl);
+      setCopied(true);
+      toast({
+        title: "Link copied!",
+        description: "Share this link with your guests",
+      });
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast({
+        title: "Failed to copy",
+        description: "Please copy the link manually",
+        variant: "destructive",
+      });
+    }
+  };
+
   const menuItems = [
+    { 
+      label: "Guest Guide Link", 
+      icon: BookMarked, 
+      action: "copy-guide",
+      gradient: true,
+      description: "Share with guests"
+    },
     { 
       label: "Your Storefront Link", 
       icon: Store, 
@@ -55,11 +89,15 @@ const HostProfile = () => {
       label: "Log Out", 
       icon: LogOut, 
       action: "/signout",
-      gradient: true
+      gradient: false
     },
   ];
 
   const handleMenuClick = (action: string) => {
+    if (action === "copy-guide") {
+      handleCopyGuideLink();
+      return;
+    }
     navigate(action);
   };
 
@@ -111,11 +149,24 @@ const HostProfile = () => {
             >
               <div className="flex items-center gap-3">
                 <item.icon className={`h-5 w-5 flex-shrink-0 ${item.gradient ? 'text-primary' : 'text-muted-foreground'}`} />
-                <span className={`font-medium text-sm ${item.gradient ? 'text-primary' : ''}`}>
-                  {item.label}
-                </span>
+                <div className="text-left">
+                  <span className={`font-medium text-sm block ${item.gradient ? 'text-primary' : ''}`}>
+                    {item.label}
+                  </span>
+                  {'description' in item && item.description && (
+                    <span className="text-xs text-muted-foreground">{item.description}</span>
+                  )}
+                </div>
               </div>
-              <ChevronRight className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+              {item.action === "copy-guide" ? (
+                copied ? (
+                  <Check className="h-5 w-5 text-green-500 flex-shrink-0" />
+                ) : (
+                  <Copy className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                )
+              ) : (
+                <ChevronRight className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+              )}
             </button>
           ))}
         </Card>
