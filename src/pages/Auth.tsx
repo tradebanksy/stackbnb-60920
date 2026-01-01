@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Apple, Users, Home, Briefcase } from "lucide-react";
+import { ArrowLeft, Apple, CheckCircle2, ChevronRight } from "lucide-react";
 import { FaAirbnb } from "react-icons/fa";
 import { authSchema, type AuthFormData } from "@/lib/validations";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -49,14 +49,8 @@ const Auth = () => {
   // Show role selection if no role is specified and user is signing up
   if (!role && isSignUp) {
     return (
-      <div className="min-h-screen bg-background relative overflow-hidden">
-        <div 
-          className="absolute inset-0 bg-cover bg-center opacity-20"
-          style={{ backgroundImage: `url(${heroImage})` }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/10 via-background/80 to-background" />
-        
-        <div className="relative flex items-center justify-center min-h-screen p-4">
+      <div className="min-h-screen bg-muted/30">
+        <div className="flex items-center justify-center min-h-screen p-4">
           <div className="w-full max-w-md space-y-6">
             <button
               onClick={() => navigate(-1)}
@@ -66,73 +60,72 @@ const Auth = () => {
               <span>Back</span>
             </button>
 
-            <Card className="p-8 backdrop-blur-sm bg-card/95 border-border/50 shadow-2xl">
-              <div className="space-y-8">
-                <div className="text-center space-y-2">
-                  <h1 className="text-3xl font-bold">Create Account</h1>
-                  <p className="text-muted-foreground">
-                    How will you be using Stackd?
-                  </p>
-                </div>
+            <div className="space-y-2">
+              <h1 className="text-3xl font-bold tracking-tight">Get Started</h1>
+              <p className="text-muted-foreground">
+                Choose how you want to use Stackd.
+              </p>
+            </div>
 
-                <div className="space-y-4">
-                  <button
-                    onClick={() => handleRoleSelect("user")}
-                    className="w-full group relative overflow-hidden rounded-xl border-2 border-border bg-card p-5 text-left transition-all duration-300 hover:border-primary/50 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-lg">
-                        <Users className="h-6 w-6" />
-                      </div>
-                      <div>
-                        <span className="block font-semibold text-lg">I'm a Guest</span>
-                        <span className="text-sm text-muted-foreground">Discover local experiences</span>
-                      </div>
+            <Card className="p-6 rounded-2xl shadow-sm border-border/50">
+              <div className="space-y-1">
+                <button
+                  onClick={() => handleRoleSelect("user")}
+                  className="w-full flex items-center justify-between p-4 rounded-xl text-left transition-colors hover:bg-muted/50 group"
+                >
+                  <div className="flex items-center gap-3">
+                    <CheckCircle2 className="h-6 w-6 text-green-500" />
+                    <div>
+                      <span className="block font-medium">Guest</span>
+                      <span className="text-sm text-muted-foreground">Discover local experiences</span>
                     </div>
-                  </button>
-                  
-                  <button
-                    onClick={() => handleRoleSelect("host")}
-                    className="w-full group relative overflow-hidden rounded-xl border-2 border-border bg-card p-5 text-left transition-all duration-300 hover:border-primary/50 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-r from-orange-500 to-pink-500 text-white shadow-lg">
-                        <Home className="h-6 w-6" />
-                      </div>
-                      <div>
-                        <span className="block font-semibold text-lg">I'm a Host</span>
-                        <span className="text-sm text-muted-foreground">Create guest guides for my property</span>
-                      </div>
+                  </div>
+                  <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-foreground transition-colors" />
+                </button>
+                
+                <div className="border-t border-border/50" />
+                
+                <button
+                  onClick={() => handleRoleSelect("host")}
+                  className="w-full flex items-center justify-between p-4 rounded-xl text-left transition-colors hover:bg-muted/50 group"
+                >
+                  <div className="flex items-center gap-3">
+                    <CheckCircle2 className="h-6 w-6 text-green-500" />
+                    <div>
+                      <span className="block font-medium">Host</span>
+                      <span className="text-sm text-muted-foreground">Create guest guides for your property</span>
                     </div>
-                  </button>
-                  
-                  <button
-                    onClick={() => handleRoleSelect("vendor")}
-                    className="w-full group relative overflow-hidden rounded-xl border-2 border-border bg-card p-5 text-left transition-all duration-300 hover:border-primary/50 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-r from-purple-500 to-indigo-500 text-white shadow-lg">
-                        <Briefcase className="h-6 w-6" />
-                      </div>
-                      <div>
-                        <span className="block font-semibold text-lg">I'm a Vendor</span>
-                        <span className="text-sm text-muted-foreground">List my business or services</span>
-                      </div>
+                  </div>
+                  <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-foreground transition-colors" />
+                </button>
+                
+                <div className="border-t border-border/50" />
+                
+                <button
+                  onClick={() => handleRoleSelect("vendor")}
+                  className="w-full flex items-center justify-between p-4 rounded-xl text-left transition-colors hover:bg-muted/50 group"
+                >
+                  <div className="flex items-center gap-3">
+                    <CheckCircle2 className="h-6 w-6 text-green-500" />
+                    <div>
+                      <span className="block font-medium">Vendor</span>
+                      <span className="text-sm text-muted-foreground">List your business or services</span>
                     </div>
-                  </button>
-                </div>
-
-                <div className="text-center">
-                  <button
-                    type="button"
-                    onClick={() => setIsSignUp(false)}
-                    className="text-sm text-primary hover:underline"
-                  >
-                    Already have an account? Sign in
-                  </button>
-                </div>
+                  </div>
+                  <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-foreground transition-colors" />
+                </button>
               </div>
             </Card>
+
+            <div className="text-center">
+              <button
+                type="button"
+                onClick={() => setIsSignUp(false)}
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Already have an account? <span className="text-primary font-medium">Sign in</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
