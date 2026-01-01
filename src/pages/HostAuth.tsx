@@ -20,13 +20,33 @@ const HostAuth = () => {
 
     try {
       if (isSignUp) {
-        const { error } = await supabase.auth.signUp({
+        const { data: signUpData, error } = await supabase.auth.signUp({
           email,
           password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/host/dashboard`,
+          },
         });
         if (error) throw error;
-        toast.success("Account created! You can now sign in.");
-        setIsSignUp(false);
+        
+        // Insert host role for the new user
+        if (signUpData.user) {
+          const { error: roleError } = await supabase
+            .from('user_roles')
+            .upsert({ 
+              user_id: signUpData.user.id, 
+              role: 'host' as const
+            }, { 
+              onConflict: 'user_id,role' 
+            });
+          
+          if (roleError) {
+            console.error('Error setting host role:', roleError);
+          }
+        }
+        
+        toast.success("Account created! Redirecting...");
+        navigate("/host/vendors");
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email,

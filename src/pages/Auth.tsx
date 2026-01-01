@@ -193,9 +193,16 @@ const Auth = () => {
           throw error;
         }
         
-        // Save user role if provided
+        // Save user role if provided - use signUpData.user.id directly since auth state may not be updated yet
         if (signUpData.user && role) {
-          const { error: roleError } = await setUserRole(role);
+          const { error: roleError } = await supabase
+            .from('user_roles')
+            .upsert({ 
+              user_id: signUpData.user.id, 
+              role 
+            }, { 
+              onConflict: 'user_id,role' 
+            });
           if (roleError) {
             console.error("Error setting user role:", roleError);
           }
