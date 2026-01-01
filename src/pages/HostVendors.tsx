@@ -77,10 +77,10 @@ const HostVendors = () => {
       .map(r => r.id);
   }, [recommendations]);
 
-  // Filter experiences by saved vendor IDs (using vendorId from experience)
+  // Filter experiences by saved vendor IDs (using experience id as the vendor identifier)
   const savedExperiences = useMemo(() => {
     return experiences.filter(exp => 
-      savedVendorIds.includes(String(exp.vendorId))
+      savedVendorIds.includes(String(exp.id))
     );
   }, [savedVendorIds]);
 
@@ -186,7 +186,7 @@ const HostVendors = () => {
               Browse experiences and click "Add to Vendor List" to add vendors here.
             </p>
             <Link 
-              to="/explore"
+              to="/explore?mode=host"
               className="inline-flex items-center justify-center px-6 py-3 rounded-full bg-gradient-to-r from-orange-500 to-pink-500 text-white font-medium hover:scale-105 transition-all"
             >
               Explore Vendors
