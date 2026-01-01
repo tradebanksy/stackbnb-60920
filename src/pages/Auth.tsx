@@ -46,6 +46,39 @@ const Auth = () => {
     }
   }, [isAuthenticated, isLoading, userRole, navigate]);
 
+  // Handle OAuth callback - save pending role after Google sign-in
+  useEffect(() => {
+    const handleOAuthCallback = async () => {
+      const pendingRole = localStorage.getItem('pending_role') as 'host' | 'vendor' | 'user' | null;
+      
+      if (isAuthenticated && pendingRole && !userRole) {
+        // User just signed in via OAuth and has a pending role to save
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (user) {
+          const { error: roleError } = await supabase
+            .from('user_roles')
+            .upsert({ 
+              user_id: user.id, 
+              role: pendingRole 
+            }, { 
+              onConflict: 'user_id,role' 
+            });
+          
+          if (!roleError) {
+            localStorage.removeItem('pending_role');
+            // Use setUserRole to update context and trigger redirect
+            await setUserRole(pendingRole);
+          } else {
+            console.error("Error setting user role:", roleError);
+          }
+        }
+      }
+    };
+    
+    handleOAuthCallback();
+  }, [isAuthenticated, userRole, setUserRole]);
+
   const handleRoleSelect = (selectedRole: "host" | "vendor" | "user") => {
     setSearchParams({ role: selectedRole });
   };
@@ -293,39 +326,6 @@ const Auth = () => {
       setLoading(false);
     }
   };
-
-  // Handle OAuth callback - save pending role after Google sign-in
-  useEffect(() => {
-    const handleOAuthCallback = async () => {
-      const pendingRole = localStorage.getItem('pending_role') as 'host' | 'vendor' | 'user' | null;
-      
-      if (isAuthenticated && pendingRole && !userRole) {
-        // User just signed in via OAuth and has a pending role to save
-        const { data: { user } } = await supabase.auth.getUser();
-        
-        if (user) {
-          const { error: roleError } = await supabase
-            .from('user_roles')
-            .upsert({ 
-              user_id: user.id, 
-              role: pendingRole 
-            }, { 
-              onConflict: 'user_id,role' 
-            });
-          
-          if (!roleError) {
-            localStorage.removeItem('pending_role');
-            // Use setUserRole to update context and trigger redirect
-            await setUserRole(pendingRole);
-          } else {
-            console.error("Error setting user role:", roleError);
-          }
-        }
-      }
-    };
-    
-    handleOAuthCallback();
-  }, [isAuthenticated, userRole, setUserRole]);
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
