@@ -22,6 +22,7 @@ import { mockRestaurants, isRestaurantOpen, type Restaurant } from "@/data/mockR
 import { formatDistance } from "@/services/geoapifyService";
 import InteractiveSelector from "@/components/ui/interactive-selector";
 import { supabase } from "@/integrations/supabase/client";
+import { GuestGuideButton } from "@/components/GuestGuideButton";
 
 interface GoogleReview {
   author_name: string;
@@ -456,6 +457,15 @@ const RestaurantDetail = () => {
             </p>
           )}
         </div>
+
+        {/* Host Guest Guide Button */}
+        {restaurant && (
+          <GuestGuideButton
+            itemId={restaurant.id}
+            itemType="restaurant"
+            itemName={restaurant.name}
+          />
+        )}
       </div>
 
       {/* Fixed bottom CTA */}

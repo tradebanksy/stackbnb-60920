@@ -5,6 +5,7 @@ import { ArrowLeft, Star, Clock, Users, CheckCircle } from "lucide-react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { experiences } from "@/data/mockData";
 import InteractiveSelector from "@/components/ui/interactive-selector";
+import { GuestGuideButton } from "@/components/GuestGuideButton";
 import { FaWater, FaBicycle, FaSwimmer, FaCamera, FaSpa, FaWineGlass, FaMotorcycle, FaShip, FaTree, FaHorse, FaMask, FaMountain, FaParachuteBox, FaPray, FaFish, FaUtensils, FaCloudSun, FaGlassCheers } from 'react-icons/fa';
 
 // Base images
@@ -264,6 +265,13 @@ const ExperienceDetails = () => {
               </ul>
             </Card>
           </div>
+
+          {/* Host Guest Guide Button */}
+          <GuestGuideButton
+            itemId={String(experience.id)}
+            itemType="experience"
+            itemName={experience.name}
+          />
         </div>
 
         {/* Fixed Bottom CTA */}
