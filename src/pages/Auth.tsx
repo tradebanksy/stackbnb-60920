@@ -161,15 +161,9 @@ const Auth = () => {
   const handleAuth = async (data: AuthFormData) => {
     setLoading(true);
     
-    // Set a 10 second timeout
-    const timeoutId = setTimeout(() => {
-      setLoading(false);
-      toast({
-        title: "Connection Error",
-        description: "Request timed out. Please check your internet connection and try again.",
-        variant: "destructive",
-      });
-    }, 10000);
+    // Use AbortController for proper timeout handling
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
 
     try {
       if (isSignUp) {
@@ -185,6 +179,16 @@ const Auth = () => {
         clearTimeout(timeoutId);
         
         if (error) {
+          // Handle "User already registered" - offer to sign in instead
+          if (error.message.includes("already registered") || error.message.includes("already exists")) {
+            toast({
+              title: "Account Exists",
+              description: "This email is already registered. Try signing in instead.",
+            });
+            setIsSignUp(false);
+            setLoading(false);
+            return;
+          }
           setLoading(false);
           throw error;
         }
@@ -238,7 +242,18 @@ const Auth = () => {
     } catch (error: unknown) {
       clearTimeout(timeoutId);
       setLoading(false);
-      const errorMessage = error instanceof Error ? error.message : "An error occurred. Please check your connection and try again.";
+      
+      // Handle abort/timeout
+      if (error instanceof Error && error.name === 'AbortError') {
+        toast({
+          title: "Connection Timeout",
+          description: "Request took too long. Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      const errorMessage = error instanceof Error ? error.message : "An error occurred. Please try again.";
       toast({
         title: "Error",
         description: errorMessage,
