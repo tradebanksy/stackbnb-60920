@@ -1,168 +1,202 @@
-import { Card } from "@/components/ui/card";
+import { useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Search, Star, ArrowLeft } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { cn } from "@/lib/utils";
+import { Search, Star, MapPin, CalendarDays, ArrowLeft, User, Sparkles, LogIn, UserPlus } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { experiences } from "@/data/mockData";
 import heroImage from "@/assets/hero-beach.jpg";
-import { useState } from "react";
+import stackdLogo from "@/assets/stackd-logo-new.png";
+import { format } from "date-fns";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { ExperienceCard } from "@/components/ExperienceCard";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useAuthContext } from "@/contexts/AuthContext";
 
 const categories = [
-  { id: "all", name: "All Experiences", icon: "✨" },
-  { id: "Water Sports", name: "Water Sports", icon: "🌊" },
-  { id: "Transportation", name: "Transportation", icon: "🚴" },
-  { id: "Food & Dining", name: "Food & Dining", icon: "🍷" },
+  { id: "all", name: "All", icon: "✨" },
+  { id: "Water Sports", name: "Water", icon: "🌊" },
+  { id: "Tours & Activities", name: "Tours", icon: "🗺️" },
+  { id: "Transportation", name: "Transport", icon: "🚴" },
+  { id: "Food & Dining", name: "Food", icon: "🍷" },
   { id: "Wellness", name: "Wellness", icon: "💆" },
-  { id: "Photography", name: "Photography", icon: "📸" },
+  { id: "Photography", name: "Photo", icon: "📸" },
 ];
-
-// Image mapping based on experience category and name
-const getExperienceImage = (experience) => {
-  const imageMap = {
-    1: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&auto=format&fit=crop", // Sunset kayaking
-    2: "https://images.unsplash.com/photo-1571068316344-75bc76f77890?w=800&auto=format&fit=crop", // Beach bikes
-    3: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&auto=format&fit=crop", // Snorkeling
-    4: "https://images.unsplash.com/photo-1452421822248-d4c2b47f0c81?w=800&auto=format&fit=crop", // Beach photography
-    5: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800&auto=format&fit=crop", // Spa/wellness
-    6: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&auto=format&fit=crop", // Food & wine
-  };
-  return imageMap[experience.id] || imageMap[1];
-};
 
 const Explore = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [locationQuery, setLocationQuery] = useState("");
+  const [calendarOpen, setCalendarOpen] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { isAuthenticated, role } = useAuthContext();
+  
+  // Check if we're in host mode (came from host vendors page)
+  const isHostMode = searchParams.get('mode') === 'host' || (isAuthenticated && role === 'host');
 
-  const filteredExperiences = selectedCategory === "all" 
-    ? experiences 
-    : experiences.filter(exp => exp.category === selectedCategory);
+  const filteredExperiences = experiences.filter((exp) => {
+    const matchesCategory = selectedCategory === "all" || exp.category === selectedCategory;
+    const matchesSearch = searchQuery === "" || 
+      exp.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      exp.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      exp.vendor.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      exp.description.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
 
   return (
-    <div className="min-h-screen bg-background relative overflow-hidden">
-      <div 
-        className="absolute inset-0 bg-cover bg-center opacity-20"
-        style={{ backgroundImage: `url(${heroImage})` }}
-      />
-      <div className="absolute inset-0 bg-gradient-to-b from-primary/10 via-background/80 to-background" />
-      
-      <div className="relative max-w-7xl mx-auto px-4 py-8 space-y-6">
-        {/* Back Button */}
-        <button
-          onClick={() => window.history.length > 1 ? navigate(-1) : navigate('/appview')}
-          className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <ArrowLeft className="h-5 w-5" />
-          <span>Back</span>
-        </button>
+    <div className="min-h-screen h-screen w-screen bg-background flex justify-center overflow-hidden">
+      {/* Phone Container - Centered & Constrained */}
+      <div className="w-full max-w-[430px] h-full flex flex-col bg-background overflow-hidden relative">
+        
+        {/* Scrollable Content */}
+        <div className="flex-1 overflow-y-auto overflow-x-hidden pb-20">
+          {/* Hero Section */}
+          <div className="relative">
+            {/* Background image */}
+            <div
+              className="absolute inset-0 bg-cover bg-center"
+              style={{ 
+                backgroundImage: `url(${heroImage})`,
+                filter: 'blur(1px)',
+              }}
+            />
+            <div className="absolute inset-0 bg-background/70" />
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background" />
 
-        {/* Hero Section with Centered 3D Search */}
-        <div className="text-center space-y-4 pt-6 pb-4">
-          {/* 3D Search Box - Airbnb Style (20% smaller) */}
-          <div className="max-w-2xl mx-auto">
-            <div className="relative group">
-              {/* Shadow layers for 3D effect */}
-              <div className="absolute -inset-1 bg-gradient-to-r from-orange-500 to-pink-500 rounded-full blur opacity-25 group-hover:opacity-40 transition duration-300"></div>
-              <div className="absolute -inset-0.5 bg-gradient-to-r from-orange-400 to-pink-400 rounded-full blur-sm opacity-20 group-hover:opacity-30 transition duration-300"></div>
-              
-              {/* Main search container */}
-              <div className="relative bg-card rounded-full shadow-2xl border border-border/50 backdrop-blur-sm overflow-hidden hover:shadow-3xl transition-all duration-300">
-                <div className="flex items-center px-6 py-4 gap-3">
-                  <Search className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                  <Input 
-                    placeholder="Search experiences..." 
-                    className="border-0 bg-transparent text-base shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 px-0"
+            {/* Header */}
+            <div className="relative z-10 flex items-center justify-between px-4 pt-3 pb-2">
+              <button
+                onClick={() => navigate(-1)}
+                className="p-2 rounded-full bg-background/80 border border-border text-foreground hover:bg-accent transition-colors"
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </button>
+              <div className="flex items-center gap-2">
+                <ThemeToggle />
+                <DropdownMenu>
+                  <DropdownMenuTrigger className="p-2 rounded-full bg-background/80 border border-border text-foreground hover:bg-accent transition-colors">
+                    <User className="h-4 w-4" />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-40">
+                    <DropdownMenuItem asChild>
+                      <Link to="/auth" className="flex items-center gap-2 cursor-pointer">
+                        <LogIn className="h-4 w-4" />
+                        Sign In
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/auth?signup=true" className="flex items-center gap-2 cursor-pointer">
+                        <UserPlus className="h-4 w-4" />
+                        Sign Up
+                      </Link>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <Link
+                  to="/trip-planner"
+                  className="p-2 rounded-full bg-gradient-to-r from-orange-500 to-purple-600 text-white"
+                >
+                  <Sparkles className="h-4 w-4" />
+                </Link>
+              </div>
+            </div>
+
+            {/* Hero Content */}
+            <div className="relative z-10 px-4 pb-4 pt-4 text-center">
+              <img src={stackdLogo} alt="stackd" className="h-40 w-40 mx-auto mb-3" />
+              <h1 className="text-xl font-bold text-foreground mb-1">
+                {isHostMode ? "Explore Vendors" : "Discover Experiences"}
+              </h1>
+              <p className="text-xs text-muted-foreground mb-3">
+                {isHostMode ? "Add vendors to your list by tapping the +" : "Find amazing experiences nearby"}
+              </p>
+
+              {/* Search Section - Single Bar */}
+              <div className="relative">
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-orange-500/20 to-purple-600/20 rounded-full blur-sm"></div>
+                <div className="relative bg-card/90 rounded-full border border-border/50 backdrop-blur-sm flex items-center px-3 py-2 gap-2">
+                  <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
+                  <Input
+                    placeholder="Search vendors..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="border-0 bg-transparent text-sm h-6 shadow-none focus-visible:ring-0 px-0 placeholder:text-muted-foreground flex-1 min-w-0"
                   />
-                  <button className="bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white rounded-full p-3 flex-shrink-0 transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg">
-                    <Search className="h-4 w-4" />
+                  <div className="h-4 w-px bg-border/50 flex-shrink-0" />
+                  <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+                    <PopoverTrigger asChild>
+                      <button className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors flex-shrink-0 min-w-[100px]">
+                        <CalendarDays className="h-4 w-4 text-primary" />
+                        <span className="text-xs whitespace-nowrap">
+                          {selectedDate ? format(selectedDate, "MMM d, yyyy") : "When?"}
+                        </span>
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="end">
+                      <Calendar
+                        mode="single"
+                        selected={selectedDate}
+                        onSelect={(date) => {
+                          setSelectedDate(date);
+                          setCalendarOpen(false);
+                        }}
+                        initialFocus
+                        className={cn("p-3 pointer-events-auto")}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <button className="bg-gradient-to-r from-orange-500 to-purple-600 text-white rounded-full p-1.5 flex-shrink-0">
+                    <Search className="h-3 w-3" />
                   </button>
                 </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Category Filters */}
-        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide justify-center flex-wrap">
-          {categories.map((category) => (
-            <button
-              key={category.id}
-              onClick={() => setSelectedCategory(category.id)}
-              className={`
-                flex items-center gap-1.5 px-3 py-1.5 rounded-full border-2 whitespace-nowrap text-sm
-                transition-all duration-300 hover:scale-105 active:scale-95 shadow-md
-                ${selectedCategory === category.id 
-                  ? 'bg-gradient-to-r from-orange-500 to-pink-500 text-white border-transparent shadow-lg scale-105' 
-                  : 'bg-card hover:border-primary/50 hover:shadow-lg'
-                }
-              `}
-            >
-              <span className="text-base">{category.icon}</span>
-              <span className="font-medium">{category.name}</span>
-            </button>
-          ))}
-        </div>
+          <div className="px-3 py-3 space-y-4">
+            {/* Category Filters */}
+            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+              {categories.map((category) => (
+                <button
+                  key={category.id}
+                  onClick={() => setSelectedCategory(category.id)}
+                  className={`
+                    flex items-center gap-1.5 px-3 py-1.5 rounded-full border whitespace-nowrap text-xs
+                    transition-all duration-300 
+                    ${selectedCategory === category.id 
+                      ? 'bg-gradient-to-r from-orange-500 to-pink-500 text-white border-transparent shadow-lg' 
+                      : 'bg-card hover:border-primary/50 border-border'
+                    }
+                  `}
+                >
+                  <span className="text-sm">{category.icon}</span>
+                  <span className="font-medium">{category.name}</span>
+                </button>
+              ))}
+            </div>
 
-        {/* Experiences Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 pb-12">
-          {filteredExperiences.map((experience) => (
-            <Link
-              key={experience.id}
-              to={`/experience/${experience.id}`}
-              className="block group"
-            >
-              <div className="space-y-2">
-                {/* Image - Half size */}
-                <div className="relative aspect-square overflow-hidden rounded-xl shadow-md">
-                  <div 
-                    className="absolute inset-0 bg-cover bg-center group-hover:scale-110 transition-transform duration-700"
-                    style={{ 
-                      backgroundImage: `url(${getExperienceImage(experience)})` 
-                    }}
-                  />
-                  
-                  {/* Category Badge */}
-                  <div className="absolute top-2 right-2 z-20">
-                    <Badge variant="secondary" className="bg-white/95 text-foreground backdrop-blur-sm shadow-md text-xs px-2 py-0.5">
-                      <span className="mr-0.5">{experience.categoryIcon}</span>
-                    </Badge>
-                  </div>
-
-                  {/* Hover Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                </div>
-
-                {/* Content */}
-                <div className="space-y-0.5">
-                  <div className="flex items-start justify-between gap-1">
-                    <h3 className="font-semibold text-sm leading-tight line-clamp-2 flex-1">
-                      {experience.name}
-                    </h3>
-                  </div>
-
-                  <p className="text-xs text-muted-foreground">
-                    {experience.vendor}
-                  </p>
-
-                  {/* Stats */}
-                  <div className="flex items-center gap-1.5 text-xs">
-                    <div className="flex items-center gap-0.5">
-                      <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                      <span className="font-semibold">{experience.rating}</span>
-                    </div>
-                    <span className="text-muted-foreground">({experience.reviewCount})</span>
-                    <span className="text-muted-foreground">•</span>
-                    <span className="text-muted-foreground">{experience.duration}</span>
-                  </div>
-
-                  {/* Price */}
-                  <div className="pt-0.5">
-                    <span className="text-sm font-semibold">${experience.price}</span>
-                    <span className="text-muted-foreground text-xs"> per person</span>
-                  </div>
-                </div>
-              </div>
-            </Link>
-          ))}
+            {/* Experiences Grid */}
+            <div className="grid grid-cols-2 gap-3">
+              {filteredExperiences.map((experience) => (
+                <ExperienceCard 
+                  key={experience.id} 
+                  experience={experience} 
+                  showAddButton={isHostMode}
+                />
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>
