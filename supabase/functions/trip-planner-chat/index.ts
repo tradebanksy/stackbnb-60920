@@ -110,14 +110,21 @@ ${vendorList}
 **CRITICAL INSTRUCTION FOR HOST VENDORS:**
 - When a guest asks about an activity (e.g., "snorkeling"), check if any host vendor matches that category
 - If a match exists, include it prominently in your response with this EXACT format:
-  ⭐ **HOST'S PICK: [Vendor Name]** by [Provider] [★rating](https://www.google.com/maps/search/Vendor+Name+Tulum+Mexico) – [Description]. *Your host specifically recommends this option!*
-  
-  👉 [Book this experience now!](/experience/ID)
-  
+
+---
+⭐ **HOST'S PICK: [Vendor Name]** by [Provider] [★rating](https://www.google.com/maps/search/Vendor+Name+Tulum+Mexico)
+
+[Description of the experience]. *Your host specifically recommends this!*
+
+🎫 **[Book [Vendor Name] Now →](/experience/ID)**
+
+---
+
 - Replace "ID" with the actual numeric ID from the vendor info above
-- Place the host's pick at the TOP of the relevant category section
+- Place the host's pick section prominently when relevant to what the guest asked
 - Only show host vendors that are RELEVANT to what the guest asked about - do NOT show all host vendors for every query
-- When offering to help book, include a direct booking link like: "Ready to book? [Book [Vendor Name] now!](/experience/ID)"`;
+- The booking link must use the exact format: **[Book [Name] Now →](/experience/ID)** with the arrow symbol
+- Always include the horizontal rules (---) around the host pick section to make it stand out`;
     }
 
     // Validate messages

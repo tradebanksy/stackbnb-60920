@@ -19,8 +19,6 @@ import {
   Eye,
   EyeOff,
   Moon,
-  Star,
-  ExternalLink,
 } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -33,7 +31,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useTheme } from "next-themes";
-import { experiences } from "@/data/mockData";
 
 // Bionic reading: bold first part of each word
 function applyBionicReading(text: string): string {
@@ -113,7 +110,6 @@ export default function TripPlannerChatUI({
   const { theme, setTheme } = useTheme();
   const [message, setMessage] = useState("");
   const [bionicEnabled, setBionicEnabled] = useState(false);
-  const [showVendorLinks, setShowVendorLinks] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { textareaRef, adjustHeight } = useAutoResizeTextarea({
@@ -369,50 +365,6 @@ export default function TripPlannerChatUI({
               <div ref={messagesEndRef} />
             </div>
           </ScrollArea>
-
-          {/* Host Vendor Quick Links */}
-          {hostVendors.length > 0 && showVendorLinks && (
-            <div className="border-t border-border bg-muted/30 px-4 py-3">
-              <div className="max-w-2xl mx-auto">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-xs font-medium text-muted-foreground flex items-center gap-1">
-                    <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                    Your Host's Recommended Vendors
-                  </p>
-                  <button 
-                    onClick={() => setShowVendorLinks(false)}
-                    className="text-xs text-muted-foreground hover:text-foreground"
-                  >
-                    Hide
-                  </button>
-                </div>
-                <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-                  {hostVendors.map((vendor) => {
-                    const exp = experiences.find(e => e.id === vendor.id);
-                    return (
-                      <Link
-                        key={vendor.id}
-                        to={`/experience/${vendor.id}`}
-                        className="flex-shrink-0 flex items-center gap-2 px-3 py-2 rounded-lg bg-background border border-border hover:border-primary/50 hover:bg-accent/50 transition-all group"
-                      >
-                        <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400 flex-shrink-0" />
-                        <div className="min-w-0">
-                          <p className="text-xs font-medium truncate group-hover:text-primary transition-colors max-w-[120px]">
-                            {vendor.name}
-                          </p>
-                          <p className="text-[10px] text-muted-foreground">
-                            ★{vendor.rating}
-                          </p>
-                        </div>
-                        <ExternalLink className="h-3 w-3 text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0" />
-                      </Link>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-          )}
-
           {/* Input at Bottom */}
           <div className="p-4 border-t border-border">
             <div className="max-w-2xl mx-auto">
