@@ -7,12 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Apple, CheckCircle2, ChevronRight } from "lucide-react";
+import { ArrowLeft, Apple, Building2, Store, Users } from "lucide-react";
 import { FaAirbnb } from "react-icons/fa";
 import { authSchema, type AuthFormData } from "@/lib/validations";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useAuthContext } from "@/contexts/AuthContext";
 import heroImage from "@/assets/hero-beach.jpg";
+import stackdLogo from "@/assets/stackd-logo-new.png";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -58,74 +59,81 @@ const Auth = () => {
   // Show role selection if no role is specified and user is signing up
   if (!role && isSignUp) {
     return (
-      <div className="min-h-screen bg-muted/30">
-        <div className="flex items-center justify-center min-h-screen p-4">
-          <div className="w-full max-w-md space-y-6">
-            <button
-              onClick={() => navigate(-1)}
-              className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <ArrowLeft className="h-5 w-5" />
-              <span>Back</span>
-            </button>
-
-            <div className="space-y-2">
-              <h1 className="text-3xl font-bold tracking-tight">Get Started</h1>
-              <p className="text-muted-foreground">
-                Choose how you want to use Stackd.
-              </p>
+      <div className="min-h-screen bg-gradient-to-b from-orange-50/50 to-background">
+        <div className="flex flex-col items-center justify-center min-h-screen p-4">
+          <div className="w-full max-w-md space-y-8">
+            {/* Logo */}
+            <div className="flex justify-center">
+              <img 
+                src={stackdLogo}
+                alt="Stackd" 
+                className="h-24 w-24 object-contain"
+              />
             </div>
 
-            <Card className="p-6 rounded-2xl shadow-sm border-border/50">
-              <div className="space-y-1">
-                <button
-                  onClick={() => handleRoleSelect("user")}
-                  className="w-full flex items-center justify-between p-4 rounded-xl text-left transition-colors hover:bg-muted/50 group"
-                >
-                  <div className="flex items-center gap-3">
-                    <CheckCircle2 className="h-6 w-6 text-green-500" />
-                    <div>
-                      <span className="block font-medium">Guest</span>
-                      <span className="text-sm text-muted-foreground">Discover local experiences</span>
-                    </div>
-                  </div>
-                  <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-foreground transition-colors" />
-                </button>
-                
-                <div className="border-t border-border/50" />
-                
-                <button
-                  onClick={() => handleRoleSelect("host")}
-                  className="w-full flex items-center justify-between p-4 rounded-xl text-left transition-colors hover:bg-muted/50 group"
-                >
-                  <div className="flex items-center gap-3">
-                    <CheckCircle2 className="h-6 w-6 text-green-500" />
-                    <div>
-                      <span className="block font-medium">Host</span>
-                      <span className="text-sm text-muted-foreground">Create guest guides for your property</span>
-                    </div>
-                  </div>
-                  <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-foreground transition-colors" />
-                </button>
-                
-                <div className="border-t border-border/50" />
-                
-                <button
-                  onClick={() => handleRoleSelect("vendor")}
-                  className="w-full flex items-center justify-between p-4 rounded-xl text-left transition-colors hover:bg-muted/50 group"
-                >
-                  <div className="flex items-center gap-3">
-                    <CheckCircle2 className="h-6 w-6 text-green-500" />
-                    <div>
-                      <span className="block font-medium">Vendor</span>
-                      <span className="text-sm text-muted-foreground">List your business or services</span>
-                    </div>
-                  </div>
-                  <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-foreground transition-colors" />
-                </button>
-              </div>
-            </Card>
+            {/* Title */}
+            <div className="text-center">
+              <h1 className="text-3xl font-bold tracking-tight">Choose your role.</h1>
+            </div>
 
+            {/* Role Cards */}
+            <div className="space-y-4">
+              {/* Guest Card */}
+              <button
+                onClick={() => handleRoleSelect("user")}
+                className="w-full rounded-2xl border-2 border-border bg-card p-6 text-center transition-all duration-200 hover:border-blue-400 hover:shadow-lg focus:outline-none focus:border-blue-500"
+              >
+                <div className="flex flex-col items-center gap-4">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-blue-400 to-cyan-500">
+                    <Users className="h-8 w-8 text-white" />
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="text-xl font-bold">Guest</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Discover local experiences and activities curated by your host.
+                    </p>
+                  </div>
+                </div>
+              </button>
+
+              {/* Host Card */}
+              <button
+                onClick={() => handleRoleSelect("host")}
+                className="w-full rounded-2xl border-2 border-border bg-card p-6 text-center transition-all duration-200 hover:border-purple-400 hover:shadow-lg focus:outline-none focus:border-purple-500"
+              >
+                <div className="flex flex-col items-center gap-4">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-purple-400 to-pink-500">
+                    <Building2 className="h-8 w-8 text-white" />
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="text-xl font-bold">Host</h3>
+                    <p className="text-sm text-muted-foreground">
+                      List your property and connect with vendors to offer curated experiences to your guests.
+                    </p>
+                  </div>
+                </div>
+              </button>
+
+              {/* Vendor Card */}
+              <button
+                onClick={() => handleRoleSelect("vendor")}
+                className="w-full rounded-2xl border-2 border-border bg-card p-6 text-center transition-all duration-200 hover:border-orange-400 hover:shadow-lg focus:outline-none focus:border-orange-500"
+              >
+                <div className="flex flex-col items-center gap-4">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-orange-400 to-red-500">
+                    <Store className="h-8 w-8 text-white" />
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="text-xl font-bold">Vendor</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Offer your services and experiences to guests through partner hosts.
+                    </p>
+                  </div>
+                </div>
+              </button>
+            </div>
+
+            {/* Sign in link */}
             <div className="text-center">
               <button
                 type="button"
