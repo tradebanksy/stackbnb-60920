@@ -1,12 +1,19 @@
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { ChevronRight, Store, CreditCard, Receipt, UserPen, Lock, HelpCircle, LogOut, BookMarked, Copy, Check } from "lucide-react";
+import { ChevronRight, Store, CreditCard, Receipt, UserPen, Lock, HelpCircle, LogOut, BookMarked, Copy, Check, Share2, MessageCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import HostBottomNav from "@/components/HostBottomNav";
 import { useSignup } from "@/contexts/SignupContext";
 import { useAuthContext } from "@/contexts/AuthContext";
 import { toast } from "@/hooks/use-toast";
 import { useState } from "react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { FaWhatsapp } from "react-icons/fa";
 
 const HostProfile = () => {
   const navigate = useNavigate();
@@ -41,11 +48,23 @@ const HostProfile = () => {
     }
   };
 
+  const shareMessage = `Check out my curated guest guide with local recommendations: ${guideUrl}`;
+
+  const handleShareSMS = () => {
+    if (!guideUrl) return;
+    window.open(`sms:?body=${encodeURIComponent(shareMessage)}`, "_blank");
+  };
+
+  const handleShareWhatsApp = () => {
+    if (!guideUrl) return;
+    window.open(`https://wa.me/?text=${encodeURIComponent(shareMessage)}`, "_blank");
+  };
+
   const menuItems = [
     { 
       label: "Guest Guide Link", 
       icon: BookMarked, 
-      action: "copy-guide",
+      action: "share-guide",
       gradient: true,
       description: "Share with guests"
     },
@@ -94,8 +113,8 @@ const HostProfile = () => {
   ];
 
   const handleMenuClick = (action: string) => {
-    if (action === "copy-guide") {
-      handleCopyGuideLink();
+    if (action === "share-guide") {
+      // Handled by dropdown, do nothing here
       return;
     }
     navigate(action);
@@ -137,37 +156,71 @@ const HostProfile = () => {
         {/* Menu Items */}
         <Card className="overflow-hidden">
           {menuItems.map((item, index) => (
-            <button
-              key={item.label}
-              onClick={() => handleMenuClick(item.action)}
-              className={`
-                w-full flex items-center justify-between p-4 
-                hover:bg-muted/30 active:bg-muted/50 transition-all
-                ${index !== menuItems.length - 1 ? 'border-b' : ''}
-                ${item.gradient ? 'bg-gradient-to-r from-orange-500/5 to-pink-500/5' : ''}
-              `}
-            >
-              <div className="flex items-center gap-3">
-                <item.icon className={`h-5 w-5 flex-shrink-0 ${item.gradient ? 'text-primary' : 'text-muted-foreground'}`} />
-                <div className="text-left">
-                  <span className={`font-medium text-sm block ${item.gradient ? 'text-primary' : ''}`}>
-                    {item.label}
-                  </span>
-                  {'description' in item && item.description && (
-                    <span className="text-xs text-muted-foreground">{item.description}</span>
-                  )}
+            item.action === "share-guide" ? (
+              <DropdownMenu key={item.label}>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    className={`
+                      w-full flex items-center justify-between p-4 
+                      hover:bg-muted/30 active:bg-muted/50 transition-all
+                      ${index !== menuItems.length - 1 ? 'border-b' : ''}
+                      bg-gradient-to-r from-orange-500/5 to-pink-500/5
+                    `}
+                  >
+                    <div className="flex items-center gap-3">
+                      <item.icon className="h-5 w-5 flex-shrink-0 text-primary" />
+                      <div className="text-left">
+                        <span className="font-medium text-sm block text-primary">
+                          {item.label}
+                        </span>
+                        {'description' in item && item.description && (
+                          <span className="text-xs text-muted-foreground">{item.description}</span>
+                        )}
+                      </div>
+                    </div>
+                    <Share2 className="h-5 w-5 text-primary flex-shrink-0" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem onClick={handleCopyGuideLink} className="cursor-pointer">
+                    {copied ? (
+                      <Check className="h-4 w-4 mr-2 text-green-500" />
+                    ) : (
+                      <Copy className="h-4 w-4 mr-2" />
+                    )}
+                    Copy Link
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleShareSMS} className="cursor-pointer">
+                    <MessageCircle className="h-4 w-4 mr-2" />
+                    Share via Text
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleShareWhatsApp} className="cursor-pointer">
+                    <FaWhatsapp className="h-4 w-4 mr-2 text-green-500" />
+                    Share via WhatsApp
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <button
+                key={item.label}
+                onClick={() => handleMenuClick(item.action)}
+                className={`
+                  w-full flex items-center justify-between p-4 
+                  hover:bg-muted/30 active:bg-muted/50 transition-all
+                  ${index !== menuItems.length - 1 ? 'border-b' : ''}
+                `}
+              >
+                <div className="flex items-center gap-3">
+                  <item.icon className="h-5 w-5 flex-shrink-0 text-muted-foreground" />
+                  <div className="text-left">
+                    <span className="font-medium text-sm block">
+                      {item.label}
+                    </span>
+                  </div>
                 </div>
-              </div>
-              {item.action === "copy-guide" ? (
-                copied ? (
-                  <Check className="h-5 w-5 text-green-500 flex-shrink-0" />
-                ) : (
-                  <Copy className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                )
-              ) : (
                 <ChevronRight className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-              )}
-            </button>
+              </button>
+            )
           ))}
         </Card>
       </div>
