@@ -3,7 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Star, MapPin, Heart, Loader2 } from "lucide-react";
+import { Star, MapPin, Heart, Loader2, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { experiences } from "@/data/mockData";
 import { mockRestaurants } from "@/data/mockRestaurants";
@@ -141,8 +141,9 @@ const GuestGuide = () => {
     .map((r) => mockRestaurants.find((rest) => rest.id === r.id))
     .filter(Boolean) || [];
 
-  const hostName = hostProfile?.full_name || "Your Host";
-  const firstName = hostName.split(" ")[0];
+  const hostName = hostProfile?.full_name;
+  const displayName = hostName || "Your Host";
+  const firstName = displayName.split(" ")[0];
 
   if (isLoading) {
     return (
@@ -168,7 +169,7 @@ const GuestGuide = () => {
   const hasRecommendations = recommendedExperiences.length > 0 || recommendedRestaurants.length > 0;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-24">
       <div className="max-w-[430px] mx-auto">
         {/* Header */}
         <div className="bg-gradient-to-br from-primary/10 via-background to-accent/10 px-4 py-8 text-center border-b border-border">
@@ -271,6 +272,17 @@ const GuestGuide = () => {
             </TabsContent>
           </Tabs>
         )}
+      </div>
+
+      {/* Fixed AI Trip Planner Button */}
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
+        <Link
+          to="/trip-planner"
+          className="flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-orange-500 to-purple-600 text-white font-medium shadow-lg hover:scale-105 transition-transform"
+        >
+          <Sparkles className="h-5 w-5" />
+          Plan your trip using AI
+        </Link>
       </div>
     </div>
   );
