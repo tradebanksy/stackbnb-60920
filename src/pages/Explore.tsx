@@ -77,7 +77,7 @@ const Explore = () => {
             {/* Header */}
             <div className="relative z-10 flex items-center justify-between px-4 pt-3 pb-2">
               <button
-                onClick={() => navigate(-1)}
+                onClick={() => isHostMode ? navigate('/host/vendors') : navigate(-1)}
                 className="p-2 rounded-full bg-background/80 border border-border text-foreground hover:bg-accent transition-colors"
               >
                 <ArrowLeft className="h-4 w-4" />
