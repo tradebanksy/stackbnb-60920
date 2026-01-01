@@ -16,6 +16,9 @@ interface HostVendor {
   price: number;
   rating: number;
   description: string;
+  duration?: string;
+  maxGuests?: number;
+  included?: string[];
 }
 
 const MAX_MESSAGE_LENGTH = 2000;
