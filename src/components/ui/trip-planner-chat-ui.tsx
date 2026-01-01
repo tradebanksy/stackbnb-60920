@@ -19,6 +19,7 @@ import {
   Eye,
   EyeOff,
   Moon,
+  Star,
 } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -391,6 +392,31 @@ export default function TripPlannerChatUI({
                   </Card>
                 </div>
               ))}
+              
+              {/* Quick response button when AI shows host's pick */}
+              {!isLoading && 
+               messages.length > 1 && 
+               messages[messages.length - 1]?.role === "assistant" && 
+               messages[messages.length - 1]?.content.includes("HOST'S PICK") &&
+               !messages[messages.length - 1]?.content.includes("Great choice") &&
+               hostVendors.length > 0 && (
+                <div className="flex justify-start mt-2">
+                  <button
+                    onClick={() => onSendMessage("I'll go with the host's recommendation")}
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium
+                      bg-gradient-to-r from-purple-600/10 via-pink-500/10 to-orange-400/10
+                      border border-purple-500/30
+                      text-foreground
+                      hover:border-purple-500/60 hover:bg-purple-500/20
+                      transition-all duration-300
+                      hover:scale-105 active:scale-95"
+                  >
+                    <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                    Go with Host's recommendation
+                  </button>
+                </div>
+              )}
+              
               {isLoading && (
                 <div className="flex justify-start">
                   <Card className="max-w-[85%] p-3 bg-muted">
