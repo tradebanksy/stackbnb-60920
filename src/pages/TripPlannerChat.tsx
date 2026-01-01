@@ -133,6 +133,7 @@ const TripPlannerChat = () => {
       messages={messages}
       isLoading={isLoading}
       onSendMessage={sendMessage}
+      hostVendors={hostVendors}
     />
   );
 };
