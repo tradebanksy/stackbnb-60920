@@ -287,6 +287,9 @@ const GuestGuide = () => {
               price: exp!.price,
               rating: exp!.rating,
               description: exp!.description,
+              duration: exp!.duration,
+              maxGuests: exp!.maxGuests,
+              included: exp!.included,
             }))
           }}
           className="flex items-center justify-center gap-2 w-full py-3 rounded-full bg-gradient-to-r from-orange-500 to-purple-600 text-white font-medium shadow-lg hover:scale-[1.02] transition-transform"

@@ -97,33 +97,50 @@ serve(async (req) => {
       const vendorList = hostVendors
         .map((v: unknown) => {
           const vendor = v as Record<string, unknown>;
-          return `- "${vendor.name}" (ID: ${vendor.id}, Category: ${vendor.category}) by ${vendor.vendor}: ${vendor.description} - $${vendor.price}, Rating: ${vendor.rating}/5, Booking Link: /experience/${vendor.id}`;
+          const included = Array.isArray(vendor.included) ? (vendor.included as string[]).join(", ") : "";
+          return `- "${vendor.name}" (ID: ${vendor.id}, Category: ${vendor.category}) by ${vendor.vendor}
+  Description: ${vendor.description}
+  Price: $${vendor.price} per person | Duration: ${vendor.duration || "N/A"} | Max Guests: ${vendor.maxGuests || "N/A"}
+  Rating: ${vendor.rating}/5
+  What's Included: ${included || "Contact for details"}
+  Booking Link: /experience/${vendor.id}`;
         })
-        .join("\n");
+        .join("\n\n");
       
       vendorContext = `
 
 **HOST'S PREFERRED VENDORS (IMPORTANT!):**
-The guest's host has these specific preferred vendors. You MUST check this list and include the relevant ones when they match what the guest is asking about:
+The guest's host has these specific preferred vendors with full details:
 ${vendorList}
 
 **CRITICAL INSTRUCTIONS FOR BOOKING LINKS:**
 
 1. **DO NOT show booking links in your initial recommendations.** Only present options and descriptions first.
 
-2. **Wait for the guest to make a selection.** When they say things like "I'll go with...", "Let's do...", "I want to book...", "I choose...", or clearly indicate a preference, THEN provide the booking link.
+2. **Wait for the guest to make a selection.** When they say things like "I'll go with...", "Let's do...", "I want to book...", "I choose...", or clearly indicate a preference, THEN provide the booking details.
 
-3. **If the guest selects a HOST'S PICK vendor:**
-   Show the internal booking link with this format:
-   
-   ---
-   ✅ Great choice! Your host recommends this one.
-   
-   🎫 **[Book [Vendor Name] Now →](/experience/ID)**
-   
-   ---
-   
-   Replace "ID" with the actual numeric ID from the vendor info above.
+3. **If the guest selects a HOST'S PICK vendor, show this styled summary:**
+
+---
+✅ **Great choice! Your host recommends this one.**
+
+**📋 Experience Details:**
+
+| ⏱️ Duration | 👥 Max Group | 💰 Price |
+|:---:|:---:|:---:|
+| [duration] | [maxGuests] guests | $[price]/person |
+
+**✨ What's Included:**
+• [item 1]
+• [item 2]
+• [item 3]
+• [etc...]
+
+🎫 **[Book [Vendor Name] Now →](/experience/ID)**
+
+---
+
+Replace the bracketed values with actual data from the vendor info above.
 
 4. **If the guest selects a NON-host vendor (any other business):**
    Show a Google search link instead:
