@@ -62,6 +62,15 @@ const Auth = () => {
       <div className="min-h-screen bg-gradient-to-b from-orange-50/50 to-background">
         <div className="flex flex-col items-center justify-center min-h-screen p-4">
           <div className="w-full max-w-md space-y-8">
+            {/* Back Button */}
+            <Button
+              variant="ghost"
+              onClick={() => (window.history.length > 1 ? navigate(-1) : navigate("/"))}
+              className="mb-0"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back
+            </Button>
             {/* Logo */}
             <div className="flex justify-center">
               <img 
