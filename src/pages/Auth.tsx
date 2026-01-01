@@ -15,8 +15,8 @@ import { useAuthContext } from "@/contexts/AuthContext";
 
 const Auth = () => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const role = searchParams.get("role") as "host" | "vendor" | null;
+  const [searchParams, setSearchParams] = useSearchParams();
+  const role = searchParams.get("role") as "host" | "vendor" | "user" | null;
   const { toast } = useToast();
   const [isSignUp, setIsSignUp] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -29,16 +29,89 @@ const Auth = () => {
         navigate("/host/dashboard", { replace: true });
       } else if (userRole === "vendor") {
         navigate("/vendor/dashboard", { replace: true });
+      } else if (userRole === "user") {
+        navigate("/appview", { replace: true });
       }
-      // Don't redirect if no role - let them complete signup flow
     }
   }, [isAuthenticated, isLoading, userRole, navigate]);
+
+  const handleRoleSelect = (selectedRole: "host" | "vendor" | "user") => {
+    setSearchParams({ role: selectedRole });
+  };
 
   const getRedirectPath = (selectedRole: string | null) => {
     if (selectedRole === "host") return "/host/dashboard";
     if (selectedRole === "vendor") return "/vendor/dashboard";
     return "/appview";
   };
+
+  // Show role selection if no role is specified and user is signing up
+  if (!role && isSignUp) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <div className="w-full max-w-md space-y-6">
+          <Button
+            variant="ghost"
+            onClick={() => navigate(-1)}
+            className="mb-4"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back
+          </Button>
+
+          <Card className="p-6">
+            <div className="space-y-6">
+              <div className="text-center space-y-2">
+                <h1 className="text-2xl font-bold">Create Account</h1>
+                <p className="text-sm text-muted-foreground">
+                  How will you be using Stackd?
+                </p>
+              </div>
+
+              <div className="space-y-3">
+                <Button
+                  variant="outline"
+                  className="w-full h-16 flex flex-col items-center justify-center"
+                  onClick={() => handleRoleSelect("user")}
+                >
+                  <span className="font-semibold">I'm a Guest</span>
+                  <span className="text-xs text-muted-foreground">Discover local experiences</span>
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  className="w-full h-16 flex flex-col items-center justify-center"
+                  onClick={() => handleRoleSelect("host")}
+                >
+                  <span className="font-semibold">I'm a Host</span>
+                  <span className="text-xs text-muted-foreground">Create guest guides for my property</span>
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  className="w-full h-16 flex flex-col items-center justify-center"
+                  onClick={() => handleRoleSelect("vendor")}
+                >
+                  <span className="font-semibold">I'm a Vendor</span>
+                  <span className="text-xs text-muted-foreground">List my business or services</span>
+                </Button>
+              </div>
+
+              <div className="text-center">
+                <button
+                  type="button"
+                  onClick={() => setIsSignUp(false)}
+                  className="text-sm text-primary hover:underline"
+                >
+                  Already have an account? Sign in
+                </button>
+              </div>
+            </div>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   const form = useForm<AuthFormData>({
     resolver: zodResolver(authSchema),
