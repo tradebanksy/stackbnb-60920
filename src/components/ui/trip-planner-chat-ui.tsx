@@ -396,22 +396,6 @@ export default function TripPlannerChatUI({
                 </div>
               ))}
               
-              {/* Quick response button when AI shows host's pick */}
-              {!isLoading && 
-               messages.length > 1 && 
-               messages[messages.length - 1]?.role === "assistant" && 
-               messages[messages.length - 1]?.content.includes("HOST'S PICK") &&
-               !messages[messages.length - 1]?.content.includes("Great choice") &&
-               hostVendors.length > 0 && (
-                <div className="flex flex-wrap gap-2 mt-3">
-                  <button
-                    onClick={() => onSendMessage("I'll go with the host's recommendation")}
-                    className="px-3 py-1.5 text-xs text-muted-foreground bg-muted/50 hover:bg-muted hover:text-foreground rounded-lg border border-border/50 transition-colors"
-                  >
-                    Go with Host's recommendation
-                  </button>
-                </div>
-              )}
               
               {isLoading && (
                 <div className="flex justify-start">
@@ -427,6 +411,20 @@ export default function TripPlannerChatUI({
           {/* Input at Bottom */}
           <div className="p-4 border-t border-border">
             <div className="max-w-2xl mx-auto">
+              {/* Quick response button above input */}
+              {!isLoading && 
+               messages.length > 1 && 
+               messages[messages.length - 1]?.role === "assistant" && (
+                <div className="flex justify-center mb-3">
+                  <button
+                    onClick={() => onSendMessage("I'll go with the host's recommendation")}
+                    className="inline-flex items-center gap-2 px-4 py-2 text-sm text-foreground bg-muted/80 hover:bg-muted rounded-full border border-border/50 transition-colors"
+                  >
+                    <Star className="w-4 h-4 text-primary" />
+                    Go with Host's recommendation
+                  </button>
+                </div>
+              )}
               <div className="relative bg-card/60 backdrop-blur-md rounded-xl border border-border">
                 <Textarea
                   ref={textareaRef}
