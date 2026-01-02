@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Star, Heart, MapPin, Navigation, Plus, Check } from "lucide-react";
+import { Star, Heart, MapPin, Navigation, Plus, Check, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { isRestaurantOpen, type Restaurant } from "@/data/mockRestaurants";
 import { toast } from "@/hooks/use-toast";
@@ -189,21 +189,23 @@ const RestaurantCard = ({ restaurant, variant = 'horizontal', size = 'default', 
             }}
           />
           
-          {/* Add to guide button (for hosts) */}
-          {showAddButton && isHost ? (
+          {/* Add to guide button (for hosts) - Top Left */}
+          {showAddButton ? (
             <button
               onClick={handleAddToGuide}
               disabled={isAdding}
-              className={`absolute top-1 right-1 z-10 ${isSmall ? 'p-1' : 'p-1.5'} rounded-full transition-all ${
+              className={`absolute top-2 left-2 z-20 p-2 rounded-full shadow-lg transition-all duration-200 ${
                 isSaved 
                   ? 'bg-green-500 text-white' 
-                  : 'bg-white/90 text-foreground hover:bg-white'
+                  : 'bg-white/95 text-foreground dark:bg-primary dark:text-white hover:bg-primary hover:text-white'
               }`}
             >
-              {isSaved ? (
-                <Check className={`${isSmall ? 'h-3 w-3' : 'h-4 w-4'}`} />
+              {isAdding ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : isSaved ? (
+                <Check className="h-4 w-4" />
               ) : (
-                <Plus className={`${isSmall ? 'h-3 w-3' : 'h-4 w-4'}`} />
+                <Plus className="h-4 w-4" />
               )}
             </button>
           ) : (
