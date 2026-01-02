@@ -4,11 +4,11 @@ import { Star, ArrowLeft, Store, Share2, Copy, Check, MessageCircle } from "luci
 import { Link, useNavigate } from "react-router-dom";
 import { experiences } from "@/data/mockData";
 import heroImage from "@/assets/hero-beach.jpg";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useProfile } from "@/contexts/ProfileContext";
 import { useSignup } from "@/contexts/SignupContext";
 import { useAuthContext } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
+import { useEnsureProfileName } from "@/hooks/useEnsureProfileName";
 import HostBottomNav from "@/components/HostBottomNav";
 import { toast } from "@/hooks/use-toast";
 import {
@@ -66,22 +66,15 @@ const getExperienceImage = (experienceId: number): string => {
 
 const HostVendors = () => {
   const navigate = useNavigate();
-  const { recommendations, isLoading, profile } = useProfile();
+  const { recommendations, isLoading } = useProfile();
   const { hostSignupData } = useSignup();
   const { user } = useAuthContext();
   const [copied, setCopied] = useState(false);
 
-  // Ensure the public guest guide can display a name (it reads from profiles.full_name)
-  useEffect(() => {
-    const fullName = `${hostSignupData.firstName} ${hostSignupData.lastName}`.trim();
-    if (!user || !fullName) return;
-    if (profile?.full_name && profile.full_name.trim()) return;
-
-    supabase
-      .from('profiles')
-      .update({ full_name: fullName })
-      .eq('user_id', user.id);
-  }, [user, hostSignupData.firstName, hostSignupData.lastName, profile?.full_name]);
+  useEnsureProfileName({
+    firstName: hostSignupData.firstName,
+    lastName: hostSignupData.lastName,
+  });
 
   const guideUrl = user ? `${window.location.origin}/guide/${user.id}` : "";
   const shareMessage = `Check out my curated guest guide with local recommendations: ${guideUrl}`;
