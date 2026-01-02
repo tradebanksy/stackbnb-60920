@@ -260,6 +260,7 @@ End with: "Want me to help you plan a specific day or book any of these? Just le
 
 **RULES:**
 - Use LOTS of emojis to make it visually engaging 🌊🐢🫧🌴🍽️
+- NEVER use inverted punctuation marks like ¡ or ¿ - always use standard English punctuation only
 - CRITICAL: Format ALL ratings as clickable markdown links to Google Maps search like this:
   [★4.7](https://www.google.com/maps/search/Business+Name+Tulum+Mexico)
   Replace spaces in business names with + signs in the URL
