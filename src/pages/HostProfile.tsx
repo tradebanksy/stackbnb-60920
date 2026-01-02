@@ -20,9 +20,9 @@ import HostBottomNav from "@/components/HostBottomNav";
 import { useSignup } from "@/contexts/SignupContext";
 import { useProfile } from "@/contexts/ProfileContext";
 import { useAuthContext } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
+import { useEnsureProfileName } from "@/hooks/useEnsureProfileName";
 import { toast } from "@/hooks/use-toast";
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -38,22 +38,30 @@ const HostProfile = () => {
   const { user } = useAuthContext();
   const [copied, setCopied] = useState(false);
 
-  const firstName = hostSignupData.firstName || "John";
-  const lastName = hostSignupData.lastName || "Doe";
-  const propertyName = propertyData.propertyName || "Beach House Paradise";
-  const initials = `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+  // Prefer backend profile name, fall back to signup/session data.
+  const displayFullName = useMemo(() => {
+    const fromDb = profile?.full_name?.trim();
+    if (fromDb) return fromDb;
+    const fromSession = `${(hostSignupData.firstName || "").trim()} ${(hostSignupData.lastName || "").trim()}`.trim();
+    return fromSession;
+  }, [profile?.full_name, hostSignupData.firstName, hostSignupData.lastName]);
+
+  const firstName = displayFullName.split(" ")[0] || "";
+  const lastName = displayFullName.split(" ").slice(1).join(" ");
+  const propertyName = propertyData.propertyName || "";
+
+  const initials = (() => {
+    const a = firstName.charAt(0);
+    const b = lastName.charAt(0);
+    const combined = `${a}${b}`.trim();
+    return combined ? combined.toUpperCase() : "H";
+  })();
 
   // Ensure the public guest guide can display a name (it reads from profiles.full_name)
-  useEffect(() => {
-    const fullName = `${firstName} ${lastName}`.trim();
-    if (!user || !fullName) return;
-    if (profile?.full_name && profile.full_name.trim()) return;
-
-    supabase
-      .from('profiles')
-      .update({ full_name: fullName })
-      .eq('user_id', user.id);
-  }, [user, firstName, lastName, profile?.full_name]);
+  useEnsureProfileName({
+    firstName: hostSignupData.firstName,
+    lastName: hostSignupData.lastName,
+  });
 
   const guideUrl = user ? `${window.location.origin}/guide/${user.id}` : "";
 
@@ -176,8 +184,12 @@ const HostProfile = () => {
               </AvatarFallback>
             </Avatar>
             <div className="min-w-0 flex-1">
-              <h2 className="text-lg font-bold truncate">{firstName} {lastName}</h2>
-              <p className="text-sm text-muted-foreground truncate">{propertyName}</p>
+              <h2 className="text-lg font-bold truncate">
+                {displayFullName || "Your Name"}
+              </h2>
+              <p className="text-sm text-muted-foreground truncate">
+                {propertyName || "Your property"}
+              </p>
             </div>
           </div>
         </Card>
