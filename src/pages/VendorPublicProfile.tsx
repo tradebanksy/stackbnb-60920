@@ -273,28 +273,6 @@ const VendorPublicProfile = () => {
             </Button>
           )}
         </div>
-
-        {/* Photo Gallery */}
-        {photos.length > 1 && (
-          <div className="space-y-3">
-            <h2 className="text-sm font-semibold">Gallery</h2>
-            <div className="grid grid-cols-3 gap-3">
-              {photos.map((photo, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setCurrentImageIndex(idx)}
-                  className={`aspect-square rounded-xl overflow-hidden relative transition-all ${
-                    idx === currentImageIndex ? 'ring-2 ring-primary ring-offset-2' : 'hover:opacity-90'
-                  }`}
-                >
-                  <img src={photo} alt={`Photo ${idx + 1}`} className="w-full h-full object-cover" />
-                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent h-8" />
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
         {/* Book Button */}
         <Button className="w-full" size="lg">
           Book Now
