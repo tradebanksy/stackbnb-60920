@@ -1,14 +1,17 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 import { 
-  ChevronLeft, Star, Clock, Users, DollarSign, 
-  Instagram, ExternalLink, Check, Heart
+  ArrowLeft, Star, Clock, Users, CheckCircle, Heart,
+  Instagram, ExternalLink, Store
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import InteractiveSelector from '@/components/ui/interactive-selector';
+import { FaUtensils, FaSpa, FaCamera, FaWineGlass, FaShip, FaBicycle, FaSwimmer, FaMountain } from 'react-icons/fa';
 
 interface VendorProfile {
   id: string;
@@ -27,12 +30,27 @@ interface VendorProfile {
   google_reviews_url: string | null;
 }
 
+// Category to icon mapping
+const categoryIcons: Record<string, { icon: string; faIcon: React.ReactNode }> = {
+  'Private Chef': { icon: '👨‍🍳', faIcon: <FaUtensils size={20} className="text-white" /> },
+  'Massage & Spa': { icon: '💆', faIcon: <FaSpa size={20} className="text-white" /> },
+  'Yacht Charter': { icon: '🛥️', faIcon: <FaShip size={20} className="text-white" /> },
+  'Photography': { icon: '📸', faIcon: <FaCamera size={20} className="text-white" /> },
+  'Tour Guide': { icon: '🗺️', faIcon: <FaMountain size={20} className="text-white" /> },
+  'Fitness & Yoga': { icon: '🧘', faIcon: <FaSpa size={20} className="text-white" /> },
+  'Wine Tasting': { icon: '🍷', faIcon: <FaWineGlass size={20} className="text-white" /> },
+  'Fishing Charter': { icon: '🎣', faIcon: <FaShip size={20} className="text-white" /> },
+  'Water Sports': { icon: '🌊', faIcon: <FaSwimmer size={20} className="text-white" /> },
+  'Cooking Class': { icon: '👩‍🍳', faIcon: <FaUtensils size={20} className="text-white" /> },
+  'Transportation': { icon: '🚗', faIcon: <FaBicycle size={20} className="text-white" /> },
+  'default': { icon: '✨', faIcon: <FaSpa size={20} className="text-white" /> },
+};
+
 const VendorPublicProfile = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const [profile, setProfile] = useState<VendorProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isFavorite, setIsFavorite] = useState(false);
 
   useEffect(() => {
@@ -80,11 +98,20 @@ const VendorPublicProfile = () => {
     setIsFavorite(!isFavorite);
   };
 
+  const handleBack = () => {
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate('/appview');
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background pb-24">
-        <div className="max-w-2xl mx-auto">
-          <Skeleton className="aspect-square w-full" />
+        <div className="max-w-[375px] mx-auto">
+          <Skeleton className="h-12 w-full" />
+          <Skeleton className="h-[280px] w-full mt-4" />
           <div className="p-4 space-y-4">
             <Skeleton className="h-8 w-3/4" />
             <Skeleton className="h-4 w-1/2" />
@@ -98,185 +125,196 @@ const VendorPublicProfile = () => {
   if (!profile) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center pb-24">
-        <div className="text-center space-y-4">
+        <Card className="p-8 text-center">
           <p className="text-muted-foreground">Profile not found or not published</p>
-          <Button onClick={() => navigate(-1)}>Go Back</Button>
-        </div>
+          <Button variant="link" className="mt-4" onClick={handleBack}>
+            Back to Explore
+          </Button>
+        </Card>
       </div>
     );
   }
 
   const photos = profile.photos || [];
+  const categoryConfig = categoryIcons[profile.category] || categoryIcons['default'];
+  
+  // Generate titles and icons for the selector
+  const photoTitles = photos.map((_, idx) => 
+    idx === 0 ? 'Featured' : idx === 1 ? 'In Action' : `View ${idx + 1}`
+  );
+  const photoIcons = photos.map(() => categoryConfig.faIcon);
 
   return (
     <div className="min-h-screen bg-background pb-24">
-      {/* Hero Image Carousel */}
-      <div className="relative px-3 pt-3">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => navigate(-1)}
-          className="absolute top-6 left-6 z-10 bg-black/30 backdrop-blur-sm text-white hover:bg-black/50 rounded-full"
-        >
-          <ChevronLeft className="h-5 w-5" />
-        </Button>
-
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={toggleFavorite}
-          className="absolute top-6 right-6 z-10 bg-black/30 backdrop-blur-sm text-white hover:bg-black/50 rounded-full"
-        >
-          <Heart className={`h-5 w-5 ${isFavorite ? 'fill-red-500 text-red-500' : ''}`} />
-        </Button>
-        
-        {photos.length > 0 ? (
-          <div className="relative aspect-square rounded-xl overflow-hidden">
-            <img
-              src={photos[currentImageIndex]}
-              alt={profile.name}
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent h-24" />
-            {photos.length > 1 && (
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5">
-                {photos.map((_, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => setCurrentImageIndex(idx)}
-                    className={`w-2 h-2 rounded-full transition-all ${
-                      idx === currentImageIndex ? 'bg-white w-4' : 'bg-white/50'
-                    }`}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-        ) : (
-          <div className="aspect-square w-full rounded-xl bg-gradient-to-br from-orange-500 to-purple-600 flex items-center justify-center">
-            <span className="text-white/60 text-lg">No photos available</span>
-          </div>
-        )}
-      </div>
-
-      {/* Content */}
-      <div className="max-w-2xl mx-auto p-4 space-y-6">
+      <div className="max-w-[375px] mx-auto">
         {/* Header */}
-        <div className="space-y-2">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <h1 className="text-2xl font-bold">{profile.name}</h1>
-              <p className="text-muted-foreground">{profile.category}</p>
+        <header className="sticky top-0 z-50 bg-card/95 backdrop-blur-sm border-b border-border">
+          <div className="px-4 py-3 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleBack}
+                className="p-2 -ml-2 rounded-full hover:bg-muted transition-colors"
+              >
+                <ArrowLeft className="h-5 w-5" />
+              </button>
+              <span className="font-semibold">{profile.category}</span>
             </div>
-            {profile.google_rating && (
-              <div className="flex items-center gap-1 bg-amber-100 dark:bg-amber-900/30 px-2 py-1 rounded-lg">
-                <Star className="h-4 w-4 text-amber-500 fill-amber-500" />
-                <span className="font-semibold">{profile.google_rating}</span>
+            <button
+              onClick={toggleFavorite}
+              className="p-2 rounded-full hover:bg-muted transition-colors"
+            >
+              <Heart className={`h-5 w-5 ${isFavorite ? 'fill-red-500 text-red-500' : ''}`} />
+            </button>
+          </div>
+        </header>
+
+        {/* Interactive Photo Selector */}
+        <div className="mb-4">
+          {photos.length > 0 ? (
+            <InteractiveSelector 
+              photos={photos}
+              titles={photoTitles}
+              icons={photoIcons}
+            />
+          ) : (
+            <div className="flex items-center justify-center py-4">
+              <div className="w-full max-w-[450px] h-[280px] mx-auto rounded-xl bg-gradient-to-br from-orange-500 to-purple-600 flex items-center justify-center">
+                <Store className="h-16 w-16 text-white/60" />
               </div>
-            )}
-          </div>
-          
-          {profile.description && (
-            <p className="text-muted-foreground">{profile.description}</p>
+            </div>
           )}
         </div>
 
-        {/* Quick Info */}
-        <div className="grid grid-cols-3 gap-3">
-          {profile.price_per_person && (
-            <Card>
-              <CardContent className="p-3 text-center">
-                <DollarSign className="h-5 w-5 mx-auto text-primary mb-1" />
-                <p className="font-bold">${profile.price_per_person}</p>
-                <p className="text-xs text-muted-foreground">per person</p>
-              </CardContent>
-            </Card>
-          )}
-          {profile.duration && (
-            <Card>
-              <CardContent className="p-3 text-center">
-                <Clock className="h-5 w-5 mx-auto text-primary mb-1" />
-                <p className="font-bold">{profile.duration}</p>
-                <p className="text-xs text-muted-foreground">duration</p>
-              </CardContent>
-            </Card>
-          )}
-          {profile.max_guests && (
-            <Card>
-              <CardContent className="p-3 text-center">
-                <Users className="h-5 w-5 mx-auto text-primary mb-1" />
-                <p className="font-bold">{profile.max_guests}</p>
-                <p className="text-xs text-muted-foreground">max guests</p>
-              </CardContent>
-            </Card>
-          )}
-        </div>
-
-        {/* About Experience */}
-        {profile.about_experience && (
-          <div className="space-y-2">
-            <h2 className="text-lg font-semibold">About This Experience</h2>
-            <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
-              {profile.about_experience}
-            </p>
-          </div>
-        )}
-
-        {/* What's Included */}
-        {profile.included_items && profile.included_items.length > 0 && (
+        <div className="px-4 py-6 space-y-6">
+          {/* Experience Header */}
           <div className="space-y-3">
-            <h2 className="text-lg font-semibold">What's Included</h2>
-            <div className="grid grid-cols-2 gap-2">
-              {profile.included_items.map((item, idx) => (
-                <div key={idx} className="flex items-center gap-2 text-sm">
-                  <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-                  <span>{item}</span>
+            <div className="flex items-start gap-3">
+              <span className="text-4xl">{categoryConfig.icon}</span>
+              <div className="flex-1 space-y-1">
+                <h1 className="text-2xl font-bold leading-tight">{profile.name}</h1>
+                <p className="text-muted-foreground">{profile.category}</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-4 text-sm">
+              {profile.google_rating && (
+                <div className="flex items-center gap-1">
+                  <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                  <span className="font-semibold">{profile.google_rating}</span>
+                  <span className="text-muted-foreground">(Google Reviews)</span>
                 </div>
-              ))}
+              )}
             </div>
           </div>
-        )}
 
-        {/* Links */}
-        <div className="flex flex-wrap gap-2">
-          {profile.instagram_url && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => window.open(profile.instagram_url!, '_blank')}
-              className="gap-2"
-            >
-              <Instagram className="h-4 w-4" />
-              Instagram
-            </Button>
+          {/* Quick Info */}
+          <Card className="p-4">
+            <div className="grid grid-cols-3 gap-4 text-center">
+              <div className="space-y-1">
+                <Clock className="h-5 w-5 mx-auto text-muted-foreground" />
+                <p className="text-xs font-medium">{profile.duration || 'Varies'}</p>
+              </div>
+              <div className="space-y-1">
+                <Users className="h-5 w-5 mx-auto text-muted-foreground" />
+                <p className="text-xs font-medium">Max {profile.max_guests || 'N/A'}</p>
+              </div>
+              <div className="space-y-1">
+                {profile.price_per_person && (
+                  <Badge variant="secondary" className="bg-gradient-to-r from-orange-500 to-pink-500 text-white">
+                    ${profile.price_per_person}
+                  </Badge>
+                )}
+                <p className="text-xs text-muted-foreground">per person</p>
+              </div>
+            </div>
+          </Card>
+
+          {/* Description */}
+          {profile.about_experience && (
+            <div className="space-y-3">
+              <h2 className="text-lg font-semibold">About This Experience</h2>
+              <Card className="p-4">
+                <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                  {profile.about_experience}
+                </p>
+              </Card>
+            </div>
           )}
-          {profile.menu_url && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => window.open(profile.menu_url!, '_blank')}
-              className="gap-2"
-            >
-              <ExternalLink className="h-4 w-4" />
-              View Menu
-            </Button>
+
+          {/* What's Included */}
+          {profile.included_items && profile.included_items.length > 0 && (
+            <div className="space-y-3">
+              <h2 className="text-lg font-semibold">What's Included</h2>
+              <Card className="p-4">
+                <ul className="space-y-2">
+                  {profile.included_items.map((item, index) => (
+                    <li key={index} className="flex items-start gap-2 text-sm">
+                      <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
+                      <span className="text-muted-foreground">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </Card>
+            </div>
           )}
-          {profile.google_reviews_url && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => window.open(profile.google_reviews_url!, '_blank')}
-              className="gap-2"
-            >
-              <Star className="h-4 w-4" />
-              Google Reviews
-            </Button>
+
+          {/* Links */}
+          {(profile.instagram_url || profile.menu_url || profile.google_reviews_url) && (
+            <div className="flex flex-wrap gap-2">
+              {profile.instagram_url && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => window.open(profile.instagram_url!, '_blank')}
+                  className="gap-2"
+                >
+                  <Instagram className="h-4 w-4" />
+                  Instagram
+                </Button>
+              )}
+              {profile.menu_url && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => window.open(profile.menu_url!, '_blank')}
+                  className="gap-2"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                  View Menu
+                </Button>
+              )}
+              {profile.google_reviews_url && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => window.open(profile.google_reviews_url!, '_blank')}
+                  className="gap-2"
+                >
+                  <Star className="h-4 w-4" />
+                  Google Reviews
+                </Button>
+              )}
+            </div>
           )}
         </div>
-        {/* Book Button */}
-        <Button className="w-full" size="lg">
-          Book Now
-        </Button>
+
+        {/* Fixed Bottom CTA */}
+        <div className="fixed bottom-0 left-0 right-0 bg-card border-t p-4 shadow-lg">
+          <div className="max-w-[375px] mx-auto flex items-center justify-between gap-4">
+            <div>
+              <p className="text-xs text-muted-foreground">From</p>
+              <p className="text-2xl font-bold">${profile.price_per_person || 'TBD'}</p>
+            </div>
+            <Button 
+              variant="default"
+              size="lg"
+              className="flex-1 bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600"
+              onClick={() => toast.info('Booking coming soon!')}
+            >
+              Book Now
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   );
