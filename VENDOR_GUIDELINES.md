@@ -397,24 +397,37 @@ Uses framer-motion's `Reorder` component for drag-and-drop reordering.
 
 ## 10. Where Vendors Appear
 
-1. **AppView Explore Tab** (`/appview`)
+1. **Explore Page Host Mode** (`/explore?mode=host`)
+   - Published vendors appear above mock experiences in a dedicated section
+   - **Vendor Card Features (Host Mode)**:
+     - **Gradient Add Button** (top-left): Orange-to-pink gradient button with Plus icon
+       - Style: `bg-gradient-to-r from-orange-500 to-pink-500 text-white`
+       - Hover: `hover:from-orange-600 hover:to-pink-600`
+       - Adds vendor to host's guest guide recommendations
+       - When added: Shows green background with check icon
+     - **Commission Badge** (top-right): Displays vendor's affiliate commission percentage
+       - Style: `bg-black/80 backdrop-blur-sm text-white` with `text-orange-400` percentage
+       - Shows `% icon` and commission amount (e.g., "15%")
+       - Only visible when `isHostMode` is true
+
+2. **AppView Explore Tab** (`/appview`)
    - `listing_type: 'restaurant'` → "Restaurants Near You" section
    - `listing_type: 'experience'` → "Popular Experiences" section
 
-2. **AppView My Wishlists Section** (`/appview`)
+3. **AppView My Wishlists Section** (`/appview`)
    - Shows favorited vendors alongside favorited experiences
    - Combined count displays "X saved"
    - Vendor favorites stored in `localStorage` key: `vendorFavorites`
    - Links to `/vendor/:id` for full profile view
 
-3. **Wishlists Page** (`/wishlists`)
+4. **Wishlists Page** (`/wishlists`)
    - Services tab shows all favorited vendors (fetched from Supabase by IDs in localStorage)
    - Grid layout with remove button on each card
 
-4. **Host Dashboard** (`/host/dashboard`)
+5. **Host Dashboard** (`/host/dashboard`)
    - "Partner Commissions" section (if `commission_percentage` is set)
 
-5. **Direct Link**
+6. **Direct Link**
    - `/vendor/:id` → Full public profile
 
 ---
