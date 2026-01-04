@@ -30,66 +30,325 @@ Use this document as a reference when creating or editing vendor profiles in sta
 
 The preview page shows vendors exactly how guests see their profile, plus management tools.
 
-### Layout (matches VendorPublicProfile)
-- Sticky header with category name and back button
-- InteractiveSelector with up to 3 photos
-- Category emoji + business name
-- Quick info card (duration, max guests, price)
-- Affiliate commission card (amber highlight, vendor-only view)
-- About This Experience section
-- What's Included list
-- Social/menu links
-- Photo gallery management
+### Component Architecture
 
-### Vendor-Only Controls
-- **Preview banner** at top: "Preview - How Guests See You" with Draft/Live badge
-- **Add photos button** in header
-- **Photo management section** with delete buttons
-- **Fixed bottom bar** with "Edit Profile" and "Publish/Unpublish" buttons
+```typescript
+// Required imports
+import { useState, useEffect, useRef } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
+import { toast } from 'sonner';
+import { 
+  ArrowLeft, Star, Clock, Users, CheckCircle, Heart,
+  Instagram, ExternalLink, Store, Eye, Edit, Globe, Plus, Trash2, Loader2, ImagePlus, GripVertical
+} from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuthContext } from '@/contexts/AuthContext';
+import VendorBottomNav from '@/components/VendorBottomNav';
+import InteractiveSelector from '@/components/ui/interactive-selector';
+import { FaUtensils, FaSpa, FaCamera, FaWineGlass, FaShip, FaBicycle, FaSwimmer, FaMountain } from 'react-icons/fa';
+import { Reorder } from 'framer-motion';
+```
+
+### TypeScript Interfaces
+
+```typescript
+interface PriceTier {
+  name: string;
+  price: number;
+}
+
+interface VendorProfile {
+  id: string;
+  name: string;
+  category: string;
+  description: string | null;
+  about_experience: string | null;
+  instagram_url: string | null;
+  photos: string[] | null;
+  menu_url: string | null;
+  price_per_person: number | null;
+  price_tiers: PriceTier[] | null;
+  duration: string | null;
+  max_guests: number | null;
+  included_items: string[] | null;
+  google_rating: number | null;
+  google_reviews_url: string | null;
+  is_published: boolean | null;
+  listing_type: string | null;
+  commission_percentage: number | null;
+}
+```
+
+### Category Icons Mapping
+
+```typescript
+const categoryIcons: Record<string, { icon: string; faIcon: React.ReactNode }> = {
+  'Private Chef': { icon: '👨‍🍳', faIcon: <FaUtensils size={20} className="text-white" /> },
+  'Massage & Spa': { icon: '💆', faIcon: <FaSpa size={20} className="text-white" /> },
+  'Yacht Charter': { icon: '🛥️', faIcon: <FaShip size={20} className="text-white" /> },
+  'Photography': { icon: '📸', faIcon: <FaCamera size={20} className="text-white" /> },
+  'Tour Guide': { icon: '🗺️', faIcon: <FaMountain size={20} className="text-white" /> },
+  'Fitness & Yoga': { icon: '🧘', faIcon: <FaSpa size={20} className="text-white" /> },
+  'Wine Tasting': { icon: '🍷', faIcon: <FaWineGlass size={20} className="text-white" /> },
+  'Fishing Charter': { icon: '🎣', faIcon: <FaShip size={20} className="text-white" /> },
+  'Water Sports': { icon: '🌊', faIcon: <FaSwimmer size={20} className="text-white" /> },
+  'Cooking Class': { icon: '👩‍🍳', faIcon: <FaUtensils size={20} className="text-white" /> },
+  'Transportation': { icon: '🚗', faIcon: <FaBicycle size={20} className="text-white" /> },
+  'default': { icon: '✨', faIcon: <FaSpa size={20} className="text-white" /> },
+};
+```
+
+### State Variables
+
+```typescript
+const navigate = useNavigate();
+const { id } = useParams();
+const { user } = useAuthContext();
+const [profile, setProfile] = useState<VendorProfile | null>(null);
+const [isLoading, setIsLoading] = useState(true);
+const [isPublishing, setIsPublishing] = useState(false);
+const [isUploading, setIsUploading] = useState(false);
+const fileInputRef = useRef<HTMLInputElement>(null);
+```
+
+### Core Functions
+
+#### fetchProfile
+- Fetches vendor profile from `vendor_profiles` table
+- If `id` param exists, fetches by profile ID; otherwise fetches by `user_id`
+- Safely parses `price_tiers` from JSONB to `PriceTier[]`
+
+#### handlePublish
+- Toggles `is_published` boolean in database
+- Updates local state and shows success toast
+
+#### handlePhotoUpload
+- Accepts multiple files via hidden file input
+- Uploads to `vendor-photos` storage bucket at path `{user.id}/{timestamp}-{random}.{ext}`
+- Appends new URLs to existing photos array
+- Updates database and local state
+
+#### handleDeletePhoto
+- Extracts file path from URL
+- Removes from `vendor-photos` storage bucket
+- Filters photo from array and updates database
+
+### Layout Structure (matches VendorPublicProfile)
+
+1. **Preview Banner** (sticky top)
+   - Yellow background: `bg-amber-500 text-amber-950`
+   - Eye icon + "Preview - How Guests See You"
+   - Draft/Live badge
+
+2. **Header** (sticky below banner)
+   - Back button → navigates to `/vendor/dashboard`
+   - Category name
+   - Add photo button + Heart icon
+
+3. **InteractiveSelector** (photo slideshow)
+   - Limited to first 3 photos: `photos.slice(0, 3)`
+   - Photo titles: "Featured", "In Action", "View 3"
+   - Icons from `categoryIcons` mapping
+
+4. **Empty State** (if no photos)
+   - Matches InteractiveSelector dimensions exactly
+   - Wrapper: `relative flex flex-col items-center justify-center py-4 bg-background`
+   - Button: `w-full max-w-[450px] h-[280px] mx-auto rounded-xl` with `minWidth: 300px`
+   - Gradient: `bg-gradient-to-br from-orange-500 to-purple-600`
+
+5. **Content Area** (`px-4 py-6 space-y-6`)
+   - Experience Header (emoji + name + category + rating)
+   - Price Tiers Card OR Quick Info Card
+   - Affiliate Commission Card (amber highlight)
+   - About This Experience section
+   - What's Included list
+   - External Links (Instagram, Menu, Google Reviews)
+   - Photo Gallery Management
+
+6. **Fixed Bottom Actions** (`fixed bottom-16`)
+   - Edit Profile button (outline)
+   - Publish/Unpublish button (gradient)
+
+7. **VendorBottomNav** (fixed bottom navigation)
 
 ---
 
-## 3. Image Display Rules
+## 3. Photo Management with Drag & Drop
 
-### Profile Page (VendorPublicProfile & VendorProfilePreview)
-- **Limit photos to 3** for the InteractiveSelector component
-- Photos use `object-cover` for proper cropping
-- InteractiveSelector dimensions: `max-w-[450px] h-[280px]`
-- Photo titles: "Featured", "In Action", "View 3"
+### Implementation
+Uses framer-motion's `Reorder` component for drag-and-drop reordering.
+
+```typescript
+<Reorder.Group
+  axis="x"
+  values={profile.photos || []}
+  onReorder={async (newOrder) => {
+    // Update local state immediately
+    setProfile(prev => prev ? { ...prev, photos: newOrder } : null);
+    
+    // Persist to database
+    const { error } = await supabase
+      .from('vendor_profiles')
+      .update({ photos: newOrder })
+      .eq('id', profile.id);
+  }}
+  className="grid grid-cols-3 gap-2"
+  style={{ listStyle: 'none', padding: 0, margin: 0 }}
+>
+  {profile.photos?.map((photo, idx) => (
+    <Reorder.Item
+      key={photo}
+      value={photo}
+      className="aspect-square rounded-lg overflow-hidden relative group/photo cursor-grab active:cursor-grabbing"
+      whileDrag={{ scale: 1.05, zIndex: 50, boxShadow: '0 10px 30px rgba(0,0,0,0.3)' }}
+    >
+      {/* Photo content */}
+    </Reorder.Item>
+  ))}
+</Reorder.Group>
+```
+
+### Photo Item Features
+- `cursor-grab active:cursor-grabbing` for drag cursor
+- `whileDrag` animation: scale 1.05, elevated z-index, shadow
+- Grip icon on hover: `GripVertical` in top-left
+- Delete button on hover: red circle in top-right
+- "Main" badge on first photo (idx === 0)
+- Images use `object-cover` and `pointer-events-none`
+
+### Photo Grid Styling
+- Grid: `grid grid-cols-3 gap-2`
+- Each photo: `aspect-square rounded-lg overflow-hidden`
+- Add button below grid: dashed border, hover effects
+
+---
+
+## 4. Image Display Rules
+
+### InteractiveSelector (Profile Pages)
+- **Container**: `max-w-[450px] h-[280px]` with `minWidth: 300px`
+- **Wrapper**: `relative flex flex-col items-center justify-center py-4 bg-background`
+- **Limit**: First 3 photos only
+- **Titles**: "Featured", "In Action", "View 3"
+- **Background**: `backgroundSize: 'cover'`, `backgroundPosition: 'center'`
+
+### Photo Gallery (Manage Photos Section)
+- Grid: `grid grid-cols-3 gap-2`
+- Photos: `aspect-square rounded-lg overflow-hidden`
+- Images: `w-full h-full object-cover`
 
 ### Card Thumbnails (AppView, Wishlists)
-- Use `aspect-square` container with `w-36` width
-- Images use `object-cover` to fill uniformly
-- If no photos, show gradient placeholder with Store icon
+- Container: `aspect-square` with `w-36` width
+- Images: `object-cover` to fill uniformly
+- Fallback: gradient placeholder with Store icon
 
 ---
 
-## 4. Booking Flow
+## 5. Price Tiers System
 
-- Vendor booking uses the same form pattern as experiences
-- Route: `/vendor/:id/book` → `/vendor/:id/payment` → `/vendor/:id/confirmed`
-- Book Now button navigates to `/vendor/:id/book`
-- Booking form collects: date, time, guests, special requests
+### Database Field
+- Column: `price_tiers` (JSONB, default `[]::jsonb`)
+- Format: `[{ "name": "Breakfast", "price": 75 }, { "name": "Dinner", "price": 150 }]`
+
+### Vendor Preview Display
+```typescript
+{profile.price_tiers && profile.price_tiers.length > 0 ? (
+  <Card className="p-4">
+    <div className="space-y-3">
+      <p className="text-sm font-medium">Pricing Options</p>
+      <div className="space-y-2">
+        {profile.price_tiers.map((tier, idx) => (
+          <div key={idx} className="flex items-center justify-between p-2 bg-muted rounded-lg">
+            <span className="text-sm">{tier.name}</span>
+            <Badge variant="secondary" className="bg-gradient-to-r from-orange-500 to-pink-500 text-white">
+              ${tier.price}/person
+            </Badge>
+          </div>
+        ))}
+      </div>
+    </div>
+  </Card>
+) : (
+  // Fallback: Quick Info Card with duration, max guests, price
+)}
+```
+
+### Guest Experience (VendorPublicProfile)
+- Dropdown selector to choose tier
+- Live quote updates below dropdown
+- Bottom CTA shows selected tier name and price
 
 ---
 
-## 5. Favorites System
+## 6. Affiliate Commission System
 
-### Storing Favorites
-- Vendor favorites stored in `localStorage` key: `vendorFavorites`
-- Format: `string[]` (array of vendor profile IDs)
+### Display (Vendor Preview)
+```typescript
+<Card className="p-4 border-amber-500/50 bg-amber-500/5">
+  <div className="flex items-center justify-between">
+    <div className="space-y-1">
+      <p className="text-sm font-medium flex items-center gap-2">
+        💰 Affiliate Commission
+      </p>
+      <p className="text-xs text-muted-foreground">
+        Visible to hosts & vendors only
+      </p>
+    </div>
+    <div className="text-right">
+      <p className="text-2xl font-bold text-amber-600 dark:text-amber-400">
+        {profile.commission_percentage ? `${profile.commission_percentage}%` : 'Not set'}
+      </p>
+    </div>
+  </div>
+</Card>
+```
 
-### Displaying Favorites
-- Heart icon on vendor cards toggles favorite state
-- Favorited vendors appear in `/wishlists` under **"Services"** tab
-
-### Heart Icon States
-- **Not favorited**: `fill-black/40 text-white` with drop shadow
-- **Favorited**: `fill-red-500 text-red-500`
+### Visibility Rules
+| Viewer Role | Can See Commission? |
+|-------------|---------------------|
+| Guest (user) | ❌ No |
+| Host | ✅ Yes |
+| Vendor | ✅ Yes |
 
 ---
 
-## 6. Vendor Profile Database Schema
+## 7. Loading & Empty States
+
+### Loading State
+```typescript
+<div className="min-h-screen bg-background pb-24">
+  <div className="max-w-[375px] mx-auto">
+    <Skeleton className="h-12 w-full" />
+    <Skeleton className="h-[280px] w-full mt-4" />
+    <div className="p-4 space-y-4">
+      <Skeleton className="h-8 w-3/4" />
+      <Skeleton className="h-4 w-1/2" />
+      <Skeleton className="h-24 w-full" />
+    </div>
+  </div>
+</div>
+```
+
+### No Profile State
+```typescript
+<div className="min-h-screen bg-background flex items-center justify-center pb-24">
+  <div className="text-center space-y-4">
+    <p className="text-muted-foreground">No profile found</p>
+    <Button onClick={() => navigate('/vendor/create-profile')}>
+      Create Profile
+    </Button>
+  </div>
+  <VendorBottomNav />
+</div>
+```
+
+---
+
+## 8. Vendor Profile Database Schema
 
 ### Required Fields
 | Field | Type | Description |
@@ -105,8 +364,8 @@ The preview page shows vendors exactly how guests see their profile, plus manage
 |-------|------|-------------|
 | `description` | text | Brief tagline/summary |
 | `about_experience` | text | Detailed description (AI-generated option) |
-| `photos` | text[] | Array of image URLs (first 3 displayed) |
-| `price_per_person` | numeric | Starting price (auto-calculated from price_tiers if set) |
+| `photos` | text[] | Array of image URLs (first 3 displayed in selector) |
+| `price_per_person` | numeric | Starting price (auto-calculated from price_tiers) |
 | `price_tiers` | jsonb | Array of pricing options `[{ "name": "Breakfast", "price": 75 }]` |
 | `duration` | text | e.g., "3 hours" |
 | `max_guests` | integer | Maximum group size |
@@ -119,81 +378,24 @@ The preview page shows vendors exactly how guests see their profile, plus manage
 
 ---
 
-## 7. Pricing Tiers System
+## 9. Storage Bucket
 
-### Setting Price Tiers (Vendor Side)
-- Vendors add multiple pricing options in the "Pricing & Details" section
-- Each tier has a **name** (e.g., "Breakfast", "Lunch", "Dinner") and **price**
-- `price_per_person` is auto-calculated as the minimum tier price
-- Tiers are editable inline after creation
+### Configuration
+- Bucket name: `vendor-photos`
+- Public: Yes (for direct URL access)
+- File path format: `{user_id}/{timestamp}-{random}.{extension}`
 
-### Guest Experience
-- If vendor has price tiers, guests see a **dropdown selector** on the public profile
-- Selecting a tier shows the **live quote** below the dropdown
-- Bottom CTA bar updates to show selected tier name and price
-- "Book Now" button proceeds with the selected option
-
-### Display Rules
-| Location | What Shows |
-|----------|------------|
-| VendorPublicProfile | Dropdown selector with all tiers + quote preview |
-| VendorProfilePreview | List of all tiers with prices |
-| AppView cards | Starting price (lowest tier) |
-| Bottom CTA bar | Selected tier name + price |
+### Upload Flow
+1. Select files via hidden `<input type="file" multiple>`
+2. For each file, generate unique filename
+3. Upload to `supabase.storage.from('vendor-photos').upload()`
+4. Get public URL via `getPublicUrl()`
+5. Append URLs to profile's photos array
+6. Update database
 
 ---
 
-## 7. Affiliate Commission System
-
-### Setting Commission
-- Vendors set commission in "Affiliate Program" section of profile editor
-- Field: `commission_percentage` (0-100)
-- Example helper text: "If you set 15%, hosts earn $15 for every $100 booking"
-
-### Visibility Rules
-| Viewer Role | Can See Commission? |
-|-------------|---------------------|
-| Guest (user) | ❌ No |
-| Host | ✅ Yes |
-| Vendor | ✅ Yes |
-
-### Display Locations
-1. **Vendor Preview** (`/vendor/preview`)
-   - Always visible to vendor owner
-   - Amber-highlighted card showing percentage
-   
-2. **Public Profile** (`/vendor/:id`)
-   - Only visible if viewer's role is "host" or "vendor"
-   - Same amber card styling
-
-3. **Host Dashboard** (`/host/dashboard`)
-   - "Partner Commissions" section shows all vendors with commission programs
-   - Sorted by highest commission first
-   - Displays: photo, name, category, rating, commission %
-   - Click navigates to vendor profile
-
----
-
-## 8. Category Icons
-
-| Category | Emoji |
-|----------|-------|
-| Private Chef | 👨‍🍳 |
-| Massage & Spa | 💆 |
-| Yacht Charter | 🛥️ |
-| Photography | 📸 |
-| Tour Guide | 🗺️ |
-| Fitness & Yoga | 🧘 |
-| Wine Tasting | 🍷 |
-| Fishing Charter | 🎣 |
-| Water Sports | 🌊 |
-| Cooking Class | 👩‍🍳 |
-| Transportation | 🚗 |
-| default | ✨ |
-
----
-
-## 9. Where Vendors Appear
+## 10. Where Vendors Appear
 
 1. **AppView Explore Tab** (`/appview`)
    - `listing_type: 'restaurant'` → "Restaurants Near You" section
@@ -210,13 +412,14 @@ The preview page shows vendors exactly how guests see their profile, plus manage
 
 ---
 
-## 10. Quick Checklist for New Vendors
+## 11. Quick Checklist for New Vendors
 
 ### Profile Setup
 - [ ] Photos uploaded (at least 1, ideally 3)
+- [ ] Photos reordered as desired (drag & drop)
 - [ ] `listing_type` correctly set (restaurant vs experience)
 - [ ] `category` matches predefined list
-- [ ] `price_per_person` set
+- [ ] `price_per_person` OR `price_tiers` set
 - [ ] `duration` specified
 - [ ] `max_guests` defined
 
@@ -233,3 +436,5 @@ The preview page shows vendors exactly how guests see their profile, plus manage
 - [ ] Heart/favorite button works
 - [ ] Book Now button navigates correctly
 - [ ] All links (Instagram, Menu, Google Reviews) open properly
+- [ ] Photo drag-and-drop reordering works
+- [ ] Photo upload and delete work
