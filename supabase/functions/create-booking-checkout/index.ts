@@ -57,20 +57,21 @@ serve(async (req) => {
       time, 
       guests, 
       totalPrice,
-      vendorId 
+      vendorId,
+      hostId // The host who referred this guest (from storefront/guide link)
     } = await req.json();
 
-    logStep("Booking details received", { experienceName, vendorName, date, time, guests, totalPrice, vendorId });
+    logStep("Booking details received", { experienceName, vendorName, date, time, guests, totalPrice, vendorId, hostId });
 
     // Validate required fields
     if (!experienceName || !totalPrice || totalPrice <= 0) {
       throw new Error("Invalid booking details");
     }
 
-    // Get vendor profile with Stripe Connect info and commission settings
+    // Get vendor profile with commission settings
     const { data: vendorProfile, error: vendorError } = await supabaseAdmin
       .from("vendor_profiles")
-      .select("stripe_account_id, stripe_onboarding_complete, host_user_id, host_commission_percentage, commission_percentage")
+      .select("stripe_account_id, stripe_onboarding_complete, commission_percentage")
       .eq("id", vendorId)
       .single();
 
@@ -80,28 +81,48 @@ serve(async (req) => {
 
     logStep("Vendor profile", vendorProfile);
 
-    // Get platform fee percentage
+    // Get platform fee percentage (fixed at 3%)
     const { data: platformSettings } = await supabaseAdmin
       .from("platform_settings")
       .select("platform_fee_percentage")
       .single();
 
-    const platformFeePercent = platformSettings?.platform_fee_percentage || 10;
+    const platformFeePercent = platformSettings?.platform_fee_percentage || 3;
     logStep("Platform fee percentage", { platformFeePercent });
 
-    // Get host's Stripe account if there's a host
+    // Vendor's commission_percentage = what the host earns
+    const hostCommissionPercent = vendorProfile?.commission_percentage || 0;
+
+    // Get host's Stripe account if there's a host and they're linked to this vendor
     let hostStripeAccountId: string | null = null;
-    if (vendorProfile?.host_user_id) {
-      const { data: hostProfile } = await supabaseAdmin
-        .from("profiles")
-        .select("stripe_account_id, stripe_onboarding_complete")
-        .eq("user_id", vendorProfile.host_user_id)
+    let validHostId: string | null = null;
+
+    if (hostId) {
+      // Verify the host has this vendor linked
+      const { data: hostVendorLink } = await supabaseAdmin
+        .from("host_vendor_links")
+        .select("id")
+        .eq("host_user_id", hostId)
+        .eq("vendor_profile_id", vendorId)
         .single();
 
-      if (hostProfile?.stripe_onboarding_complete) {
-        hostStripeAccountId = hostProfile.stripe_account_id;
+      if (hostVendorLink) {
+        validHostId = hostId;
+        
+        // Get host's Stripe account
+        const { data: hostProfile } = await supabaseAdmin
+          .from("profiles")
+          .select("stripe_account_id, stripe_onboarding_complete")
+          .eq("user_id", hostId)
+          .single();
+
+        if (hostProfile?.stripe_onboarding_complete) {
+          hostStripeAccountId = hostProfile.stripe_account_id;
+        }
+        logStep("Host profile", { hostId, hostStripeAccountId, onboardingComplete: hostProfile?.stripe_onboarding_complete });
+      } else {
+        logStep("Host not linked to this vendor", { hostId, vendorId });
       }
-      logStep("Host profile", { hostStripeAccountId, onboardingComplete: hostProfile?.stripe_onboarding_complete });
     }
 
     // Initialize Stripe
@@ -120,13 +141,12 @@ serve(async (req) => {
     }
 
     // Calculate payment splits
+    // Host gets: hostCommissionPercent (set by vendor)
+    // Platform gets: platformFeePercent (3%)
+    // Vendor gets: remainder
     const totalAmountCents = Math.round(totalPrice * 100);
     const platformFeeCents = Math.round(totalAmountCents * (platformFeePercent / 100));
-    
-    const hostCommissionPercent = vendorProfile?.host_commission_percentage || 15;
-    const hostPayoutCents = Math.round(totalAmountCents * (hostCommissionPercent / 100));
-    
-    // Vendor gets remainder after platform fee and host commission
+    const hostPayoutCents = validHostId ? Math.round(totalAmountCents * (hostCommissionPercent / 100)) : 0;
     const vendorPayoutCents = totalAmountCents - platformFeeCents - hostPayoutCents;
 
     logStep("Payment splits calculated", {
@@ -169,17 +189,16 @@ serve(async (req) => {
         time: time,
         guests: guests.toString(),
         user_id: user.id,
+        host_user_id: validHostId || "",
         platform_fee_cents: platformFeeCents.toString(),
         vendor_payout_cents: vendorPayoutCents.toString(),
         host_payout_cents: hostPayoutCents.toString(),
-        host_user_id: vendorProfile?.host_user_id || "",
       },
     };
 
     // If vendor has Stripe Connect set up, use payment_intent_data for transfers
     if (vendorProfile?.stripe_account_id && vendorProfile?.stripe_onboarding_complete) {
-      // Calculate application fee (platform keeps this)
-      // The vendor receives the payment, we take our cut + host cut as application fee
+      // Vendor receives the payment, we take platform fee + host cut as application fee
       // Then we'll transfer host cut to host separately via webhook
       sessionConfig.payment_intent_data = {
         application_fee_amount: platformFeeCents + hostPayoutCents,
