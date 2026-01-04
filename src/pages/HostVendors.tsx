@@ -216,12 +216,14 @@ const HostVendors = () => {
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                     />
                     
-                    {/* Category Badge */}
-                    <div className="absolute top-2 right-2 z-20">
-                      <Badge variant="secondary" className="bg-white/95 text-foreground backdrop-blur-sm shadow-md text-xs px-1.5 py-0.5">
-                        <span>{vendor.category}</span>
-                      </Badge>
-                    </div>
+                    {/* Commission Badge */}
+                    {vendor.commission_percentage && (
+                      <div className="absolute top-2 right-2 z-20">
+                        <Badge className="bg-green-500/90 text-white backdrop-blur-sm shadow-md text-xs px-1.5 py-0.5 font-semibold">
+                          {vendor.commission_percentage}%
+                        </Badge>
+                      </div>
+                    )}
 
                     {/* Gradient overlay with name */}
                     <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-2">
