@@ -2,15 +2,15 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Star, ArrowLeft, Store, Share2, Copy, Check, MessageCircle } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { experiences } from "@/data/mockData";
 import heroImage from "@/assets/hero-beach.jpg";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useProfile } from "@/contexts/ProfileContext";
 import { useSignup } from "@/contexts/SignupContext";
 import { useAuthContext } from "@/contexts/AuthContext";
 import { useEnsureProfileName } from "@/hooks/useEnsureProfileName";
 import HostBottomNav from "@/components/HostBottomNav";
 import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,57 +19,26 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { FaWhatsapp } from "react-icons/fa";
 
-// Import experience images
-import kayakingImg from "@/assets/experiences/kayaking.jpg";
-import bikesImg from "@/assets/experiences/bikes.jpg";
-import snorkelingImg from "@/assets/experiences/snorkeling.jpg";
-import photographyImg from "@/assets/experiences/photography.jpg";
-import spaImg from "@/assets/experiences/spa.jpg";
-import wineImg from "@/assets/experiences/wine.jpg";
-import atvImg from "@/assets/experiences/atv.jpg";
-import boatImg from "@/assets/experiences/boat.jpg";
-import ziplineImg from "@/assets/experiences/zipline.jpg";
-import horsebackImg from "@/assets/experiences/horseback.jpg";
-import scubaImg from "@/assets/experiences/scuba.jpg";
-import hikingImg from "@/assets/experiences/hiking.jpg";
-import parasailingImg from "@/assets/experiences/parasailing.jpg";
-import yogaImg from "@/assets/experiences/yoga.jpg";
-import fishingImg from "@/assets/experiences/fishing.jpg";
-import cookingImg from "@/assets/experiences/cooking.jpg";
-import balloonImg from "@/assets/experiences/balloon.jpg";
-import diningImg from "@/assets/experiences/dining.jpg";
-
-// Image mapping for experiences
-const getExperienceImage = (experienceId: number): string => {
-  const imageMap: Record<number, string> = {
-    1: kayakingImg,
-    2: bikesImg,
-    3: snorkelingImg,
-    4: photographyImg,
-    5: spaImg,
-    6: wineImg,
-    7: atvImg,
-    8: boatImg,
-    9: ziplineImg,
-    10: horsebackImg,
-    11: scubaImg,
-    12: hikingImg,
-    13: parasailingImg,
-    14: yogaImg,
-    15: fishingImg,
-    16: cookingImg,
-    17: balloonImg,
-    18: diningImg,
-  };
-  return imageMap[experienceId] || kayakingImg;
-};
+interface VendorProfile {
+  id: string;
+  name: string;
+  category: string;
+  description: string | null;
+  photos: string[] | null;
+  price_per_person: number | null;
+  google_rating: number | null;
+  commission_percentage: number | null;
+  listing_type: string;
+}
 
 const HostVendors = () => {
   const navigate = useNavigate();
-  const { recommendations, isLoading } = useProfile();
+  const { recommendations, isLoading: isLoadingProfile } = useProfile();
   const { hostSignupData } = useSignup();
   const { user } = useAuthContext();
   const [copied, setCopied] = useState(false);
+  const [vendorProfiles, setVendorProfiles] = useState<VendorProfile[]>([]);
+  const [isLoadingVendors, setIsLoadingVendors] = useState(false);
 
   useEnsureProfileName({
     firstName: hostSignupData.firstName,
@@ -108,12 +77,39 @@ const HostVendors = () => {
       .map(r => r.id);
   }, [recommendations]);
 
-  // Filter experiences by saved vendor IDs (using experience id as the vendor identifier)
-  const savedExperiences = useMemo(() => {
-    return experiences.filter(exp => 
-      savedVendorIds.includes(String(exp.id))
-    );
+  // Fetch vendor profiles from Supabase
+  useEffect(() => {
+    const fetchVendorProfiles = async () => {
+      if (savedVendorIds.length === 0) {
+        setVendorProfiles([]);
+        return;
+      }
+
+      setIsLoadingVendors(true);
+      try {
+        const { data, error } = await supabase
+          .from('vendor_profiles')
+          .select('id, name, category, description, photos, price_per_person, google_rating, commission_percentage, listing_type')
+          .in('id', savedVendorIds)
+          .eq('is_published', true);
+
+        if (error) {
+          console.error('Error fetching vendor profiles:', error);
+          toast({ title: "Failed to load vendors", variant: "destructive" });
+        } else {
+          setVendorProfiles(data || []);
+        }
+      } catch (err) {
+        console.error('Error:', err);
+      } finally {
+        setIsLoadingVendors(false);
+      }
+    };
+
+    fetchVendorProfiles();
   }, [savedVendorIds]);
+
+  const isLoading = isLoadingProfile || isLoadingVendors;
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden pb-24">
@@ -199,46 +195,52 @@ const HostVendors = () => {
         ) : (
           /* Vendors Grid - Smaller cards like AppView */
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 pb-12">
-            {savedExperiences.map((experience) => (
+            {vendorProfiles.map((vendor) => (
               <Link
-                key={experience.id}
-                to={`/experience/${experience.id}`}
+                key={vendor.id}
+                to={`/vendor/${vendor.id}`}
                 className="block group"
               >
                 <div className="space-y-1.5">
                   {/* Image - Smaller like AppView */}
                   <div className="relative aspect-square overflow-hidden rounded-xl shadow-md">
                     <img 
-                      src={getExperienceImage(experience.id)}
-                      alt={experience.name}
+                      src={vendor.photos?.[0] || heroImage}
+                      alt={vendor.name}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                     />
                     
                     {/* Category Badge */}
                     <div className="absolute top-2 right-2 z-20">
                       <Badge variant="secondary" className="bg-white/95 text-foreground backdrop-blur-sm shadow-md text-xs px-1.5 py-0.5">
-                        <span>{experience.categoryIcon}</span>
+                        <span>{vendor.category}</span>
                       </Badge>
                     </div>
 
                     {/* Gradient overlay with name */}
                     <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-2">
-                      <p className="text-white text-xs font-medium line-clamp-1">{experience.name}</p>
+                      <p className="text-white text-xs font-medium line-clamp-1">{vendor.name}</p>
                     </div>
                   </div>
 
                   {/* Content - Compact */}
                   <div className="space-y-0.5 px-0.5">
                     <p className="text-[10px] text-muted-foreground line-clamp-1">
-                      {experience.vendor}
+                      {vendor.listing_type === 'restaurant' ? 'Restaurant' : 'Experience'}
                     </p>
 
                     {/* Stats */}
                     <div className="flex items-center gap-1 text-[10px]">
-                      <Star className="h-2.5 w-2.5 fill-yellow-400 text-yellow-400" />
-                      <span className="font-semibold">{experience.rating}</span>
-                      <span className="text-muted-foreground">•</span>
-                      <span className="text-muted-foreground">${experience.price}</span>
+                      {vendor.google_rating && (
+                        <>
+                          <Star className="h-2.5 w-2.5 fill-yellow-400 text-yellow-400" />
+                          <span className="font-semibold">{vendor.google_rating}</span>
+                          <span className="text-muted-foreground">•</span>
+                        </>
+                      )}
+                      {vendor.price_per_person && (
+                        <span className="text-muted-foreground">${vendor.price_per_person}</span>
+                      )}
                     </div>
                   </div>
                 </div>
