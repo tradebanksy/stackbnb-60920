@@ -561,15 +561,15 @@ const AppView = () => {
                 </div>
               </section>
 
-              {/* Wishlists Section - Shows hearted experiences */}
+              {/* Wishlists Section - Shows hearted experiences and vendors */}
               <section className="space-y-2">
                 <div className="flex items-center justify-between">
                   <h2 className="text-sm font-semibold">My Wishlists</h2>
-                  {favorites.length > 0 && (
-                    <span className="text-xs text-muted-foreground">{favorites.length} saved</span>
+                  {(favorites.length > 0 || vendorFavorites.length > 0) && (
+                    <span className="text-xs text-muted-foreground">{favorites.length + vendorFavorites.length} saved</span>
                   )}
                 </div>
-                {favorites.length === 0 ? (
+                {favorites.length === 0 && vendorFavorites.length === 0 ? (
                   <div className="py-8 text-center">
                     <Heart className="h-8 w-8 mx-auto text-muted-foreground/50 mb-2" />
                     <p className="text-xs text-muted-foreground">No favorites yet</p>
@@ -577,6 +577,41 @@ const AppView = () => {
                   </div>
                 ) : (
                   <div className="grid grid-cols-2 gap-3">
+                    {/* Vendor favorites */}
+                    {[...vendorExperiences, ...vendorRestaurants]
+                      .filter(vendor => vendorFavorites.includes(vendor.id))
+                      .map((vendor) => (
+                        <Link key={vendor.id} to={`/vendor/${vendor.id}`} className="block">
+                          <div className="aspect-square rounded-xl overflow-hidden relative">
+                            <img
+                              src={vendor.photos?.[0] || '/placeholder.svg'}
+                              alt={vendor.name}
+                              className="w-full h-full object-cover"
+                            />
+                            <button
+                              onClick={(e) => toggleVendorFavorite(vendor.id, e)}
+                              className="absolute top-2 right-2 z-10"
+                            >
+                              <Heart className="h-4 w-4 drop-shadow-md fill-red-500 text-red-500" />
+                            </button>
+                          </div>
+                          <div className="mt-1.5">
+                            <p className="text-xs font-medium line-clamp-1">{vendor.name}</p>
+                            <p className="text-[10px] text-muted-foreground line-clamp-1">{vendor.category}</p>
+                            <div className="flex items-center gap-1 text-[10px]">
+                              {vendor.google_rating && (
+                                <>
+                                  <Star className="h-2.5 w-2.5 fill-yellow-400 text-yellow-400" />
+                                  <span>{vendor.google_rating}</span>
+                                  <span className="text-muted-foreground">•</span>
+                                </>
+                              )}
+                              <span className="font-medium">${vendor.price_per_person}</span>
+                            </div>
+                          </div>
+                        </Link>
+                      ))}
+                    {/* Experience favorites */}
                     {experiences.filter(exp => favorites.includes(exp.id)).map((experience) => (
                       <Link key={experience.id} to={`/experience/${experience.id}`} className="block">
                         <div className="aspect-square rounded-xl overflow-hidden relative">
