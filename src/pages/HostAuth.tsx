@@ -44,11 +44,28 @@ const HostAuth = () => {
         toast.success("Account created! Redirecting...");
         navigate("/host/vendors");
       } else {
-        const { error } = await supabase.auth.signInWithPassword({
+        const { data: signInData, error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
         if (error) throw error;
+
+        // Check if user is admin
+        if (signInData.user) {
+          const { data: roleData } = await supabase
+            .from('user_roles')
+            .select('role')
+            .eq('user_id', signInData.user.id)
+            .eq('role', 'admin')
+            .maybeSingle();
+
+          if (roleData) {
+            toast.success("Welcome back, Admin!");
+            navigate("/admin/settings");
+            return;
+          }
+        }
+
         toast.success("Signed in successfully!");
         navigate("/host/vendors");
       }
