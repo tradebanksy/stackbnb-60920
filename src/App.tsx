@@ -78,6 +78,7 @@ import VendorPublicProfile from "./pages/VendorPublicProfile";
 import VendorBookingForm from "./pages/VendorBookingForm";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PlatformSettings from "./pages/PlatformSettings";
+import HostVendorManagement from "./pages/HostVendorManagement";
 
 const ProtectedHostRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, isLoading, role } = useAuthContext();
@@ -189,6 +190,7 @@ const AppRoutes = () => (
     <Route path="/host/help-support" element={<ProtectedHostRoute><HelpSupport /></ProtectedHostRoute>} />
     <Route path="/host/bookings" element={<ProtectedHostRoute><HostBookings /></ProtectedHostRoute>} />
     <Route path="/host/vendors/active" element={<ProtectedHostRoute><HostActiveVendors /></ProtectedHostRoute>} />
+    <Route path="/host/vendors/manage" element={<ProtectedHostRoute><HostVendorManagement /></ProtectedHostRoute>} />
     <Route path="/host/earnings" element={<ProtectedHostRoute><HostEarnings /></ProtectedHostRoute>} />
     <Route path="/host/ratings" element={<ProtectedHostRoute><HostRatings /></ProtectedHostRoute>} />
     <Route 

@@ -23,6 +23,7 @@ export type Database = {
           experience_name: string
           guests: number
           host_payout_amount: number | null
+          host_user_id: string | null
           id: string
           payout_status: string | null
           platform_fee_amount: number | null
@@ -44,6 +45,7 @@ export type Database = {
           experience_name: string
           guests?: number
           host_payout_amount?: number | null
+          host_user_id?: string | null
           id?: string
           payout_status?: string | null
           platform_fee_amount?: number | null
@@ -65,6 +67,7 @@ export type Database = {
           experience_name?: string
           guests?: number
           host_payout_amount?: number | null
+          host_user_id?: string | null
           id?: string
           payout_status?: string | null
           platform_fee_amount?: number | null
@@ -81,6 +84,35 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "bookings_vendor_profile_id_fkey"
+            columns: ["vendor_profile_id"]
+            isOneToOne: false
+            referencedRelation: "vendor_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      host_vendor_links: {
+        Row: {
+          created_at: string
+          host_user_id: string
+          id: string
+          vendor_profile_id: string
+        }
+        Insert: {
+          created_at?: string
+          host_user_id: string
+          id?: string
+          vendor_profile_id: string
+        }
+        Update: {
+          created_at?: string
+          host_user_id?: string
+          id?: string
+          vendor_profile_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "host_vendor_links_vendor_profile_id_fkey"
             columns: ["vendor_profile_id"]
             isOneToOne: false
             referencedRelation: "vendor_profiles"

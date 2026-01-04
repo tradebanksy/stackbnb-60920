@@ -16,6 +16,7 @@ import {
   Share2,
   MessageCircle,
   Settings,
+  Handshake,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import HostBottomNav from "@/components/HostBottomNav";
@@ -130,6 +131,13 @@ const HostProfile = () => {
       icon: Store, 
       action: "/host/storefront",
       gradient: false
+    },
+    { 
+      label: "My Vendors", 
+      icon: Handshake, 
+      action: "/host/vendors/manage",
+      gradient: false,
+      description: "Manage commission partnerships"
     },
     { 
       label: "Payment Settings", 

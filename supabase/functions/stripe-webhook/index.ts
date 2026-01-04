@@ -79,7 +79,7 @@ serve(async (req) => {
       const bookingTime = metadata.time || "";
       const guests = parseInt(metadata.guests || "1", 10);
       const userId = metadata.user_id;
-      const hostUserId = metadata.host_user_id;
+      const hostUserId = metadata.host_user_id || null;
       
       // Payment split amounts (stored in cents in metadata)
       const platformFeeCents = parseInt(metadata.platform_fee_cents || "0", 10);
@@ -133,7 +133,8 @@ serve(async (req) => {
           vendor_payout_amount: vendorPayoutCents / 100,
           host_payout_amount: hostPayoutCents / 100,
           platform_fee_amount: platformFeeCents / 100,
-          payout_status: "pending",
+          payout_status: hostPayoutCents > 0 ? "pending" : "processed",
+          host_user_id: hostUserId || null,
         })
         .select()
         .single();
@@ -156,7 +157,7 @@ serve(async (req) => {
 
         if (hostProfile?.stripe_account_id && hostProfile?.stripe_onboarding_complete) {
           try {
-            // Create a transfer to the host
+            // Create a transfer to the host from the application fee
             const transfer = await stripe.transfers.create({
               amount: hostPayoutCents,
               currency: session.currency || "usd",
