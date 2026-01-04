@@ -135,7 +135,7 @@ const VendorPublicProfile = () => {
     );
   }
 
-  const photos = profile.photos || [];
+  const photos = (profile.photos || []).slice(0, 3); // Limit to 3 photos for uniform display
   const categoryConfig = categoryIcons[profile.category] || categoryIcons['default'];
   
   // Generate titles and icons for the selector
