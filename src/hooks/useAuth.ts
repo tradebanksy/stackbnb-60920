@@ -113,20 +113,24 @@ export const useAuth = () => {
   const setUserRole = async (role: 'host' | 'vendor' | 'user'): Promise<{ error: string | null }> => {
     if (!authState.user) return { error: 'Not authenticated' };
 
-    const { error } = await supabase
-      .from('user_roles')
-      .upsert({ 
-        user_id: authState.user.id, 
-        role 
-      }, { 
-        onConflict: 'user_id,role' 
-      });
+    // Use server-side Edge Function to assign role securely
+    const { data, error } = await supabase.functions.invoke('assign-role', { 
+      body: { role } 
+    });
 
-    if (!error) {
-      setAuthState(prev => ({ ...prev, role }));
+    if (error) {
+      console.error('Error assigning role:', error.message);
+      return { error: error.message };
     }
 
-    return { error: error?.message ?? null };
+    if (!data?.success) {
+      return { error: data?.error || 'Failed to assign role' };
+    }
+
+    // Refresh role from database to confirm
+    const newRole = await fetchUserRole(authState.user.id);
+    setAuthState(prev => ({ ...prev, role: newRole }));
+    return { error: null };
   };
 
   const signOut = async () => {

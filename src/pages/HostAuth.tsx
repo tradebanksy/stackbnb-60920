@@ -30,16 +30,11 @@ const HostAuth = () => {
         });
         if (error) throw error;
         
-        // Insert host role for the new user
+        // Insert host role for the new user using secure Edge Function
         if (signUpData.user) {
-          const { error: roleError } = await supabase
-            .from('user_roles')
-            .upsert({ 
-              user_id: signUpData.user.id, 
-              role: 'host' as const
-            }, { 
-              onConflict: 'user_id,role' 
-            });
+          const { error: roleError } = await supabase.functions.invoke('assign-role', {
+            body: { role: 'host' }
+          });
           
           if (roleError) {
             console.error('Error setting host role:', roleError);
