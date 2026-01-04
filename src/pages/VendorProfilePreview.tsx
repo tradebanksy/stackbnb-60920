@@ -7,13 +7,14 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 import { 
   ArrowLeft, Star, Clock, Users, CheckCircle, Heart,
-  Instagram, ExternalLink, Store, Eye, Edit, Globe, Plus, Trash2, Loader2, ImagePlus
+  Instagram, ExternalLink, Store, Eye, Edit, Globe, Plus, Trash2, Loader2, ImagePlus, GripVertical
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthContext } from '@/contexts/AuthContext';
 import VendorBottomNav from '@/components/VendorBottomNav';
 import InteractiveSelector from '@/components/ui/interactive-selector';
 import { FaUtensils, FaSpa, FaCamera, FaWineGlass, FaShip, FaBicycle, FaSwimmer, FaMountain } from 'react-icons/fa';
+import { Reorder } from 'framer-motion';
 
 interface PriceTier {
   name: string;
@@ -496,17 +497,51 @@ const VendorProfilePreview = () => {
           {/* Photo Gallery Management */}
           {(profile.photos?.length ?? 0) > 0 && (
             <div className="space-y-3">
-              <h2 className="text-lg font-semibold">Manage Photos</h2>
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold">Manage Photos</h2>
+                <span className="text-xs text-muted-foreground">Drag to reorder</span>
+              </div>
               <Card className="p-4">
-                <div className="grid grid-cols-3 gap-2">
+                <Reorder.Group
+                  axis="x"
+                  values={profile.photos || []}
+                  onReorder={async (newOrder) => {
+                    // Update local state immediately
+                    setProfile(prev => prev ? { ...prev, photos: newOrder } : null);
+                    
+                    // Persist to database
+                    try {
+                      const { error } = await supabase
+                        .from('vendor_profiles')
+                        .update({ photos: newOrder })
+                        .eq('id', profile.id);
+                      
+                      if (error) throw error;
+                    } catch (error) {
+                      console.error('Error reordering photos:', error);
+                      toast.error('Failed to save photo order');
+                    }
+                  }}
+                  className="grid grid-cols-3 gap-2"
+                  style={{ listStyle: 'none', padding: 0, margin: 0 }}
+                >
                   {profile.photos?.map((photo, idx) => (
-                    <div
-                      key={idx}
-                      className="aspect-square rounded-lg overflow-hidden relative group/photo"
+                    <Reorder.Item
+                      key={photo}
+                      value={photo}
+                      className="aspect-square rounded-lg overflow-hidden relative group/photo cursor-grab active:cursor-grabbing"
+                      whileDrag={{ scale: 1.05, zIndex: 50, boxShadow: '0 10px 30px rgba(0,0,0,0.3)' }}
                     >
-                      <img src={photo} alt={`Photo ${idx + 1}`} className="w-full h-full object-cover" />
+                      <img src={photo} alt={`Photo ${idx + 1}`} className="w-full h-full object-cover pointer-events-none" />
+                      <div className="absolute inset-0 bg-black/0 group-hover/photo:bg-black/20 transition-colors" />
+                      <div className="absolute top-1 left-1 p-1 bg-black/50 rounded opacity-0 group-hover/photo:opacity-100 transition-opacity">
+                        <GripVertical className="h-3 w-3 text-white" />
+                      </div>
                       <button
-                        onClick={() => handleDeletePhoto(photo, idx)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeletePhoto(photo, idx);
+                        }}
                         className="absolute top-1 right-1 p-1.5 bg-red-500/90 rounded-full opacity-0 group-hover/photo:opacity-100 transition-opacity"
                       >
                         <Trash2 className="h-3 w-3 text-white" />
@@ -518,24 +553,24 @@ const VendorProfilePreview = () => {
                           </Badge>
                         </div>
                       )}
-                    </div>
+                    </Reorder.Item>
                   ))}
-                  {/* Add photo button */}
-                  <button
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={isUploading}
-                    className="aspect-square rounded-lg border-2 border-dashed border-muted-foreground/30 flex flex-col items-center justify-center gap-1 hover:border-primary hover:bg-primary/5 transition-colors"
-                  >
-                    {isUploading ? (
-                      <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-                    ) : (
-                      <>
-                        <Plus className="h-5 w-5 text-muted-foreground" />
-                        <span className="text-[10px] text-muted-foreground">Add</span>
-                      </>
-                    )}
-                  </button>
-                </div>
+                </Reorder.Group>
+                {/* Add photo button */}
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isUploading}
+                  className="aspect-square rounded-lg border-2 border-dashed border-muted-foreground/30 flex flex-col items-center justify-center gap-1 hover:border-primary hover:bg-primary/5 transition-colors mt-2"
+                >
+                  {isUploading ? (
+                    <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                  ) : (
+                    <>
+                      <Plus className="h-5 w-5 text-muted-foreground" />
+                      <span className="text-[10px] text-muted-foreground">Add</span>
+                    </>
+                  )}
+                </button>
               </Card>
             </div>
           )}
