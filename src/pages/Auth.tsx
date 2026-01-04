@@ -74,25 +74,13 @@ const Auth = () => {
       
       if (isAuthenticated && pendingRole && !userRole) {
         // User just signed in via OAuth and has a pending role to save
-        const { data: { user } } = await supabase.auth.getUser();
+        // Use setUserRole which now calls the Edge Function
+        const { error: roleError } = await setUserRole(pendingRole);
         
-        if (user) {
-          const { error: roleError } = await supabase
-            .from('user_roles')
-            .upsert({ 
-              user_id: user.id, 
-              role: pendingRole 
-            }, { 
-              onConflict: 'user_id,role' 
-            });
-          
-          if (!roleError) {
-            localStorage.removeItem('pending_role');
-            // Use setUserRole to update context and trigger redirect
-            await setUserRole(pendingRole);
-          } else {
-            console.error("Error setting user role:", roleError);
-          }
+        if (!roleError) {
+          localStorage.removeItem('pending_role');
+        } else {
+          console.error("Error setting user role:", roleError);
         }
       }
     };
@@ -268,16 +256,12 @@ const Auth = () => {
           throw error;
         }
         
-        // Save user role if provided - use signUpData.user.id directly since auth state may not be updated yet
+        // Save user role if provided - use Edge Function for secure role assignment
         if (signUpData.user && role) {
-          const { error: roleError } = await supabase
-            .from('user_roles')
-            .upsert({ 
-              user_id: signUpData.user.id, 
-              role 
-            }, { 
-              onConflict: 'user_id,role' 
-            });
+          // Call Edge Function to assign role securely server-side
+          const { error: roleError } = await supabase.functions.invoke('assign-role', {
+            body: { role }
+          });
           if (roleError) {
             console.error("Error setting user role:", roleError);
           }
