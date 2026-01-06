@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import type { Vendor } from "@/types";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
@@ -9,7 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
-import { Heart, User, Search, Star, Sparkles, Store, ChevronRight, ChevronDown, Megaphone, Monitor, MapPin, CalendarDays, LogIn, UserPlus, CheckCircle, DollarSign, Zap, Home } from "lucide-react";
+import { Heart, User, Search, Star, Sparkles, Store, ChevronRight, ChevronDown, Megaphone, Monitor, MapPin, CalendarDays, LogIn, UserPlus, CheckCircle, DollarSign, Zap, Home, Settings, LogOut } from "lucide-react";
+import { useAuthContext } from "@/contexts/AuthContext";
 import { Card } from "@/components/ui/card";
 import {
   Collapsible,
@@ -104,6 +105,8 @@ interface VendorProfile {
 }
 
 const AppView = () => {
+  const { isAuthenticated, signOut } = useAuthContext();
+  const navigate = useNavigate();
   const [favorites, setFavorites] = useState<number[]>(() => {
     const saved = localStorage.getItem("favorites");
     return saved ? JSON.parse(saved) : [];
@@ -120,6 +123,11 @@ const AppView = () => {
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [locationQuery, setLocationQuery] = useState("");
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/appview");
+  };
 
   useEffect(() => {
     fetchMyBusinesses();
@@ -271,18 +279,41 @@ const AppView = () => {
                       <User className="h-4 w-4" />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-40">
-                      <DropdownMenuItem asChild>
-                        <Link to="/auth" className="flex items-center gap-2 cursor-pointer">
-                          <LogIn className="h-4 w-4" />
-                          Sign In
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link to="/auth?signup=true" className="flex items-center gap-2 cursor-pointer">
-                          <UserPlus className="h-4 w-4" />
-                          Sign Up
-                        </Link>
-                      </DropdownMenuItem>
+                      {isAuthenticated ? (
+                        <>
+                          <DropdownMenuItem asChild>
+                            <Link to="/profile" className="flex items-center gap-2 cursor-pointer">
+                              <User className="h-4 w-4" />
+                              Profile
+                            </Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem asChild>
+                            <Link to="/host/profile" className="flex items-center gap-2 cursor-pointer">
+                              <Settings className="h-4 w-4" />
+                              Settings
+                            </Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={handleSignOut} className="flex items-center gap-2 cursor-pointer text-destructive">
+                            <LogOut className="h-4 w-4" />
+                            Sign Out
+                          </DropdownMenuItem>
+                        </>
+                      ) : (
+                        <>
+                          <DropdownMenuItem asChild>
+                            <Link to="/auth" className="flex items-center gap-2 cursor-pointer">
+                              <LogIn className="h-4 w-4" />
+                              Sign In
+                            </Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem asChild>
+                            <Link to="/auth?signup=true" className="flex items-center gap-2 cursor-pointer">
+                              <UserPlus className="h-4 w-4" />
+                              Sign Up
+                            </Link>
+                          </DropdownMenuItem>
+                        </>
+                      )}
                     </DropdownMenuContent>
                   </DropdownMenu>
                   <Link
