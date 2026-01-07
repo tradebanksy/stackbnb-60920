@@ -288,7 +288,7 @@ const AppView = () => {
                             </Link>
                           </DropdownMenuItem>
                           <DropdownMenuItem asChild>
-                            <Link to="/host/profile" className="flex items-center gap-2 cursor-pointer">
+                            <Link to="/profile" className="flex items-center gap-2 cursor-pointer">
                               <Settings className="h-4 w-4" />
                               Settings
                             </Link>
