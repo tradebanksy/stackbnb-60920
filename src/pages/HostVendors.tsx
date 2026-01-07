@@ -128,7 +128,7 @@ const HostVendors = () => {
       <div className="relative max-w-7xl mx-auto px-4 py-8 space-y-6">
         {/* Back Button */}
         <button
-          onClick={() => window.history.length > 1 ? navigate(-1) : navigate('/host/dashboard')}
+          onClick={() => navigate('/host/dashboard')}
           className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
         >
           <ArrowLeft className="h-5 w-5" />
