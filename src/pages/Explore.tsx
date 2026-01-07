@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, MapPin, ArrowLeft, User, Sparkles, LogIn, UserPlus, Star, Store, Plus, Check, Loader2 } from "lucide-react";
+import { Search, MapPin, ArrowLeft, User, Sparkles, LogIn, UserPlus, Star, Store, Plus, Check, Loader2, Settings, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { experiences } from "@/data/mockData";
 import { mockRestaurants } from "@/data/mockRestaurants";
@@ -218,19 +218,49 @@ const Explore = () => {
                   <DropdownMenuTrigger className="p-2 rounded-full bg-background/80 border border-border text-foreground hover:bg-accent transition-colors">
                     <User className="h-4 w-4" />
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-40">
-                    <DropdownMenuItem asChild>
-                      <Link to="/auth" className="flex items-center gap-2 cursor-pointer">
-                        <LogIn className="h-4 w-4" />
-                        Sign In
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link to="/auth?signup=true" className="flex items-center gap-2 cursor-pointer">
-                        <UserPlus className="h-4 w-4" />
-                        Sign Up
-                      </Link>
-                    </DropdownMenuItem>
+                  <DropdownMenuContent align="end" className="w-40 bg-background border border-border">
+                    {isAuthenticated ? (
+                      <>
+                        <DropdownMenuItem asChild>
+                          <Link to="/profile" className="flex items-center gap-2 cursor-pointer">
+                            <User className="h-4 w-4" />
+                            Profile
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link to="/profile" className="flex items-center gap-2 cursor-pointer">
+                            <Settings className="h-4 w-4" />
+                            Settings
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem 
+                          onClick={async () => {
+                            const { signOut } = await import('@/integrations/supabase/client').then(m => ({ signOut: m.supabase.auth.signOut.bind(m.supabase.auth) }));
+                            await signOut();
+                            navigate('/explore');
+                          }} 
+                          className="flex items-center gap-2 cursor-pointer text-destructive"
+                        >
+                          <LogOut className="h-4 w-4" />
+                          Sign Out
+                        </DropdownMenuItem>
+                      </>
+                    ) : (
+                      <>
+                        <DropdownMenuItem asChild>
+                          <Link to="/auth" className="flex items-center gap-2 cursor-pointer">
+                            <LogIn className="h-4 w-4" />
+                            Sign In
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link to="/auth?signup=true" className="flex items-center gap-2 cursor-pointer">
+                            <UserPlus className="h-4 w-4" />
+                            Sign Up
+                          </Link>
+                        </DropdownMenuItem>
+                      </>
+                    )}
                   </DropdownMenuContent>
                 </DropdownMenu>
                 <Link
