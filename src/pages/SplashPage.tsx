@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
-import stackdLogo from "@/assets/stackd-logo-new.png";
+import Logo3DSpin from "@/components/Logo3DSpin";
 
 const SplashPage = () => {
   const [shakeExplore, setShakeExplore] = useState(false);
@@ -49,15 +49,12 @@ const SplashPage = () => {
         }}
       />
       
-      {/* Logo */}
-      <div className="mb-12">
-        <img 
-          src={stackdLogo} 
-          alt="stackd logo" 
-          className="h-64 w-64 sm:h-80 sm:w-80 lg:h-96 lg:w-96 mx-auto"
-          style={{ filter: 'drop-shadow(0 25px 50px rgba(0, 0, 0, 0.5)) drop-shadow(0 10px 20px rgba(0, 0, 0, 0.3))' }}
-        />
-      </div>
+      {/* Animated 3D Logo */}
+      <Logo3DSpin 
+        className="mb-12" 
+        desktopSize={320} 
+        mobileSize={220} 
+      />
 
       {/* Buttons Container */}
       <div className="flex items-center gap-5">
