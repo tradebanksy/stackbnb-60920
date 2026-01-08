@@ -14,6 +14,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useAuthContext } from "@/contexts/AuthContext";
 import heroImage from "@/assets/hero-beach.jpg";
 import stackdLogo from "@/assets/stackd-logo-new.png";
+import { PasswordResetOTPDialog } from "@/components/PasswordResetOTPDialog";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -23,7 +24,8 @@ const Auth = () => {
   const { toast } = useToast();
   const [isSignUp, setIsSignUp] = useState(true);
   const [loading, setLoading] = useState(false);
-  const [isResettingPassword, setIsResettingPassword] = useState(false);
+  const [showOTPDialog, setShowOTPDialog] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
   const { isAuthenticated, isLoading, role: userRole, setUserRole } = useAuthContext();
 
   // All hooks must be called before any conditional returns
@@ -386,7 +388,7 @@ const Auth = () => {
     }
   };
 
-  const handleForgotPassword = async () => {
+  const handleForgotPassword = () => {
     const email = form.getValues("email").trim();
     if (!email) {
       toast({
@@ -396,39 +398,18 @@ const Auth = () => {
       });
       return;
     }
-
-    setIsResettingPassword(true);
-    try {
-      // Use edge function to generate direct reset link
-      const { data, error } = await supabase.functions.invoke('generate-reset-link', {
-        body: { email }
-      });
-
-      if (error) throw error;
-
-      if (data?.link) {
-        window.open(data.link, '_blank');
-        toast({
-          title: "Reset link opened",
-          description: "A new tab has opened with your password reset page.",
-        });
-      } else {
-        throw new Error("Could not generate reset link");
-      }
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : "Failed to generate reset link";
-      toast({
-        title: "Couldn't send reset email",
-        description: msg,
-        variant: "destructive",
-      });
-    } finally {
-      setIsResettingPassword(false);
-    }
+    setResetEmail(email);
+    setShowOTPDialog(true);
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+    <>
+      <PasswordResetOTPDialog 
+        open={showOTPDialog} 
+        onOpenChange={setShowOTPDialog} 
+        email={resetEmail} 
+      />
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-6">
         <button
           onClick={() => navigate(-1)}
@@ -486,10 +467,10 @@ const Auth = () => {
                     <button
                       type="button"
                       onClick={handleForgotPassword}
-                      disabled={loading || isResettingPassword}
+                      disabled={loading}
                       className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                     >
-                      {isResettingPassword ? "Sending reset email..." : "Forgot password?"}
+                      Forgot password?
                     </button>
                   </div>
                 )}
@@ -581,6 +562,7 @@ const Auth = () => {
         </Card>
       </div>
     </div>
+    </>
   );
 };
 
