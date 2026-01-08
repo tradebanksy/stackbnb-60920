@@ -19,7 +19,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "@/hooks/use-toast";
 import { mockRestaurants, isRestaurantOpen, type Restaurant } from "@/data/mockRestaurants";
-import { formatDistance } from "@/services/geoapifyService";
+import { formatDistance } from "@/services/googleMapsService";
 import InteractiveSelector from "@/components/ui/interactive-selector";
 import { supabase } from "@/integrations/supabase/client";
 import { GuestGuideButton } from "@/components/GuestGuideButton";
