@@ -9,13 +9,15 @@ import { useAuthContext } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import stackdLogo from "@/assets/stackd-logo-new.png";
+import { PasswordResetOTPDialog } from "@/components/PasswordResetOTPDialog";
 
 const SignIn = () => {
   const navigate = useNavigate();
   const { isAuthenticated, role, isLoading } = useAuthContext();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isResettingPassword, setIsResettingPassword] = useState(false);
+  const [showOTPDialog, setShowOTPDialog] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
   
   const [formData, setFormData] = useState({
     email: '',
@@ -83,7 +85,7 @@ const SignIn = () => {
     }
   };
 
-  const handleForgotPassword = async () => {
+  const handleForgotPassword = () => {
     const email = formData.email.trim();
     if (!email) {
       toast({
@@ -93,35 +95,8 @@ const SignIn = () => {
       });
       return;
     }
-
-    setIsResettingPassword(true);
-    try {
-      // Use edge function to generate direct reset link
-      const { data, error } = await supabase.functions.invoke('generate-reset-link', {
-        body: { email }
-      });
-
-      if (error) throw error;
-
-      if (data?.link) {
-        window.open(data.link, '_blank');
-        toast({
-          title: "Reset link opened",
-          description: "A new tab has opened with your password reset page.",
-        });
-      } else {
-        throw new Error("Could not generate reset link");
-      }
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : "Failed to generate reset link";
-      toast({
-        title: "Couldn't send reset email",
-        description: msg,
-        variant: "destructive",
-      });
-    } finally {
-      setIsResettingPassword(false);
-    }
+    setResetEmail(email);
+    setShowOTPDialog(true);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -140,7 +115,13 @@ const SignIn = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+    <>
+      <PasswordResetOTPDialog 
+        open={showOTPDialog} 
+        onOpenChange={setShowOTPDialog} 
+        email={resetEmail} 
+      />
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-4">
         <Link 
           to="/" 
@@ -206,10 +187,10 @@ const SignIn = () => {
             <button
               type="button"
               onClick={handleForgotPassword}
-              disabled={isSubmitting || isResettingPassword}
+              disabled={isSubmitting}
               className="text-sm text-primary hover:underline disabled:opacity-60"
             >
-              {isResettingPassword ? "Sending reset email..." : "Forgot Password?"}
+              Forgot Password?
             </button>
           </div>
         </form>
@@ -229,6 +210,7 @@ const SignIn = () => {
         </Card>
       </div>
     </div>
+    </>
   );
 };
 
