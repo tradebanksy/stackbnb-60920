@@ -322,9 +322,9 @@ const PriceComparison = ({ category, experienceName, currentPrice, duration }: P
               <p className="text-xs font-medium text-muted-foreground">Similar in Tulum</p>
               <div className="space-y-2">
                 {priceData.comparables.map((comp, index) => (
-                  <div key={index} className="flex items-start justify-between gap-2 text-sm p-2 rounded-lg bg-muted/50">
-                    <span className="font-medium break-words min-w-0 flex-1">{comp.name}</span>
-                    <span className="text-muted-foreground whitespace-nowrap shrink-0">{comp.priceRange}</span>
+                  <div key={index} className="flex items-center justify-between text-sm p-2 rounded-lg bg-muted/50">
+                    <span className="font-medium truncate flex-1 mr-2">{comp.name}</span>
+                    <span className="text-muted-foreground whitespace-nowrap">{comp.priceRange}</span>
                   </div>
                 ))}
               </div>
