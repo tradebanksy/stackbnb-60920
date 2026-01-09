@@ -131,10 +131,43 @@ const PriceComparison = ({ category, experienceName, currentPrice, duration }: P
       </Button>
 
       {isLoading && (
-        <Card className="p-4 space-y-3">
+        <Card className="p-4 space-y-4 border-primary/20 bg-gradient-to-br from-primary/5 to-transparent animate-in fade-in duration-300">
+          {/* Header skeleton */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-4 w-4 rounded-full" />
+              <Skeleton className="h-6 w-24 rounded-full" />
+            </div>
+            <Skeleton className="h-4 w-20" />
+          </div>
+          
+          {/* Price range bar skeleton */}
+          <div className="space-y-2">
+            <div className="flex justify-between">
+              <Skeleton className="h-3 w-8" />
+              <Skeleton className="h-3 w-16" />
+              <Skeleton className="h-3 w-8" />
+            </div>
+            <Skeleton className="h-2 w-full rounded-full" />
+            <Skeleton className="h-3 w-32 mx-auto" />
+          </div>
+          
+          {/* Assessment text skeleton */}
+          <Skeleton className="h-4 w-full" />
           <Skeleton className="h-4 w-3/4" />
-          <Skeleton className="h-8 w-full" />
-          <Skeleton className="h-4 w-1/2" />
+          
+          {/* Comparables skeleton */}
+          <div className="space-y-2 pt-2">
+            <Skeleton className="h-3 w-24" />
+            <Skeleton className="h-10 w-full rounded-lg" />
+            <Skeleton className="h-10 w-full rounded-lg" />
+            <Skeleton className="h-10 w-full rounded-lg" />
+          </div>
+          
+          {/* Market insight skeleton */}
+          <div className="border-t pt-3">
+            <Skeleton className="h-3 w-full" />
+          </div>
         </Card>
       )}
 
