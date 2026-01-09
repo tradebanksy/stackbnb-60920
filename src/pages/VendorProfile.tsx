@@ -171,8 +171,8 @@ const VendorProfile = () => {
           ) : isEditing ? (
             <div className="space-y-4">
               <div className="flex items-center gap-3">
-                <Avatar className="h-16 w-16 bg-gradient-to-r from-orange-500 to-pink-500 flex-shrink-0">
-                  <AvatarFallback className="text-white text-xl font-semibold">
+                <Avatar className="h-16 w-16 flex-shrink-0">
+                  <AvatarFallback className="bg-gradient-to-br from-orange-400 via-pink-500 to-purple-600 text-white text-xl font-semibold">
                     {initials}
                   </AvatarFallback>
                 </Avatar>
@@ -208,8 +208,8 @@ const VendorProfile = () => {
             </div>
           ) : (
             <div className="flex items-center gap-3">
-              <Avatar className="h-16 w-16 bg-gradient-to-r from-orange-500 to-pink-500 flex-shrink-0">
-                <AvatarFallback className="text-white text-xl font-semibold">
+              <Avatar className="h-16 w-16 flex-shrink-0">
+                <AvatarFallback className="bg-gradient-to-br from-orange-400 via-pink-500 to-purple-600 text-white text-xl font-semibold">
                   {initials}
                 </AvatarFallback>
               </Avatar>
