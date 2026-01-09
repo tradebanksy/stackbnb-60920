@@ -14,6 +14,7 @@ interface AuthState {
 
 const fetchUserRole = async (userId: string): Promise<UserRole> => {
   try {
+    console.log('[Auth] Fetching role for user:', userId);
     // Fetch all roles for the user (handles cases with multiple roles)
     const { data, error } = await supabase
       .from('user_roles')
@@ -21,24 +22,30 @@ const fetchUserRole = async (userId: string): Promise<UserRole> => {
       .eq('user_id', userId);
 
     if (error) {
-      console.error('Error fetching user role:', error);
+      console.error('[Auth] Error fetching user role:', error);
       return null;
     }
 
+    console.log('[Auth] Roles data:', data);
+
     if (!data || data.length === 0) {
+      console.log('[Auth] No roles found for user');
       return null;
     }
 
     // Priority: admin > host > vendor > user
     const roles = data.map(r => r.role);
-    if (roles.includes('admin')) return 'host'; // Admin acts as host for UI purposes
-    if (roles.includes('host')) return 'host';
-    if (roles.includes('vendor')) return 'vendor';
-    if (roles.includes('user')) return 'user';
+    let resolvedRole: UserRole = null;
+    if (roles.includes('admin')) resolvedRole = 'host'; // Admin acts as host for UI purposes
+    else if (roles.includes('host')) resolvedRole = 'host';
+    else if (roles.includes('vendor')) resolvedRole = 'vendor';
+    else if (roles.includes('user')) resolvedRole = 'user';
+    else resolvedRole = (data[0]?.role as UserRole) ?? null;
     
-    return (data[0]?.role as UserRole) ?? null;
+    console.log('[Auth] Resolved role:', resolvedRole);
+    return resolvedRole;
   } catch (err) {
-    console.error('Error fetching user role:', err);
+    console.error('[Auth] Error fetching user role:', err);
     return null;
   }
 };
