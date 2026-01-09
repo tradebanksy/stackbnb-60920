@@ -162,6 +162,20 @@ const PriceComparison = ({ category, experienceName, currentPrice, duration }: P
     }
   };
 
+  const getMarkerGlowColor = () => {
+    if (!priceData) return 'shadow-md';
+    switch (priceData.priceAssessment) {
+      case 'below_average':
+        return 'shadow-[0_0_8px_2px_rgba(34,197,94,0.5)]';
+      case 'above_average':
+        return 'shadow-[0_0_8px_2px_rgba(245,158,11,0.5)]';
+      case 'premium':
+        return 'shadow-[0_0_8px_2px_rgba(168,85,247,0.5)]';
+      default:
+        return 'shadow-[0_0_8px_2px_rgba(59,130,246,0.5)]';
+    }
+  };
+
   const getAssessmentLabel = () => {
     if (!priceData) return '';
     switch (priceData.priceAssessment) {
@@ -271,7 +285,7 @@ const PriceComparison = ({ category, experienceName, currentPrice, duration }: P
               />
               {/* Current price marker */}
               <div 
-                className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-foreground rounded-full border-2 border-background shadow-md animate-[pulse_2s_cubic-bezier(0.4,0,0.6,1)_infinite]"
+                className={`absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-foreground rounded-full border-2 border-background animate-[pulse_2s_cubic-bezier(0.4,0,0.6,1)_infinite] ${getMarkerGlowColor()}`}
                 style={{ 
                   left: `${Math.min(100, Math.max(0, ((currentPrice - priceData.priceRange.low) / (priceData.priceRange.high - priceData.priceRange.low)) * 100))}%`,
                   transform: 'translate(-50%, -50%)'
