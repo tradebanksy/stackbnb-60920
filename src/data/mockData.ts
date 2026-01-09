@@ -86,50 +86,50 @@ export const vendorDashboardStats = [
 
 export const recentBookings = [
   { 
-    service: "Sunset Kayak Tour", 
+    service: "Snorkeling Adventure", 
     vendor: "Ocean Adventures", 
     date: "Aug 15, 2024", 
-    amount: "$160" 
+    amount: "$95" 
   },
   { 
-    service: "Beach Bike Rental", 
-    vendor: "Coastal Bikes", 
+    service: "Food & Wine Tour", 
+    vendor: "Local Food Tours", 
     date: "Aug 14, 2024", 
-    amount: "$90" 
-  },
-  { 
-    service: "Couples Massage", 
-    vendor: "Relax Spa Team", 
-    date: "Aug 12, 2024", 
-    amount: "$360" 
-  },
-  { 
-    service: "Surf Lessons", 
-    vendor: "Surf School Pro", 
-    date: "Aug 10, 2024", 
     amount: "$120" 
+  },
+  { 
+    service: "Parasailing Adventure", 
+    vendor: "Sky High Watersports", 
+    date: "Aug 12, 2024", 
+    amount: "$140" 
+  },
+  { 
+    service: "ATV Jungle Adventure", 
+    vendor: "Adventure Seekers", 
+    date: "Aug 10, 2024", 
+    amount: "$135" 
   },
 ];
 
 export const upcomingBookings = [
   { 
-    service: "Sunset Kayak Tour",
+    service: "Snorkeling Adventure",
     date: "Aug 18 2024",
-    time: "6:00 PM",
+    time: "10:00 AM",
     guest: "Sarah Johnson",
     host: "Beach House Paradise"
   },
   { 
-    service: "Snorkeling Adventure",
+    service: "Mountain Hiking Expedition",
     date: "Aug 19 2024",
-    time: "10:00 AM",
+    time: "8:00 AM",
     guest: "Mike Chen",
     host: "Sunset Villa"
   },
   { 
-    service: "Beach Photography Session",
+    service: "Hot Air Balloon Ride",
     date: "Aug 20 2024",
-    time: "4:30 PM",
+    time: "6:00 AM",
     guest: "Emma Davis",
     host: "Ocean View Resort"
   },
@@ -138,14 +138,6 @@ export const upcomingBookings = [
 export const vendorServices = [
   {
     id: 1,
-    name: "Sunset Kayak Tour",
-    duration: "2 hours",
-    capacity: "Max 6 people",
-    price: "$80.00",
-    description: "Experience the beauty of sunset while kayaking along the coast"
-  },
-  {
-    id: 2,
     name: "Snorkeling Adventure",
     duration: "3 hours",
     capacity: "Max 8 people",
@@ -153,12 +145,20 @@ export const vendorServices = [
     description: "Explore vibrant coral reefs and marine life"
   },
   {
+    id: 2,
+    name: "Food & Wine Tour",
+    duration: "4 hours",
+    capacity: "Max 10 people",
+    price: "$120.00",
+    description: "Taste the best local cuisine and wines"
+  },
+  {
     id: 3,
-    name: "Beach Photography Session",
+    name: "Parasailing Adventure",
     duration: "1.5 hours",
-    capacity: "Max 4 people",
-    price: "$150.00",
-    description: "Professional photography session at scenic beach locations"
+    capacity: "Max 3 people",
+    price: "$140.00",
+    description: "Soar 400 feet above the ocean for breathtaking views"
   },
 ];
 
@@ -266,50 +266,6 @@ export interface Experience {
 
 export const experiences: Experience[] = [
   {
-    id: 1,
-    name: "Sunset Kayak Tour",
-    vendor: "Ocean Adventures",
-    vendorId: 1,
-    category: "Water Sports",
-    categoryIcon: "🌊",
-    price: 80,
-    duration: "2 hours",
-    maxGuests: 6,
-    rating: 4.9,
-    reviewCount: 124,
-    description: "Experience the beauty of sunset while kayaking along the pristine coastline. Perfect for beginners and experienced paddlers alike.",
-    included: [
-      "Professional kayak equipment",
-      "Safety gear and instruction",
-      "Sunset snacks and beverages",
-      "Professional photos",
-      "Small group (max 6 people)"
-    ],
-    images: [kayaking, kayaking2, kayaking3]
-  },
-  {
-    id: 2,
-    name: "Beach Bike Rental",
-    vendor: "Coastal Bikes",
-    vendorId: 2,
-    category: "Transportation",
-    categoryIcon: "🚴",
-    price: 45,
-    duration: "Full day",
-    maxGuests: 4,
-    rating: 4.7,
-    reviewCount: 89,
-    description: "Explore the coastal town at your own pace with our premium beach cruisers. Includes helmet, lock, and a local's guide to the best spots.",
-    included: [
-      "Premium beach cruiser bike",
-      "Helmet and lock",
-      "Basket for belongings",
-      "Local attractions map",
-      "24-hour support"
-    ],
-    images: [bikes, hiking, hiking2]
-  },
-  {
     id: 3,
     name: "Snorkeling Adventure",
     vendor: "Ocean Adventures",
@@ -330,50 +286,6 @@ export const experiences: Experience[] = [
       "Marine life guide"
     ],
     images: [snorkeling, snorkeling2, snorkeling3]
-  },
-  {
-    id: 4,
-    name: "Beach Photography Session",
-    vendor: "Island Photography",
-    vendorId: 6,
-    category: "Photography",
-    categoryIcon: "📸",
-    price: 150,
-    duration: "1.5 hours",
-    maxGuests: 4,
-    rating: 4.8,
-    reviewCount: 67,
-    description: "Capture your vacation memories with a professional photography session at the most beautiful beach locations.",
-    included: [
-      "1.5 hour session",
-      "50+ edited photos",
-      "Online gallery",
-      "Print-ready files",
-      "Location scouting"
-    ],
-    images: [photography, hiking3, balloon]
-  },
-  {
-    id: 5,
-    name: "Couples Spa Experience",
-    vendor: "Spa by the Sea",
-    vendorId: 5,
-    category: "Wellness",
-    categoryIcon: "💆",
-    price: 180,
-    duration: "90 minutes",
-    maxGuests: 2,
-    rating: 4.9,
-    reviewCount: 201,
-    description: "Indulge in a relaxing couples massage with ocean views. Includes aromatherapy, hot stones, and champagne.",
-    included: [
-      "90-minute couples massage",
-      "Aromatherapy oils",
-      "Hot stone therapy",
-      "Champagne and chocolates",
-      "Private treatment room"
-    ],
-    images: [spa, yoga, dining]
   },
   {
     id: 6,
