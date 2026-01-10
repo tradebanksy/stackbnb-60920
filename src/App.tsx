@@ -79,6 +79,7 @@ import VendorBookingForm from "./pages/VendorBookingForm";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PlatformSettings from "./pages/PlatformSettings";
 import HostVendorManagement from "./pages/HostVendorManagement";
+import AdminPromoCodes from "./pages/AdminPromoCodes";
 
 const ProtectedHostRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, isLoading, role } = useAuthContext();
@@ -172,6 +173,7 @@ const AppRoutes = () => (
     
     {/* Admin Routes */}
     <Route path="/admin/settings" element={<PlatformSettings />} />
+    <Route path="/admin/promo-codes" element={<AdminPromoCodes />} />
     
     {/* Legacy routes */}
     <Route path="/storefront/:id" element={<Storefront />} />
