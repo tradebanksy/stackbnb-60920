@@ -27,6 +27,7 @@ export type Database = {
           id: string
           payout_status: string | null
           platform_fee_amount: number | null
+          reminder_sent_at: string | null
           status: string
           stripe_payment_intent_id: string | null
           stripe_session_id: string | null
@@ -49,6 +50,7 @@ export type Database = {
           id?: string
           payout_status?: string | null
           platform_fee_amount?: number | null
+          reminder_sent_at?: string | null
           status?: string
           stripe_payment_intent_id?: string | null
           stripe_session_id?: string | null
@@ -71,6 +73,7 @@ export type Database = {
           id?: string
           payout_status?: string | null
           platform_fee_amount?: number | null
+          reminder_sent_at?: string | null
           status?: string
           stripe_payment_intent_id?: string | null
           stripe_session_id?: string | null

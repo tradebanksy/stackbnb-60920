@@ -10,7 +10,7 @@ const corsHeaders = {
 };
 
 interface BookingNotification {
-  type: "booking" | "promo_used" | "vendor_booking" | "guest_confirmation";
+  type: "booking" | "promo_used" | "vendor_booking" | "guest_confirmation" | "booking_reminder";
   experienceName?: string;
   vendorName?: string;
   vendorEmail?: string;
@@ -256,6 +256,78 @@ const handler = async (req: Request): Promise<Response> => {
       console.log("[ADMIN-NOTIFICATION] Guest confirmation email sent:", guestEmailResponse);
 
       return new Response(JSON.stringify({ success: true, emailResponse: guestEmailResponse }), {
+        status: 200,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      });
+    } else if (notification.type === "booking_reminder") {
+      // Booking reminder email - 72 hours before
+      subject = `⏰ Reminder: ${notification.experienceName} in 3 Days!`;
+      htmlContent = `
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <div style="text-align: center; margin-bottom: 30px;">
+            <h1 style="color: #f97316; margin-bottom: 10px;">⏰ Your Experience is Coming Up!</h1>
+            <p style="color: #64748b; font-size: 16px; margin: 0;">Just a friendly reminder about your upcoming booking.</p>
+          </div>
+          
+          <div style="background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%); border-radius: 16px; padding: 24px; margin-bottom: 20px; border: 1px solid #fed7aa;">
+            <h2 style="margin: 0 0 20px 0; color: #1e293b; font-size: 22px;">${notification.experienceName}</h2>
+            
+            <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 16px;">
+              <div style="display: flex; align-items: center; margin-bottom: 12px;">
+                <span style="font-size: 24px; margin-right: 12px;">📅</span>
+                <div>
+                  <p style="margin: 0; color: #64748b; font-size: 12px; text-transform: uppercase;">Date</p>
+                  <p style="margin: 4px 0 0 0; font-weight: 600; font-size: 18px; color: #1e293b;">${notification.date}</p>
+                </div>
+              </div>
+              
+              <div style="display: flex; align-items: center; margin-bottom: 12px;">
+                <span style="font-size: 24px; margin-right: 12px;">🕐</span>
+                <div>
+                  <p style="margin: 0; color: #64748b; font-size: 12px; text-transform: uppercase;">Time</p>
+                  <p style="margin: 4px 0 0 0; font-weight: 600; font-size: 18px; color: #1e293b;">${notification.time}</p>
+                </div>
+              </div>
+              
+              <div style="display: flex; align-items: center;">
+                <span style="font-size: 24px; margin-right: 12px;">👥</span>
+                <div>
+                  <p style="margin: 0; color: #64748b; font-size: 12px; text-transform: uppercase;">Guests</p>
+                  <p style="margin: 4px 0 0 0; font-weight: 600; font-size: 18px; color: #1e293b;">${notification.guests} ${notification.guests === 1 ? 'person' : 'people'}</p>
+                </div>
+              </div>
+            </div>
+            
+            ${notification.vendorName ? `
+            <p style="margin: 0; color: #64748b; font-size: 14px;">Hosted by <strong style="color: #1e293b;">${notification.vendorName}</strong></p>
+            ` : ''}
+          </div>
+          
+          <div style="background: #f0f9ff; border-radius: 12px; padding: 16px; margin-bottom: 20px; border: 1px solid #bae6fd;">
+            <h3 style="margin: 0 0 12px 0; color: #0369a1; font-size: 16px;">📋 Quick Checklist</h3>
+            <ul style="margin: 0; padding-left: 20px; color: #1e293b;">
+              <li style="margin-bottom: 8px;">Arrive 10-15 minutes early</li>
+              <li style="margin-bottom: 8px;">Check any specific requirements from the vendor</li>
+              <li style="margin-bottom: 8px;">Bring appropriate attire/gear if needed</li>
+              <li>Have your confirmation email ready</li>
+            </ul>
+          </div>
+          
+          <p style="color: #64748b; font-size: 14px; text-align: center;">We're excited for your upcoming experience! 🎉</p>
+          <p style="color: #94a3b8; font-size: 12px; text-align: center;">This is an automated reminder from Stackd.</p>
+        </div>
+      `;
+
+      const reminderEmailResponse = await resend.emails.send({
+        from: "Stackd <notifications@resend.dev>",
+        to: [notification.guestEmail!],
+        subject,
+        html: htmlContent,
+      });
+
+      console.log("[ADMIN-NOTIFICATION] Booking reminder email sent:", reminderEmailResponse);
+
+      return new Response(JSON.stringify({ success: true, emailResponse: reminderEmailResponse }), {
         status: 200,
         headers: { "Content-Type": "application/json", ...corsHeaders },
       });
