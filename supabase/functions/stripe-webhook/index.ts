@@ -158,6 +158,51 @@ serve(async (req) => {
 
       logStep("Booking created successfully", { bookingId: booking.id });
 
+      // Get user email for notification
+      const { data: userData } = await supabaseAdmin.auth.admin.getUserById(userId);
+      const guestEmail = userData?.user?.email || metadata.guest_email;
+
+      // Send admin notification
+      try {
+        const notificationPayload = {
+          type: "booking",
+          experienceName,
+          vendorName,
+          guestEmail,
+          date: bookingDate,
+          time: bookingTime,
+          guests,
+          totalAmount: (session.amount_total || 0) / 100,
+          currency: session.currency || "usd",
+          promoCode: metadata.promo_code || null,
+          discountAmount: metadata.discount_amount ? parseFloat(metadata.discount_amount) : null,
+          originalAmount: metadata.original_amount ? parseFloat(metadata.original_amount) : null,
+        };
+
+        const response = await fetch(
+          `${Deno.env.get("SUPABASE_URL")}/functions/v1/send-admin-notification`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}`,
+            },
+            body: JSON.stringify(notificationPayload),
+          }
+        );
+
+        if (response.ok) {
+          logStep("Admin notification sent");
+        } else {
+          const errorText = await response.text();
+          logStep("Admin notification failed", { error: errorText });
+        }
+      } catch (notifError) {
+        const notifErrorMsg = notifError instanceof Error ? notifError.message : String(notifError);
+        logStep("Admin notification error", { error: notifErrorMsg });
+        // Don't fail the webhook for notification errors
+      }
+
       // Transfer host's portion if applicable
       if (hostUserId && hostPayoutCents > 0) {
         // Get host's Stripe account

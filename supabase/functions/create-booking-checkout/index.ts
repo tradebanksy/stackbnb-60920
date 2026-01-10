@@ -69,8 +69,11 @@ serve(async (req) => {
       time, 
       guests, 
       totalPrice,
+      originalPrice,
       vendorId,
-      hostId // The host who referred this guest (from storefront/guide link)
+      hostId, // The host who referred this guest (from storefront/guide link)
+      promoCode,
+      discountAmount
     } = await req.json();
 
     logStep("Booking details received", { experienceName, vendorName, date, time, guests, totalPrice, vendorId, hostId });
@@ -213,10 +216,14 @@ serve(async (req) => {
         time: time,
         guests: guests.toString(),
         user_id: user.id,
+        guest_email: user.email,
         host_user_id: validHostId || "",
         platform_fee_cents: platformFeeCents.toString(),
         vendor_payout_cents: vendorPayoutCents.toString(),
         host_payout_cents: hostPayoutCents.toString(),
+        promo_code: promoCode || "",
+        discount_amount: discountAmount ? discountAmount.toString() : "0",
+        original_amount: originalPrice ? originalPrice.toString() : totalPrice.toString(),
       },
     };
 
