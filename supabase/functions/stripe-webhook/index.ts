@@ -203,6 +203,61 @@ serve(async (req) => {
         // Don't fail the webhook for notification errors
       }
 
+      // Send vendor notification
+      if (vendorId) {
+        try {
+          // Get vendor's email from vendor_profiles
+          const { data: vendorProfile } = await supabaseAdmin
+            .from("vendor_profiles")
+            .select("user_id")
+            .eq("id", vendorId)
+            .single();
+
+          if (vendorProfile?.user_id) {
+            const { data: vendorUserData } = await supabaseAdmin.auth.admin.getUserById(vendorProfile.user_id);
+            const vendorEmail = vendorUserData?.user?.email;
+
+            if (vendorEmail) {
+              const vendorNotificationPayload = {
+                type: "vendor_booking",
+                vendorEmail,
+                experienceName,
+                guestEmail,
+                date: bookingDate,
+                time: bookingTime,
+                guests,
+                totalAmount: (session.amount_total || 0) / 100,
+                vendorPayoutAmount: vendorPayoutCents / 100,
+                currency: session.currency || "usd",
+              };
+
+              const vendorNotifResponse = await fetch(
+                `${Deno.env.get("SUPABASE_URL")}/functions/v1/send-admin-notification`,
+                {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}`,
+                  },
+                  body: JSON.stringify(vendorNotificationPayload),
+                }
+              );
+
+              if (vendorNotifResponse.ok) {
+                logStep("Vendor notification sent", { vendorEmail });
+              } else {
+                const errorText = await vendorNotifResponse.text();
+                logStep("Vendor notification failed", { error: errorText });
+              }
+            }
+          }
+        } catch (vendorNotifError) {
+          const vendorNotifErrorMsg = vendorNotifError instanceof Error ? vendorNotifError.message : String(vendorNotifError);
+          logStep("Vendor notification error", { error: vendorNotifErrorMsg });
+          // Don't fail the webhook for notification errors
+        }
+      }
+
       // Transfer host's portion if applicable
       if (hostUserId && hostPayoutCents > 0) {
         // Get host's Stripe account
