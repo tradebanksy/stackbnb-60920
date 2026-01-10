@@ -10,14 +10,16 @@ const corsHeaders = {
 };
 
 interface BookingNotification {
-  type: "booking" | "promo_used";
+  type: "booking" | "promo_used" | "vendor_booking";
   experienceName?: string;
   vendorName?: string;
+  vendorEmail?: string;
   guestEmail?: string;
   date?: string;
   time?: string;
   guests?: number;
   totalAmount?: number;
+  vendorPayoutAmount?: number;
   currency?: string;
   promoCode?: string;
   discountAmount?: number;
@@ -120,6 +122,58 @@ const handler = async (req: Request): Promise<Response> => {
           <p style="color: #64748b; font-size: 14px;">This is an automated notification from Stackd.</p>
         </div>
       `;
+    } else if (notification.type === "vendor_booking") {
+      // Vendor notification - send to vendor email
+      subject = `🎉 New Booking for ${notification.experienceName}!`;
+      htmlContent = `
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <h1 style="color: #f97316; margin-bottom: 20px;">You Have a New Booking!</h1>
+          
+          <div style="background: #fff7ed; border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #fed7aa;">
+            <h2 style="margin: 0 0 15px 0; color: #1e293b;">${notification.experienceName}</h2>
+            
+            <table style="width: 100%; border-collapse: collapse;">
+              <tr>
+                <td style="padding: 8px 0; color: #64748b;">Guest Email</td>
+                <td style="padding: 8px 0; text-align: right; font-weight: 600;">${notification.guestEmail || 'N/A'}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; color: #64748b;">Date</td>
+                <td style="padding: 8px 0; text-align: right; font-weight: 600;">${notification.date}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; color: #64748b;">Time</td>
+                <td style="padding: 8px 0; text-align: right; font-weight: 600;">${notification.time}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; color: #64748b;">Guests</td>
+                <td style="padding: 8px 0; text-align: right; font-weight: 600;">${notification.guests}</td>
+              </tr>
+              <tr style="border-top: 2px solid #fed7aa;">
+                <td style="padding: 12px 0; font-weight: 600; font-size: 18px;">Your Payout</td>
+                <td style="padding: 12px 0; text-align: right; font-weight: 700; font-size: 18px; color: #16a34a;">$${notification.vendorPayoutAmount?.toFixed(2)} ${notification.currency?.toUpperCase()}</td>
+              </tr>
+            </table>
+          </div>
+          
+          <p style="color: #64748b; font-size: 14px;">Please reach out to the guest to confirm any additional details.</p>
+          <p style="color: #64748b; font-size: 14px;">This is an automated notification from Stackd.</p>
+        </div>
+      `;
+
+      const vendorEmailResponse = await resend.emails.send({
+        from: "Stackd <notifications@resend.dev>",
+        to: [notification.vendorEmail!],
+        subject,
+        html: htmlContent,
+      });
+
+      console.log("[ADMIN-NOTIFICATION] Vendor email sent:", vendorEmailResponse);
+
+      return new Response(JSON.stringify({ success: true, emailResponse: vendorEmailResponse }), {
+        status: 200,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      });
     } else {
       throw new Error("Unknown notification type");
     }

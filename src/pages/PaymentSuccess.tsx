@@ -5,6 +5,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useBooking } from "@/contexts/BookingContext";
 import { useEffect, useState } from "react";
 import { useAuthContext } from "@/contexts/AuthContext";
+import confetti from "canvas-confetti";
 
 const PaymentSuccess = () => {
   const navigate = useNavigate();
@@ -12,12 +13,43 @@ const PaymentSuccess = () => {
   const { bookingData, guestData, clearBookingData } = useBooking();
   const { user } = useAuthContext();
   const [isLoading, setIsLoading] = useState(true);
+  const [showContent, setShowContent] = useState(false);
   const sessionId = searchParams.get("session_id");
 
   useEffect(() => {
     // Small delay to ensure booking data is available
     const timer = setTimeout(() => {
       setIsLoading(false);
+      
+      // Trigger confetti animation after loading
+      setTimeout(() => {
+        setShowContent(true);
+        
+        const duration = 3000;
+        const end = Date.now() + duration;
+        const colors = ['#f97316', '#ec4899', '#22c55e', '#3b82f6'];
+
+        (function frame() {
+          confetti({
+            particleCount: 4,
+            angle: 60,
+            spread: 55,
+            origin: { x: 0 },
+            colors: colors
+          });
+          confetti({
+            particleCount: 4,
+            angle: 120,
+            spread: 55,
+            origin: { x: 1 },
+            colors: colors
+          });
+
+          if (Date.now() < end) {
+            requestAnimationFrame(frame);
+          }
+        }());
+      }, 100);
     }, 500);
 
     return () => clearTimeout(timer);
@@ -47,7 +79,7 @@ const PaymentSuccess = () => {
           </div>
         </div>
 
-        <div className="px-4 py-8 space-y-6">
+        <div className={`px-4 py-8 space-y-6 transition-all duration-500 ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
           {/* Success Icon */}
           <div className="text-center space-y-4">
             <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-green-400 to-green-600 animate-scale-in">
