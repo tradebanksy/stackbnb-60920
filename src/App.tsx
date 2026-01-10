@@ -40,6 +40,7 @@ import VendorDashboard from "./pages/VendorDashboard";
 
 import AddService from "./pages/AddService";
 import VendorProfile from "./pages/VendorProfile";
+import VendorSettings from "./pages/VendorSettings";
 import AllBookings from "./pages/AllBookings";
 import ActiveHosts from "./pages/ActiveHosts";
 import RevenueBreakdown from "./pages/RevenueBreakdown";
@@ -277,6 +278,14 @@ const AppRoutes = () => (
       element={
         <ProtectedVendorRoute>
           <VendorProfile />
+        </ProtectedVendorRoute>
+      } 
+    />
+    <Route 
+      path="/vendor/settings" 
+      element={
+        <ProtectedVendorRoute>
+          <VendorSettings />
         </ProtectedVendorRoute>
       } 
     />
