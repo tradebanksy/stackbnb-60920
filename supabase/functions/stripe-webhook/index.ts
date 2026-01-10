@@ -258,6 +258,50 @@ serve(async (req) => {
         }
       }
 
+      // Send guest confirmation email
+      if (guestEmail) {
+        try {
+          const guestNotificationPayload = {
+            type: "guest_confirmation",
+            guestEmail,
+            guestName: metadata.guest_name || null,
+            experienceName,
+            vendorName,
+            date: bookingDate,
+            time: bookingTime,
+            guests,
+            totalAmount: (session.amount_total || 0) / 100,
+            currency: session.currency || "usd",
+            promoCode: metadata.promo_code || null,
+            discountAmount: metadata.discount_amount ? parseFloat(metadata.discount_amount) : null,
+            originalAmount: metadata.original_amount ? parseFloat(metadata.original_amount) : null,
+          };
+
+          const guestNotifResponse = await fetch(
+            `${Deno.env.get("SUPABASE_URL")}/functions/v1/send-admin-notification`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}`,
+              },
+              body: JSON.stringify(guestNotificationPayload),
+            }
+          );
+
+          if (guestNotifResponse.ok) {
+            logStep("Guest confirmation email sent", { guestEmail });
+          } else {
+            const errorText = await guestNotifResponse.text();
+            logStep("Guest confirmation email failed", { error: errorText });
+          }
+        } catch (guestNotifError) {
+          const guestNotifErrorMsg = guestNotifError instanceof Error ? guestNotifError.message : String(guestNotifError);
+          logStep("Guest confirmation email error", { error: guestNotifErrorMsg });
+          // Don't fail the webhook for notification errors
+        }
+      }
+
       // Transfer host's portion if applicable
       if (hostUserId && hostPayoutCents > 0) {
         // Get host's Stripe account
