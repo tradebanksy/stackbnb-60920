@@ -452,11 +452,12 @@ const AppView = () => {
                     ) : (
                       <>
                         {/* Vendor restaurants first */}
-                        {vendorRestaurants.map((vendor) => (
+                        {vendorRestaurants.map((vendor, index) => (
                           <Link
                             key={vendor.id}
                             to={`/vendor/${vendor.id}`}
-                            className="flex-shrink-0 w-36"
+                            className="flex-shrink-0 w-36 animate-fade-in"
+                            style={{ animationDelay: `${index * 50}ms` }}
                           >
                             <div className="aspect-square rounded-xl overflow-hidden relative">
                               {vendor.photos && vendor.photos.length > 0 ? (
@@ -499,11 +500,12 @@ const AppView = () => {
                           </Link>
                         ))}
                         {/* Mock restaurants only as fallback when no real vendors */}
-                        {vendorRestaurants.length === 0 && restaurants.map((restaurant) => (
+                        {vendorRestaurants.length === 0 && restaurants.map((restaurant, index) => (
                           <Link
                             key={restaurant.id}
                             to={`/restaurant/${restaurant.id}`}
-                            className="flex-shrink-0 w-36"
+                            className="flex-shrink-0 w-36 animate-fade-in"
+                            style={{ animationDelay: `${index * 50}ms` }}
                           >
                             <div className="aspect-square rounded-xl overflow-hidden relative">
                               <img
@@ -551,11 +553,12 @@ const AppView = () => {
                     ) : (
                       <>
                         {/* Vendor experiences first */}
-                        {vendorExperiences.map((vendor) => (
+                        {vendorExperiences.map((vendor, index) => (
                           <Link
                             key={vendor.id}
                             to={`/vendor/${vendor.id}`}
-                            className="flex-shrink-0 w-36"
+                            className="flex-shrink-0 w-36 animate-fade-in"
+                            style={{ animationDelay: `${index * 50}ms` }}
                           >
                             <div className="aspect-square rounded-xl overflow-hidden relative">
                               {vendor.photos && vendor.photos.length > 0 ? (
@@ -598,11 +601,12 @@ const AppView = () => {
                           </Link>
                         ))}
                         {/* Mock experiences only as fallback when no real vendors */}
-                        {vendorExperiences.length === 0 && popularExperiences.map((experience: any) => (
+                        {vendorExperiences.length === 0 && popularExperiences.map((experience: any, index: number) => (
                           <Link
                             key={experience.id}
                             to={`/experience/${experience.id}`}
-                            className="flex-shrink-0 w-36"
+                            className="flex-shrink-0 w-36 animate-fade-in"
+                            style={{ animationDelay: `${index * 50}ms` }}
                           >
                             <div className="aspect-square rounded-xl overflow-hidden relative">
                               <img
