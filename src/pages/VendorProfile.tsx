@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { ChevronRight, CreditCard, Receipt, UserPen, Lock, HelpCircle, LogOut, Eye, User } from "lucide-react";
+import { ChevronRight, CreditCard, Receipt, UserPen, Lock, HelpCircle, LogOut, Eye, Settings } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import VendorBottomNav from "@/components/VendorBottomNav";
 import { supabase } from "@/integrations/supabase/client";
@@ -97,6 +97,12 @@ const VendorProfile = () => {
       icon: Eye, 
       action: "/vendor/preview",
       gradient: true
+    },
+    { 
+      label: "Settings", 
+      icon: Settings, 
+      action: "/vendor/settings",
+      gradient: false
     },
     { 
       label: "Payment Settings", 
