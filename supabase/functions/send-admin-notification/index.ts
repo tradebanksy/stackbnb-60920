@@ -10,11 +10,12 @@ const corsHeaders = {
 };
 
 interface BookingNotification {
-  type: "booking" | "promo_used" | "vendor_booking";
+  type: "booking" | "promo_used" | "vendor_booking" | "guest_confirmation";
   experienceName?: string;
   vendorName?: string;
   vendorEmail?: string;
   guestEmail?: string;
+  guestName?: string;
   date?: string;
   time?: string;
   guests?: number;
@@ -171,6 +172,90 @@ const handler = async (req: Request): Promise<Response> => {
       console.log("[ADMIN-NOTIFICATION] Vendor email sent:", vendorEmailResponse);
 
       return new Response(JSON.stringify({ success: true, emailResponse: vendorEmailResponse }), {
+        status: 200,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      });
+    } else if (notification.type === "guest_confirmation") {
+      // Guest confirmation email
+      subject = `✅ Booking Confirmed: ${notification.experienceName}`;
+      htmlContent = `
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <div style="text-align: center; margin-bottom: 30px;">
+            <h1 style="color: #16a34a; margin-bottom: 10px;">🎉 Booking Confirmed!</h1>
+            <p style="color: #64748b; font-size: 16px; margin: 0;">Thank you for your booking${notification.guestName ? `, ${notification.guestName}` : ''}!</p>
+          </div>
+          
+          <div style="background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%); border-radius: 16px; padding: 24px; margin-bottom: 20px; border: 1px solid #bbf7d0;">
+            <h2 style="margin: 0 0 20px 0; color: #1e293b; font-size: 22px;">${notification.experienceName}</h2>
+            
+            <div style="display: flex; align-items: center; margin-bottom: 16px;">
+              <span style="font-size: 24px; margin-right: 12px;">📅</span>
+              <div>
+                <p style="margin: 0; color: #64748b; font-size: 12px; text-transform: uppercase;">Date & Time</p>
+                <p style="margin: 4px 0 0 0; font-weight: 600; font-size: 16px; color: #1e293b;">${notification.date} at ${notification.time}</p>
+              </div>
+            </div>
+            
+            <div style="display: flex; align-items: center; margin-bottom: 16px;">
+              <span style="font-size: 24px; margin-right: 12px;">👥</span>
+              <div>
+                <p style="margin: 0; color: #64748b; font-size: 12px; text-transform: uppercase;">Guests</p>
+                <p style="margin: 4px 0 0 0; font-weight: 600; font-size: 16px; color: #1e293b;">${notification.guests} ${notification.guests === 1 ? 'person' : 'people'}</p>
+              </div>
+            </div>
+            
+            ${notification.vendorName ? `
+            <div style="display: flex; align-items: center; margin-bottom: 16px;">
+              <span style="font-size: 24px; margin-right: 12px;">🏢</span>
+              <div>
+                <p style="margin: 0; color: #64748b; font-size: 12px; text-transform: uppercase;">Hosted By</p>
+                <p style="margin: 4px 0 0 0; font-weight: 600; font-size: 16px; color: #1e293b;">${notification.vendorName}</p>
+              </div>
+            </div>
+            ` : ''}
+          </div>
+          
+          <div style="background: #f8fafc; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="margin: 0 0 15px 0; color: #1e293b;">Payment Summary</h3>
+            <table style="width: 100%; border-collapse: collapse;">
+              ${notification.promoCode ? `
+              <tr>
+                <td style="padding: 8px 0; color: #64748b;">Original Price</td>
+                <td style="padding: 8px 0; text-align: right; text-decoration: line-through; color: #94a3b8;">$${notification.originalAmount?.toFixed(2)}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; color: #16a34a;">Promo Code (${notification.promoCode})</td>
+                <td style="padding: 8px 0; text-align: right; font-weight: 600; color: #16a34a;">-$${notification.discountAmount?.toFixed(2)}</td>
+              </tr>
+              ` : ''}
+              <tr style="border-top: 2px solid #e2e8f0;">
+                <td style="padding: 12px 0; font-weight: 700; font-size: 18px; color: #1e293b;">Total Paid</td>
+                <td style="padding: 12px 0; text-align: right; font-weight: 700; font-size: 18px; color: #f97316;">$${notification.totalAmount?.toFixed(2)} ${notification.currency?.toUpperCase()}</td>
+              </tr>
+            </table>
+          </div>
+          
+          <div style="background: #fffbeb; border-radius: 12px; padding: 16px; margin-bottom: 20px; border: 1px solid #fde68a;">
+            <p style="margin: 0; color: #92400e; font-size: 14px;">
+              <strong>💡 Important:</strong> Please arrive 10-15 minutes before your scheduled time. If you need to make any changes, contact the vendor directly.
+            </p>
+          </div>
+          
+          <p style="color: #64748b; font-size: 14px; text-align: center;">We hope you have an amazing experience!</p>
+          <p style="color: #94a3b8; font-size: 12px; text-align: center;">This is an automated confirmation from Stackd.</p>
+        </div>
+      `;
+
+      const guestEmailResponse = await resend.emails.send({
+        from: "Stackd <notifications@resend.dev>",
+        to: [notification.guestEmail!],
+        subject,
+        html: htmlContent,
+      });
+
+      console.log("[ADMIN-NOTIFICATION] Guest confirmation email sent:", guestEmailResponse);
+
+      return new Response(JSON.stringify({ success: true, emailResponse: guestEmailResponse }), {
         status: 200,
         headers: { "Content-Type": "application/json", ...corsHeaders },
       });
