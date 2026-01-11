@@ -82,6 +82,7 @@ import PaymentSuccess from "./pages/PaymentSuccess";
 import PlatformSettings from "./pages/PlatformSettings";
 import HostVendorManagement from "./pages/HostVendorManagement";
 import AdminPromoCodes from "./pages/AdminPromoCodes";
+import MyBookings from "./pages/MyBookings";
 
 const ProtectedHostRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, isLoading, role } = useAuthContext();
@@ -154,6 +155,7 @@ const AppRoutes = () => (
     <Route path="/auth" element={<Auth />} />
     <Route path="/reset-password" element={<ResetPassword />} />
     <Route path="/profile" element={<Profile />} />
+    <Route path="/bookings" element={<MyBookings />} />
     <Route path="/for-hosts" element={<ForHosts />} />
     <Route path="/for-vendors" element={<ForVendors />} />
     <Route path="/trip-planner" element={<TripPlannerChat />} />
