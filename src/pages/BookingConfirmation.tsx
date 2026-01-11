@@ -417,7 +417,7 @@ END:VCALENDAR`;
               variant="outline" 
               className="w-full" 
               size="lg"
-              onClick={() => navigate('/explore')}
+              onClick={() => navigate('/bookings')}
             >
               View My Bookings
             </Button>
