@@ -281,7 +281,7 @@ END:VCALENDAR`;
                 <XCircle className="h-12 w-12 text-white" />
               </div>
               <div className="space-y-2">
-                <h1 className="text-2xl font-bold">Booking Cancelled</h1>
+                <h1 className="text-2xl font-medium">Booking Cancelled</h1>
                 <p className="text-muted-foreground">
                   Your booking has been successfully cancelled
                 </p>
@@ -334,7 +334,7 @@ END:VCALENDAR`;
               <CheckCircle className="h-12 w-12 text-white" />
             </div>
             <div className="space-y-2">
-              <h1 className="text-2xl font-bold">Payment Successful!</h1>
+              <h1 className="text-2xl font-medium">Payment Successful!</h1>
               <p className="text-muted-foreground">
                 Your booking has been confirmed
               </p>
