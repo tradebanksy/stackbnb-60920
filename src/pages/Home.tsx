@@ -27,6 +27,7 @@ import { Footerdemo } from "@/components/ui/footer-section";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { PageTransition } from "@/components/PageTransition";
 import { ParallaxHero, ParallaxCard } from "@/components/ParallaxContainer";
+import { AnimatedTabs } from "@/components/AnimatedTabs";
 import kayakingImg from "@/assets/experiences/kayaking.jpg";
 import bikesImg from "@/assets/experiences/bikes.jpg";
 import snorkelingImg from "@/assets/experiences/snorkeling.jpg";
@@ -253,26 +254,15 @@ const Home = () => {
             </div>
           </div>
 
-          {/* Category Filters */}
-          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide justify-center flex-wrap">
-            {categories.map((category) => (
-              <button
-                key={category.id}
-                onClick={() => setSelectedCategory(category.id)}
-                className={`
-                  flex items-center gap-1.5 px-4 py-2 rounded-full border whitespace-nowrap text-sm
-                  transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]
-                  ${
-                    selectedCategory === category.id
-                      ? "bg-gradient-to-r from-orange-500 to-purple-600 text-white border-transparent shadow-lg"
-                      : "bg-card border-border/50 hover:border-purple-500/30 hover:shadow-md"
-                  }
-                `}
-              >
-                <span className="text-base">{category.icon}</span>
-                <span className="font-medium">{category.name}</span>
-              </button>
-            ))}
+          {/* Category Filters with Animated Indicator */}
+          <div className="flex justify-center">
+            <AnimatedTabs
+              tabs={categories}
+              activeTab={selectedCategory}
+              onTabChange={setSelectedCategory}
+              variant="gradient"
+              className="flex-wrap justify-center"
+            />
           </div>
 
           {/* Experiences Grid with Parallax Cards */}

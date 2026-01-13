@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { SkeletonCardGrid } from "@/components/ui/skeleton-card";
+import { AnimatedTabs } from "@/components/AnimatedTabs";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import stackdLogo from "@/assets/stackd-logo-new.png";
@@ -123,27 +124,13 @@ const AllExperiences = () => {
           />
         </div>
 
-        {/* Category Filters */}
-        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-          {categories.map((category) => (
-            <button
-              key={category.id}
-              onClick={() => setSelectedCategory(category.id)}
-              className={`
-                flex items-center gap-1.5 px-3 py-1.5 rounded-full border whitespace-nowrap text-sm
-                transition-all duration-200
-                ${
-                  selectedCategory === category.id
-                    ? "bg-gradient-to-r from-orange-500 to-purple-600 text-white border-transparent"
-                    : "bg-card border-border hover:border-primary/30"
-                }
-              `}
-            >
-              <span>{category.icon}</span>
-              <span className="font-medium">{category.name}</span>
-            </button>
-          ))}
-        </div>
+        {/* Category Filters with Animated Indicator */}
+        <AnimatedTabs
+          tabs={categories}
+          activeTab={selectedCategory}
+          onTabChange={setSelectedCategory}
+          variant="gradient"
+        />
 
         {/* Results Count */}
         {!isLoading && (
