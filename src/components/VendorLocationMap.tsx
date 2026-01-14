@@ -195,8 +195,50 @@ export function VendorLocationMap({ vendorName, vendorAddress, placeId }: Vendor
     );
   }
 
+  // Generate static map URL
+  const getStaticMapUrl = () => {
+    if (!directionsData?.vendorLocation) return null;
+    const { lat, lng } = directionsData.vendorLocation;
+    const apiKey = import.meta.env.VITE_GOOGLE_MAPS_KEY || 'AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8';
+    // Modern styled map with custom colors
+    const style = [
+      'feature:all|element:geometry|color:0xf5f5f5',
+      'feature:water|element:geometry|color:0xc9e9ff',
+      'feature:road|element:geometry|color:0xffffff',
+      'feature:road.arterial|element:geometry|color:0xfefefe',
+      'feature:road.highway|element:geometry|color:0xdadada',
+      'feature:poi|element:labels|visibility:off',
+      'feature:transit|visibility:off',
+    ].map(s => `style=${encodeURIComponent(s)}`).join('&');
+    
+    return `https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lng}&zoom=14&size=400x200&scale=2&maptype=roadmap&markers=color:0xEF4444%7C${lat},${lng}&${style}&key=${apiKey}`;
+  };
+
+  const staticMapUrl = getStaticMapUrl();
+
   return (
     <Card className="overflow-hidden border-border/50 bg-gradient-to-br from-card via-card to-primary/5 backdrop-blur-sm">
+      {/* Mini Map Preview */}
+      {staticMapUrl && (
+        <div 
+          className="relative h-32 w-full cursor-pointer group overflow-hidden"
+          onClick={openInGoogleMaps}
+        >
+          <img
+            src={staticMapUrl}
+            alt={`Map showing ${vendorName} location`}
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+          />
+          {/* Gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent opacity-60" />
+          {/* Tap to open indicator */}
+          <div className="absolute bottom-2 right-2 px-2 py-1 rounded-full bg-background/80 backdrop-blur-sm text-xs font-medium text-foreground flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <ExternalLink className="h-3 w-3" />
+            Open in Maps
+          </div>
+        </div>
+      )}
+      
       {/* Compact Location Header */}
       <div className="p-4 space-y-4">
         {/* Main Info Row */}
