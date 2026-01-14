@@ -21,6 +21,7 @@ import {
   Moon,
   Star,
   RotateCcw,
+  CalendarDays,
 } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -239,6 +240,23 @@ export default function TripPlannerChatUI({
               </Tooltip>
             </TooltipProvider>
           )}
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => navigate('/itinerary')}
+                  className="transition-colors"
+                >
+                  <CalendarDays className="h-5 w-5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>View Itinerary</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
