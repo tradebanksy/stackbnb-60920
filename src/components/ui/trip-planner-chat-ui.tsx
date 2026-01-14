@@ -158,11 +158,7 @@ export default function TripPlannerChatUI({
   });
 
   const handleBack = () => {
-    if (window.history.length > 1) {
-      navigate(-1);
-    } else {
-      navigate('/appview');
-    }
+    navigate('/appview');
   };
 
   const handleSend = () => {
