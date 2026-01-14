@@ -38,6 +38,7 @@ export function VendorLocationMap({ vendorName, vendorAddress, placeId }: Vendor
   const [isSaving, setIsSaving] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const [itineraryItemId, setItineraryItemId] = useState<string | null>(null);
+  const [mapError, setMapError] = useState(false);
 
   // Check auth state and if already saved
   useEffect(() => {
@@ -203,7 +204,6 @@ export function VendorLocationMap({ vendorName, vendorAddress, placeId }: Vendor
     return `https://staticmap.openstreetmap.de/staticmap.php?center=${lat},${lng}&zoom=14&size=600x200&maptype=osmarenderer&markers=${lat},${lng},red-pushpin`;
   };
 
-  const [mapError, setMapError] = useState(false);
   const staticMapUrl = getStaticMapUrl();
 
   return (
