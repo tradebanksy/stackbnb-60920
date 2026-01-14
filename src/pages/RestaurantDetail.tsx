@@ -42,6 +42,45 @@ interface GoogleReviewsData {
   error?: string;
 }
 
+interface CachedGoogleReviews extends GoogleReviewsData {
+  timestamp: number;
+}
+
+const CACHE_DURATION_MS = 24 * 60 * 60 * 1000; // 24 hours
+
+const getDetailCacheKey = (restaurantId: string) => `google_reviews_detail_${restaurantId}`;
+
+const getCachedReviews = (restaurantId: string): GoogleReviewsData | null => {
+  try {
+    const cached = localStorage.getItem(getDetailCacheKey(restaurantId));
+    if (!cached) return null;
+    
+    const parsed: CachedGoogleReviews = JSON.parse(cached);
+    if (Date.now() - parsed.timestamp > CACHE_DURATION_MS) {
+      localStorage.removeItem(getDetailCacheKey(restaurantId));
+      return null;
+    }
+    
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { timestamp, ...reviewData } = parsed;
+    return reviewData;
+  } catch {
+    return null;
+  }
+};
+
+const setCachedReviews = (restaurantId: string, data: GoogleReviewsData) => {
+  try {
+    const cacheData: CachedGoogleReviews = {
+      ...data,
+      timestamp: Date.now()
+    };
+    localStorage.setItem(getDetailCacheKey(restaurantId), JSON.stringify(cacheData));
+  } catch (error) {
+    console.error('Error caching Google reviews:', error);
+  }
+};
+
 const RestaurantDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -76,14 +115,27 @@ const RestaurantDetail = () => {
     // Check if favorited
     const favorites = JSON.parse(localStorage.getItem("restaurantFavorites") || "[]");
     setIsFavorite(favorites.includes(id));
+
+    // Load cached reviews immediately if available
+    if (id) {
+      const cached = getCachedReviews(id);
+      if (cached) {
+        setGoogleReviews(cached);
+      }
+    }
   }, [id]);
 
   // Fetch Google Reviews when restaurant is loaded
   useEffect(() => {
     const fetchGoogleReviews = async () => {
-      if (!restaurant) return;
+      if (!restaurant || !id) return;
       
-      setIsLoadingReviews(true);
+      // If we already have cached data, don't show loading state
+      const hasCachedData = googleReviews !== null;
+      if (!hasCachedData) {
+        setIsLoadingReviews(true);
+      }
+      
       try {
         // Build a more specific search query with restaurant keyword and address
         const searchQuery = `${restaurant.name} restaurant ${restaurant.address} ${restaurant.city}`;
@@ -101,6 +153,7 @@ const RestaurantDetail = () => {
         }
 
         setGoogleReviews(data);
+        setCachedReviews(id, data);
       } catch (error) {
         console.error('Error fetching Google reviews:', error);
       } finally {
@@ -109,7 +162,7 @@ const RestaurantDetail = () => {
     };
 
     fetchGoogleReviews();
-  }, [restaurant]);
+  }, [restaurant, id]);
 
   const toggleFavorite = () => {
     const favorites = JSON.parse(localStorage.getItem("restaurantFavorites") || "[]");

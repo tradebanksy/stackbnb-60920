@@ -10,6 +10,43 @@ interface GoogleReviewsData {
   totalReviews?: number;
 }
 
+interface CachedGoogleData extends GoogleReviewsData {
+  timestamp: number;
+}
+
+const CACHE_DURATION_MS = 24 * 60 * 60 * 1000; // 24 hours
+
+const getCacheKey = (restaurantId: string) => `google_reviews_${restaurantId}`;
+
+const getCachedData = (restaurantId: string): GoogleReviewsData | null => {
+  try {
+    const cached = localStorage.getItem(getCacheKey(restaurantId));
+    if (!cached) return null;
+    
+    const parsed: CachedGoogleData = JSON.parse(cached);
+    if (Date.now() - parsed.timestamp > CACHE_DURATION_MS) {
+      localStorage.removeItem(getCacheKey(restaurantId));
+      return null;
+    }
+    
+    return { rating: parsed.rating, totalReviews: parsed.totalReviews };
+  } catch {
+    return null;
+  }
+};
+
+const setCachedData = (restaurantId: string, data: GoogleReviewsData) => {
+  try {
+    const cacheData: CachedGoogleData = {
+      ...data,
+      timestamp: Date.now()
+    };
+    localStorage.setItem(getCacheKey(restaurantId), JSON.stringify(cacheData));
+  } catch (error) {
+    console.error('Error caching Google data:', error);
+  }
+};
+
 interface RestaurantCardWithGoogleRatingProps {
   restaurant: Restaurant;
   index: number;
@@ -25,9 +62,14 @@ export const RestaurantCardWithGoogleRating = ({
   onToggleFavorite,
   showFavoriteButton = false,
 }: RestaurantCardWithGoogleRatingProps) => {
-  const [googleData, setGoogleData] = useState<GoogleReviewsData | null>(null);
+  const [googleData, setGoogleData] = useState<GoogleReviewsData | null>(() => 
+    getCachedData(restaurant.id)
+  );
 
   useEffect(() => {
+    // If we have cached data, don't fetch
+    if (googleData) return;
+
     const fetchGoogleRating = async () => {
       try {
         const searchQuery = `${restaurant.name} restaurant ${restaurant.address} ${restaurant.city}`;
@@ -40,10 +82,12 @@ export const RestaurantCardWithGoogleRating = ({
         });
 
         if (!error && data?.rating) {
-          setGoogleData({
+          const reviewData = {
             rating: data.rating,
             totalReviews: data.totalReviews
-          });
+          };
+          setGoogleData(reviewData);
+          setCachedData(restaurant.id, reviewData);
         }
       } catch (error) {
         console.error('Error fetching Google rating:', error);
@@ -51,7 +95,7 @@ export const RestaurantCardWithGoogleRating = ({
     };
 
     fetchGoogleRating();
-  }, [restaurant]);
+  }, [restaurant, googleData]);
 
   const displayRating = googleData?.rating ?? restaurant.rating;
 
