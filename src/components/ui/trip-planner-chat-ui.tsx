@@ -20,6 +20,7 @@ import {
   EyeOff,
   Moon,
   Star,
+  RotateCcw,
 } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -133,6 +134,7 @@ interface TripPlannerChatUIProps {
   messages: Message[];
   isLoading: boolean;
   onSendMessage: (message: string) => void;
+  onClearChat?: () => void;
   hostVendors?: HostVendor[];
 }
 
@@ -140,6 +142,7 @@ export default function TripPlannerChatUI({
   messages,
   isLoading,
   onSendMessage,
+  onClearChat,
   hostVendors = [],
 }: TripPlannerChatUIProps) {
   const navigate = useNavigate();
@@ -217,6 +220,25 @@ export default function TripPlannerChatUI({
           <h1 className="text-lg font-bold">Trip Planner</h1>
         </div>
         <div className="flex items-center gap-1">
+          {onClearChat && messages.length > 1 && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={onClearChat}
+                    className="transition-colors"
+                  >
+                    <RotateCcw className="h-5 w-5" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>New Chat</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
