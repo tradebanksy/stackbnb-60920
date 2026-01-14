@@ -51,6 +51,11 @@ const TripPlannerChat = () => {
   });
   const [isLoading, setIsLoading] = useState(false);
 
+  const clearChat = () => {
+    sessionStorage.removeItem(CHAT_HISTORY_KEY);
+    setMessages([{ role: "assistant", content: initialMessage }]);
+  };
+
   // Persist messages to sessionStorage whenever they change
   useEffect(() => {
     sessionStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(messages));
@@ -204,6 +209,7 @@ const TripPlannerChat = () => {
         messages={messages}
         isLoading={isLoading}
         onSendMessage={sendMessage}
+        onClearChat={clearChat}
         hostVendors={hostVendors}
       />
     </PageTransition>
