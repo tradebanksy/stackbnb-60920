@@ -177,6 +177,7 @@ export function VendorLocationMap({ vendorName, vendorAddress, placeId }: Vendor
         style: 'mapbox://styles/mapbox/light-v11',
         bounds: bounds,
         fitBoundsOptions: { padding: 40 },
+        attributionControl: false, // Hide Mapbox attribution/logo
       });
 
       map.current.on('load', () => {
