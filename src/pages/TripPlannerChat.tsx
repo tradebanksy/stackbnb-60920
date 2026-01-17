@@ -280,6 +280,7 @@ const TripPlannerChat = () => {
         onSendMessage={sendMessage}
         onClearChat={clearChat}
         hostVendors={hostVendors}
+        isAuthenticated={isAuthenticated}
       />
     </PageTransition>
   );
