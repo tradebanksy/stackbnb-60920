@@ -76,4 +76,8 @@ export interface Itinerary {
   isConfirmed?: boolean;
   /** Timestamp when the itinerary was confirmed */
   confirmedAt?: string;
+  /** Share token for public sharing */
+  shareToken?: string;
+  /** Full share URL */
+  shareUrl?: string;
 }

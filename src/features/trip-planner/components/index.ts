@@ -9,3 +9,4 @@ export { ItineraryPage } from "./ItineraryPage";
 export { ItineraryDaySchedule } from "./ItineraryDaySchedule";
 export { EditableItineraryDaySchedule } from "./EditableItineraryDaySchedule";
 export { RegenerateDialog } from "./RegenerateDialog";
+export { ShareItineraryDialog } from "./ShareItineraryDialog";
