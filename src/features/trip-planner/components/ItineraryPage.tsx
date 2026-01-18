@@ -22,6 +22,7 @@ import { useItineraryContext, type RegenerateMode } from "../context/ItineraryCo
 import { ItineraryDaySchedule } from "./ItineraryDaySchedule";
 import { EditableItineraryDaySchedule } from "./EditableItineraryDaySchedule";
 import { RegenerateDialog, type RegenerateOption } from "./RegenerateDialog";
+import { ShareItineraryDialog } from "./ShareItineraryDialog";
 import type { ItineraryDay, Message } from "../types";
 
 function formatDateRange(startDate: string, endDate: string): string {
@@ -101,13 +102,17 @@ export function ItineraryPage({ messages = [] }: ItineraryPageProps) {
     hasUserEdits,
     isGenerating,
     isConfirmed,
+    isSharing,
+    shareUrl,
     confirmItinerary,
     unconfirmItinerary,
+    generateShareLink,
   } = useItineraryContext();
 
   const [selectedDayIndex, setSelectedDayIndex] = useState(0);
   const [isEditMode, setIsEditMode] = useState(false);
   const [showRegenerateDialog, setShowRegenerateDialog] = useState(false);
+  const [showShareDialog, setShowShareDialog] = useState(false);
 
   const selectedDay = useMemo(() => {
     if (!itinerary || !itinerary.days.length) return null;
@@ -151,6 +156,14 @@ export function ItineraryPage({ messages = [] }: ItineraryPageProps) {
 
   const handleUnlock = () => {
     unconfirmItinerary();
+  };
+
+  const handleShareClick = () => {
+    setShowShareDialog(true);
+  };
+
+  const handleGenerateShareLink = async () => {
+    await generateShareLink();
   };
 
   // Empty state
@@ -254,7 +267,7 @@ export function ItineraryPage({ messages = [] }: ItineraryPageProps) {
                   <Lock className="h-4 w-4 mr-2" />
                   Unlock
                 </Button>
-                <Button variant="outline" className="flex-1" disabled>
+                <Button variant="outline" className="flex-1" onClick={handleShareClick}>
                   <Share2 className="h-4 w-4 mr-2" />
                   Share
                 </Button>
@@ -308,6 +321,15 @@ export function ItineraryPage({ messages = [] }: ItineraryPageProps) {
           onOpenChange={setShowRegenerateDialog}
           onSelect={handleRegenerateSelect}
           hasUserEdits={hasUserEdits}
+        />
+
+        {/* Share Itinerary Dialog */}
+        <ShareItineraryDialog
+          open={showShareDialog}
+          onOpenChange={setShowShareDialog}
+          shareUrl={shareUrl}
+          isGenerating={isSharing}
+          onGenerateLink={handleGenerateShareLink}
         />
       </div>
     </PageTransition>

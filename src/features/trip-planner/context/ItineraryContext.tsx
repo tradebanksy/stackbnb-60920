@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback, useRef, type ReactNode } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import type { Message, Itinerary, ItineraryDay, ItineraryItem } from "../types";
 import { extractDestination, extractDates, extractActivities, generateDays } from "../utils";
 
@@ -10,8 +11,10 @@ interface ItineraryContextValue {
   itinerary: Itinerary | null;
   isGenerating: boolean;
   isSaving: boolean;
+  isSharing: boolean;
   hasUserEdits: boolean;
   isConfirmed: boolean;
+  shareUrl: string | null;
   generateItineraryFromChat: (messages: Message[], mode?: RegenerateMode) => void;
   updateItinerary: (partialUpdate: Partial<Itinerary>) => void;
   updateDayItems: (dayIndex: number, items: ItineraryItem[]) => void;
@@ -20,6 +23,7 @@ interface ItineraryContextValue {
   confirmItinerary: () => void;
   unconfirmItinerary: () => void;
   clearItinerary: () => void;
+  generateShareLink: () => Promise<string | null>;
 }
 
 const ItineraryContext = createContext<ItineraryContextValue | null>(null);
@@ -36,6 +40,7 @@ export function ItineraryProvider({ children }: ItineraryProviderProps) {
   const [itinerary, setItinerary] = useState<Itinerary | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isSharing, setIsSharing] = useState(false);
   const hasInitialized = useRef(false);
 
   // Load from storage on mount
@@ -206,6 +211,60 @@ export function ItineraryProvider({ children }: ItineraryProviderProps) {
     });
   }, []);
 
+  const generateShareLink = useCallback(async (): Promise<string | null> => {
+    if (!itinerary || !itinerary.isConfirmed) return null;
+    
+    // If we already have a share URL, return it
+    if (itinerary.shareUrl) return itinerary.shareUrl;
+    
+    setIsSharing(true);
+    
+    try {
+      // Generate a unique share token
+      const shareToken = crypto.randomUUID();
+      
+      // Get current user (optional - works for both logged-in and anonymous)
+      const { data: { user } } = await supabase.auth.getUser();
+      const userId = user?.id || crypto.randomUUID();
+      
+      // Create shared itinerary record in database
+      const { error } = await supabase
+        .from('shared_itineraries')
+        .insert({
+          share_token: shareToken,
+          user_id: userId,
+          title: `Trip to ${itinerary.destination}`,
+          is_public: true,
+        });
+
+      if (error) {
+        console.error('Error creating shared itinerary:', error);
+        return null;
+      }
+
+      // Build share URL
+      const baseUrl = window.location.origin;
+      const shareUrl = `${baseUrl}/shared/${shareToken}`;
+
+      // Update local itinerary with share info
+      setItinerary(prev => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          shareToken,
+          shareUrl,
+        };
+      });
+
+      return shareUrl;
+    } catch (error) {
+      console.error('Error generating share link:', error);
+      return null;
+    } finally {
+      setIsSharing(false);
+    }
+  }, [itinerary]);
+
   // Check if any items have been user-edited
   const hasUserEdits = itinerary?.days.some(day => 
     day.items.some(item => item.isUserEdited)
@@ -214,12 +273,17 @@ export function ItineraryProvider({ children }: ItineraryProviderProps) {
   // Check if itinerary is confirmed
   const isConfirmed = itinerary?.isConfirmed ?? false;
 
+  // Get share URL from itinerary
+  const shareUrl = itinerary?.shareUrl ?? null;
+
   const value: ItineraryContextValue = {
     itinerary,
     isGenerating,
     isSaving,
+    isSharing,
     hasUserEdits,
     isConfirmed,
+    shareUrl,
     generateItineraryFromChat,
     updateItinerary,
     updateDayItems,
@@ -228,6 +292,7 @@ export function ItineraryProvider({ children }: ItineraryProviderProps) {
     confirmItinerary,
     unconfirmItinerary,
     clearItinerary,
+    generateShareLink,
   };
 
   return (
