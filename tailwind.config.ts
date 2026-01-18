@@ -98,6 +98,11 @@ export default {
           "0%": { transform: "translateX(-100%)" },
           "100%": { transform: "translateX(100%)" },
         },
+        "gradient-rotate": {
+          "0%": { backgroundPosition: "0% 50%" },
+          "50%": { backgroundPosition: "100% 50%" },
+          "100%": { backgroundPosition: "0% 50%" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -105,6 +110,7 @@ export default {
         "shake": "shake 0.5s ease-in-out",
         "glow-pulse": "glow-pulse 2s ease-in-out infinite",
         "shimmer": "shimmer 3s ease-in-out infinite",
+        "gradient-rotate": "gradient-rotate 3s ease infinite",
       },
     },
   },
