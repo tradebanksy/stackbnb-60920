@@ -54,8 +54,14 @@ export function ChatInputArea({
       )}
     >
       <div className="max-w-2xl mx-auto">
-        {/* Gradient border wrapper */}
-        <div className="relative rounded-xl p-[2px] bg-gradient-to-r from-primary/50 via-purple-500/50 to-pink-500/50">
+        {/* Animated gradient border wrapper */}
+        <div 
+          className="relative rounded-xl p-[2px] animate-gradient-rotate"
+          style={{
+            background: "linear-gradient(90deg, hsl(var(--primary)), #a855f7, #ec4899, #f97316, hsl(var(--primary)))",
+            backgroundSize: "300% 100%",
+          }}
+        >
           <div className="relative flex items-end gap-2 rounded-[10px] border-0 bg-card p-2">
           <Textarea
             ref={textareaRef}
