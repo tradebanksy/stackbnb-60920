@@ -10,8 +10,15 @@ import type { StreamingStatus } from "../context/TripPlannerChatContext";
 const ThinkingIndicator = memo(function ThinkingIndicator() {
   return (
     <div className="flex justify-start animate-fade-in" role="status" aria-label="JC is thinking">
-      <Card className="max-w-[85%] p-3 bg-muted">
-        <div className="flex items-center gap-2">
+      <Card className="relative max-w-[85%] p-3 bg-muted overflow-hidden">
+        {/* Shimmer overlay */}
+        <div 
+          className="absolute inset-0 -translate-x-full animate-shimmer"
+          style={{
+            background: 'linear-gradient(90deg, transparent, hsl(var(--primary) / 0.08), transparent)',
+          }}
+        />
+        <div className="relative flex items-center gap-2">
           <span className="text-sm text-muted-foreground">JC is thinking</span>
           <span className="flex items-center gap-0.5">
             <span className="w-1.5 h-1.5 bg-primary/70 rounded-full animate-bounce [animation-delay:-0.3s]" />
