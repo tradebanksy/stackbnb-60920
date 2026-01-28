@@ -123,14 +123,25 @@ export function ChatSuggestionPills({ className, onOpenItinerary }: ChatSuggesti
   useEffect(() => {
     if (wasGeneratingRef.current && !isGenerating && didTriggerBuildRef.current) {
       didTriggerBuildRef.current = false;
-      if (!generationError) {
+      if (generationError) {
+        toast.error("Failed to generate itinerary", {
+          description: generationError.message || "Something went wrong. Please try again.",
+          action: generationError.retryable ? {
+            label: "Retry",
+            onClick: () => {
+              didTriggerBuildRef.current = true;
+              generateItineraryFromChat(messages, "full");
+            },
+          } : undefined,
+        });
+      } else {
         toast.success("Itinerary generated!", {
           description: "Your trip plan is ready to view and customize.",
         });
       }
     }
     wasGeneratingRef.current = isGenerating;
-  }, [isGenerating, generationError]);
+  }, [isGenerating, generationError, generateItineraryFromChat, messages]);
   
   const suggestions = useMemo(() => {
     return getSuggestions(messages.length, hasItineraryItems, hasDestination);
