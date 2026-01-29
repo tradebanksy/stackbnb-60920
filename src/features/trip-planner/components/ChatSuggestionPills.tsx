@@ -1,6 +1,6 @@
 import { useMemo, useCallback, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { Sparkles, Home, MapPin, Utensils, Calendar, Wand2 } from "lucide-react";
+import { Sparkles, Home, MapPin, Utensils, Calendar, Wand2, Share2 } from "lucide-react";
 import { toast } from "sonner";
 import { useTripPlannerChatContext } from "../context/TripPlannerChatContext";
 import { useItineraryContext } from "../context/ItineraryContext";
@@ -9,15 +9,35 @@ interface SuggestionPill {
   icon: React.ReactNode;
   label: string;
   prompt?: string;
-  action?: "openItinerary" | "buildItinerary";
+  action?: "openItinerary" | "buildItinerary" | "shareItinerary";
   variant?: "primary" | "secondary";
+}
+
+// Detect if AI has confirmed the itinerary is complete
+function detectItineraryComplete(messages: Array<{ role: string; content: string }>): boolean {
+  const lastAssistantMessages = messages
+    .filter(m => m.role === "assistant")
+    .slice(-2);
+  
+  const combinedText = lastAssistantMessages.map(m => m.content.toLowerCase()).join(" ");
+  
+  const completionPatterns = [
+    /itinerary\s+(?:is\s+)?(?:ready|complete|finished|all\s+set)/i,
+    /(?:your|the)\s+(?:trip|plan)\s+(?:is\s+)?(?:ready|complete|all\s+set)/i,
+    /(?:finalized|wrapped\s+up)\s+(?:your|the)\s+(?:itinerary|plan)/i,
+    /here(?:'s|\s+is)\s+your\s+(?:complete|full|final)\s+itinerary/i,
+    /(?:everything|all)\s+(?:is\s+)?planned\s+(?:out|for\s+you)/i,
+  ];
+  
+  return completionPatterns.some(pattern => pattern.test(combinedText));
 }
 
 // Context-aware suggestions based on conversation state
 function getSuggestions(
   messageCount: number,
   hasItineraryItems: boolean,
-  hasDestination: boolean
+  hasDestination: boolean,
+  isItineraryComplete: boolean
 ): SuggestionPill[] {
   // Initial state - conversational prompts
   if (messageCount <= 2) {
@@ -39,6 +59,16 @@ function getSuggestions(
 
   const suggestions: SuggestionPill[] = [];
 
+  // If itinerary is complete, show share option prominently
+  if (isItineraryComplete && hasItineraryItems) {
+    suggestions.push({
+      icon: <Share2 className="h-3.5 w-3.5" />,
+      label: "Generate shareable itinerary",
+      action: "shareItinerary",
+      variant: "primary",
+    });
+  }
+
   // If destination detected but no items yet, show "Build itinerary now" prominently
   if (hasDestination && !hasItineraryItems) {
     suggestions.push({
@@ -49,13 +79,13 @@ function getSuggestions(
     });
   }
 
-  // If user has items in itinerary, show view option prominently
+  // If user has items in itinerary, show view option
   if (hasItineraryItems) {
     suggestions.push({
       icon: <Calendar className="h-3.5 w-3.5" />,
       label: "View itinerary",
       action: "openItinerary",
-      variant: "primary",
+      variant: isItineraryComplete ? "secondary" : "primary",
     });
   }
 
@@ -109,9 +139,18 @@ interface ChatSuggestionPillsProps {
 
 export function ChatSuggestionPills({ className, onOpenItinerary }: ChatSuggestionPillsProps) {
   const { messages, sendMessage, isLoading } = useTripPlannerChatContext();
-  const { itinerary, generateItineraryFromChat, isGenerating, generationError } = useItineraryContext();
+  const { 
+    itinerary, 
+    generateItineraryFromChat, 
+    isGenerating, 
+    generationError,
+    confirmItinerary,
+    generateShareLink,
+    isSharing,
+  } = useItineraryContext();
   
   const detectedDestination = useMemo(() => detectDestination(messages), [messages]);
+  const isItineraryComplete = useMemo(() => detectItineraryComplete(messages), [messages]);
   const hasItineraryItems = itinerary?.days.some(day => day.items.length > 0) ?? false;
   const hasDestination = !!detectedDestination;
   
@@ -144,11 +183,30 @@ export function ChatSuggestionPills({ className, onOpenItinerary }: ChatSuggesti
   }, [isGenerating, generationError, generateItineraryFromChat, messages]);
   
   const suggestions = useMemo(() => {
-    return getSuggestions(messages.length, hasItineraryItems, hasDestination);
-  }, [messages.length, hasItineraryItems, hasDestination]);
+    return getSuggestions(messages.length, hasItineraryItems, hasDestination, isItineraryComplete);
+  }, [messages.length, hasItineraryItems, hasDestination, isItineraryComplete]);
 
-  const handleClick = useCallback((suggestion: SuggestionPill) => {
-    if (isLoading || isGenerating) return;
+  const handleClick = useCallback(async (suggestion: SuggestionPill) => {
+    if (isLoading || isGenerating || isSharing) return;
+    
+    // Handle "Generate shareable itinerary" action
+    if (suggestion.action === "shareItinerary") {
+      // First confirm the itinerary, then generate share link
+      confirmItinerary();
+      try {
+        await generateShareLink();
+        toast.success("Shareable link generated!", {
+          description: "Your itinerary is now ready to share.",
+        });
+        // Open the itinerary sheet to show the share options
+        onOpenItinerary?.();
+      } catch {
+        toast.error("Failed to generate share link", {
+          description: "Please try again.",
+        });
+      }
+      return;
+    }
     
     // Handle "Build itinerary now" action
     if (suggestion.action === "buildItinerary") {
@@ -169,7 +227,7 @@ export function ChatSuggestionPills({ className, onOpenItinerary }: ChatSuggesti
     if (suggestion.prompt) {
       sendMessage(suggestion.prompt);
     }
-  }, [isLoading, isGenerating, sendMessage, onOpenItinerary, generateItineraryFromChat, messages]);
+  }, [isLoading, isGenerating, isSharing, sendMessage, onOpenItinerary, generateItineraryFromChat, messages, confirmItinerary, generateShareLink]);
 
   // Only show after some conversation
   const userMessageCount = messages.filter(m => m.role === "user").length;
